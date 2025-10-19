@@ -1,0 +1,14 @@
+{% extends 'learning/base.html' %}
+{% load static %}
+
+{% block title %}Beranda - E-Learning{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <img src="{% static 'image/sekolah.jpg' %}" alt="Gedung Sekolah" class="hero-img">
+    <div class="hero-text">
+        <h2>SMKN 2 Baleendah</h2>
+        <a href="/login/" class="hero-btn">KLIK LOGIN</a>
+    </div>
+</section>
+{% endblock %}
