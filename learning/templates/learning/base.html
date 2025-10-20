@@ -8,19 +8,23 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <img src="{% static 'image/logo smk.jpg' %}" alt="Logo SMK">
-            <a href="{% url 'home' %}"><img src="{% static 'image/logo.smk.jpg' %}" alt= "back-home"</a>
-            </div>
-            <div class="welcome">Selamat Datang di E-Learning </div>
-            <a href="learning/login" class="login-link">Masuk</a>
+    <nav>
+        <div class="hero">
+            <img src="{% static 'image/Logo smk.jpg' %}" alt="Logo SMK">
+        </div>
+        <h2>WEB E-LEARNING SMKN 2 BALEENDAH</h2>
+        <ul>
+            <li>
+                <a href="{% url "home" %}">home</a>
+            </li>
+            <li>
+                <a href="{% url "login" %}">masuk</a>
+            </li>
+            
+        </ul>
 
-            
-            
-        </nav>
-    </header>
+    </nav>
+    
 
     <main>
         {% block content %}
@@ -28,7 +32,7 @@
     </main>
 
     <footer>
-        <p>© 2025 BelajarOnline | SMKN 2 BALEENDAH</p>
+        
     </footer>
 </body>
 </html>

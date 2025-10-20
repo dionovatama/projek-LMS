@@ -1,17 +1,25 @@
 {% extends 'learning/base.html' %}
-
 {% block content %}
-<div class="login-container">
-    <h2>Login ke E-Learning</h2>
-    <form method="post">
-        {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+<form method="POST">
+    {% csrf_token %}
+    <div class="welcome_login">
+        <h4>SILAHKAN LOGIN MENGGUNAKAN AKUN MASING-MASING</h4>
+    </div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+    <div class="form_login">
+        <label>Username:</label>
+        <input type="text" name="username" required><br>
 
-        <button type="submit">Masuk</button>
-    </form>
-</div>
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+
+        <button type="submit">Login</button>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</form>
 {% endblock %}

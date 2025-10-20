@@ -2,13 +2,16 @@
 {% load static %}
 
 {% block title %}Beranda - E-Learning{% endblock %}
-
 {% block content %}
-<section class="hero">
-    <img src="{% static 'image/sekolah.jpg' %}" alt="Gedung Sekolah" class="hero-img">
-    <div class="hero-text">
-        <h2>SMKN 2 Baleendah</h2>
-        <a href="/login/" class="hero-btn">KLIK LOGIN</a>
-    </div>
-</section>
+<div class="home">
+</div>
+<div class="home_button">
+    <div class="btn-home">    
+    <h2>SMKN 2 Baleendah</h2>
+    <a href="{% url "login" %}">Login</a>
+</div>
+
+
+
+
 {% endblock %}

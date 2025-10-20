@@ -1,155 +1,161 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-image: url('../image/bgr.jpg');
+   background-color: aliceblue;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
 }
+/* navbar mulai */
+nav {
+    background-color: rgb(14, 14, 65);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    position: relative;
+}
 
-/* Navbar */
+nav .hero img {
+    width: 60px;
+    height: auto;
+}
 
-.welcome {
+nav h2 {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    color: white;
-    font-weight: bold;
-    font-size: 30px;
+    margin: 0;
 }
 
-.navbar {
+nav ul {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #0056b3;
-    padding: 8px 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-} 
-
-.logo img {
-    height: 55px;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
 }
 
-.login-link {
+nav ul li a {
     text-decoration: none;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 17px;
-}
-
-.login-link:hover {
-    color: #ff0000;
-}
-
-/* Hero Section */
-.hero {
-    position: relative;
-    text-align: center;
-    top: 100px;
-}
-
-.hero-img {
-    width: 50%;
-    height: 50%;
-    object-fit: cover;
-    border-radius: 75px 75px 75px 75px;
-}
-
-.hero-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     color: white;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 25px 40px;
-    border-radius: 10px;
-}
-
-.hero-text h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.hero-btn {
-    display: inline-block;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 10px 25px;
-    border-radius: 8px;
+    font-weight: 600;
+    padding: 6px 0;
     transition: 0.3s;
 }
 
-.hero-btn:hover {
-    background-color: #0056b3;
+nav ul li a:hover {
+    border-bottom: 2px solid white;
 }
+/* navbar selesai */
 
-/* Footer */
-footer {
-    background: #007bff;
-    color: white;
+/* Home mulai */
+
+.home_button {
+    display: flex;
+    background-image:url("../image/sekolah.jpg");
+    background-position: center;
+    background-size: cover;
+    width: 50%;
+    height: 20%;
+    max-width: 350px;
+    margin: 70px auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    padding: 80px;
     text-align: center;
-    padding: 10px;
-    margin-top: 25%;
+    align-items: center;
+    justify-content: center;
+    
+    
+} 
+    
+.btn-home {
+    justify-content: center;
+    color: rgb(235, 235, 235);
+    text-align: center;
+    padding-left: 20px;
 }
 
+.btn-home a {
+    background-color: aliceblue;
+    text-decoration: none;
+    border: 30px;
+    background-size: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    
+}
 
-/* ====== LOGIN PAGE ====== */
-.login-container {
-    max-width: 400px;
+/* HOME SELESAI */
+
+/* form login mulai */
+form {
+    background-color: white;
+    width: 350px;
     margin: 100px auto;
-    padding: 40px;
-    background: white;
+    padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
 }
 
-.login-container h2 {
-    color: #007bff;
+.welcome_login h4 {
+    color: rgb(14, 14, 65);
     margin-bottom: 20px;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.form_login {
     text-align: left;
 }
 
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
+.form_login label {
+    font-weight: 600;
+    color: rgb(14, 14, 65);
 }
 
-.form-group input {
+.form_login input {
     width: 100%;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
-    font-size: 16px;
+    border-radius: 5px;
 }
 
 .btn-login {
-    background-color: #007bff;
+    background-color: rgb(14, 14, 65);
     color: white;
-    padding: 10px 20px;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: 0.3s;
 }
-
-
 
 .btn-login:hover {
-    background-color: #0056b3;
+    background-color: #2a2a8b;
 }
 
-.register-text {
-    margin-top: 15px;
+/* form login selesai */
+
+/* dashboard murid mulai */
+
+.mtk {
+    background-color: white;
+    width: 200px;
+    margin: 100px 40px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.mtk img {
+    width: 75%;
+}
+
+.mtk_h4 {
+    margin-bottom: 25px;
 }
