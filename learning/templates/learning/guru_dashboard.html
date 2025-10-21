@@ -1,2 +1,11 @@
 {% extends 'learning/base.html' %}
 {% load static %}
+
+{% block content %}
+
+<a href="{% url 'buat_tugas' %}" class="btn btn-primary" style="margin-top: 20px;">
+    ➕ Tambah Tugas
+</a>
+
+
+{% endblock content %}

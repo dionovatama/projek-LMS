@@ -4,13 +4,14 @@
 {% block title  %}dashboard murid{% endblock %}
 {% block content %}
   <div class="dashboard-container">
-        <h1 class="highlight">selamat datang, {{ request.user.username }} di E-learning</h1>
+        <h1 class="highlight">selamat datang {{ request.user.username }} di E-learning</h1>
         <p>Ini adalah dashboard siswa LMS kamu. Disini bisa ditambahkan menu, tugas, dan informasi lainnya.</p>
     </div>
 
   <div class="mtk">
     <img src="{% static "image/mtk.jpg" %}" alt="mtk">
     <h4>mata pelajaran matematika kelas 11</h4>
+      <a href="{% url "home" %}">masuk</a>
         <p>berisi tugas dan materi matematika</p>
   </div>
 

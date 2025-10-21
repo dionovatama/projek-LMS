@@ -1,0 +1,24 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h2>Tambah Tugas</h2>
+<form method="post">
+    {% csrf_token %}
+    <label>Pilih Bab:</label>
+    <select name="bab">
+        {% for b in bab_list %}
+        <option value="{{ b.id }}">{{ b.judul }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Nama Tugas:</label>
+    <input type="text" name="nama_tugas"><br><br>
+
+    <label>Deskripsi:</label>
+    <textarea name="deskripsi"></textarea><br><br>
+
+    <label>Deadline:</label>
+    <input type="date" name="deadline"><br><br>
+
+    <button type="submit">Simpan</button>
+</form>
+{% endblock %}
