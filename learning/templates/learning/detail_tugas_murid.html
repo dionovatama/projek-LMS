@@ -1,0 +1,11 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 10px;">
+    <h2>{{ tugas.judul }}</h2>
+    <p><strong>Deskripsi:</strong> {{ tugas.deskripsi }}</p>
+    <p><strong>Tanggal dibuat:</strong> {{ tugas.tanggal_dibuat }}</p>
+    <a href="{% url 'daftar_tugas_murid' %}" style="text-decoration: none; color: blue;">Kembali</a>
+    <a href="{% url 'kirim_tugas' tugas.id %}">Kumpulkan Tugas</a>
+
+</div>
+{% endblock %}

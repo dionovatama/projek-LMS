@@ -3,18 +3,31 @@
 
 {% block title  %}dashboard murid{% endblock %}
 {% block content %}
-  <div class="dashboard-container">
-        <h1 class="highlight">selamat datang {{ request.user.username }} di E-learning</h1>
-        <p>Ini adalah dashboard siswa LMS kamu. Disini bisa ditambahkan menu, tugas, dan informasi lainnya.</p>
-    </div>
+<div class="dashboard-container">
+  <h1 class="highlight">selamat datang {{ request.user.username }} di E-learning</h1>
+  <p>Ini adalah dashboard siswa LMS kamu. Disini bisa ditambahkan menu, tugas, dan informasi lainnya.</p>
+</div>
 
-  <div class="mtk">
-    <img src="{% static "image/mtk.jpg" %}" alt="mtk">
+<div class="mtk">
+  <img src="{% static "image/mtk.jpg" %}" alt="mtk">
     <h4>mata pelajaran matematika kelas 11</h4>
       <a href="{% url "home" %}">masuk</a>
         <p>berisi tugas dan materi matematika</p>
   </div>
 
+
+<div class="mapel-container">
+  {% for m in mapel_list %}
+  <div class="card">
+    <img src="{% static 'image/mtk.jpg' %}" alt="{{ m.nama_mapel }}">
+    <h3>{{ m.nama_mapel }}</h3>
+    <p>{{ m.deskripsi|default:"Belum ada deskripsi mapel." }}</p>
+    <a href="{% url 'daftar_tugas_per_mapel' m.id %}">Lihat Tugas</a>
+  </div>
+  {% empty %}
+  <p>Belum ada mata pelajaran terdaftar.</p>
+  {% endfor %}
+</div>
 
 
 

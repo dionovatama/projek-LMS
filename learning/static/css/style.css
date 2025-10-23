@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-   background-color: aliceblue;
+   background-color: rgb(243, 240, 255);
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -76,13 +76,13 @@ nav ul li a:hover {
     
 .btn-home {
     justify-content: center;
-    color: rgb(235, 235, 235);
+    color: rgb(255, 255, 255);
     text-align: center;
     padding-left: 20px;
 }
 
 .btn-home a {
-    background-color: aliceblue;
+    background-color: rgb(11, 7, 109);
     text-decoration: none;
     border: 30px;
     background-size: cover;
@@ -183,3 +183,5 @@ form {
 .mtk_h4 {
     margin-bottom: 25px;
 }
+
+

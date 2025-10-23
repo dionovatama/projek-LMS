@@ -1,0 +1,16 @@
+{% extends 'learning/base.html' %}
+{% block title %}Tugas {{ mapel.nama_mapel }}{% endblock %}
+
+{% block content %}
+<h2>Tugas untuk {{ mapel.nama_mapel }}</h2>
+
+{% for t in tugas_list %}
+<div class="card">
+  <h3>{{ t.judul }}</h3>
+  <p>{{ t.deskripsi|truncatechars:50 }}</p>
+  <a href="{% url 'detail_tugas_murid' t.id %}">Lihat detail</a>
+</div>
+{% empty %}
+<p>Tidak ada tugas untuk mapel ini.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h2>Kirim Tugas: {{ tugas.judul }}</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Upload File:</label><br>
+    <input type="file" name="file_jawaban"><br><br>
+
+    <label>Catatan (opsional):</label><br>
+    <textarea name="catatan" rows="4" cols="50"></textarea><br><br>
+
+    <button type="submit">Kirim Tugas</button>
+</form>
+{% endblock %}

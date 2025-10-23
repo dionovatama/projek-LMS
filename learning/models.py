@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 # ==========================
 # 1. Custom User
@@ -61,3 +62,16 @@ class Nilai(models.Model):
 
     def __str__(self):
         return f"{self.siswa.username} - {self.tugas.judul}: {self.nilai}"
+    
+    from django.conf import settings
+
+class PengumpulanTugas(models.Model):
+    tugas = models.ForeignKey('Tugas', on_delete=models.CASCADE)
+    siswa = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    file_jawaban = models.FileField(upload_to='tugas_siswa/', blank=True, null=True)
+    catatan = models.TextField(blank=True, null=True)
+    tanggal_kumpul = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='Menunggu Penilaian')
+
+    def __str__(self):
+        return f"{self.siswa.username} - {self.tugas.judul}"

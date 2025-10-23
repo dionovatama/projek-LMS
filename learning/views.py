@@ -12,9 +12,12 @@ def home(request):
 def guru_dashboard(request):
     return render(request, 'learning/guru_dashboard.html')
 
-def siswa_dashboard(request):
-    return render(request, 'learning/siswa_dashboard.html')
+from .models import Mapel
 
+def siswa_dashboard(request):
+    mapel_list = Mapel.objects.all()  # ambil semua mapel
+    context = {'mapel_list': mapel_list}
+    return render(request, 'learning/siswa_dashboard.html', context)
 
 def login_view(request):
     if request.method == 'POST':
@@ -30,8 +33,8 @@ def login_view(request):
             if hasattr(user, 'role'):  # supaya gak error kalau belum ada field role
                 if user.role == 'guru':
                     return redirect('dashboard_guru')
-                elif user.role == 'murid':
-                    return redirect('dashboard_murid')
+                elif user.role == 'siswa':
+                    return redirect('dashboard_siswa')
 
             return redirect('home')
         else:
@@ -47,18 +50,18 @@ from django.contrib import messages
 def buat_tugas(request):
     if request.user.role != 'guru':
         messages.error(request, 'Hanya guru yang bisa menambah tugas.')
-        return redirect('dashboard_murid')
+        return redirect('dashboard_siswa')
 
     if request.method == 'POST':
         bab_id = request.POST.get('bab')
-        nama_tugas = request.POST.get('nama_tugas')
+        judul = request.POST.get('nama_tugas')
         deskripsi = request.POST.get('deskripsi')
         deadline = request.POST.get('deadline')
 
         bab = Bab.objects.get(id=bab_id)
         Tugas.objects.create(
             bab=bab,
-            nama_tugas=nama_tugas,
+            judul=judul,
             deskripsi=deskripsi,
             deadline=deadline
         )
@@ -84,3 +87,55 @@ def tambah_bab(request):
 
     return render(request, 'learning/tambah_bab.html')
 
+from .models import Tugas
+
+@login_required
+def daftar_tugas_guru(request):
+    if request.user.role != 'guru':
+        return redirect('dashboard_siswa')
+    
+    tugas_list = Tugas.objects.filter(bab__mapel__guru=request.user)
+    return render(request, 'learning/daftar_tugas_guru.html', {'tugas_list': tugas_list})
+
+@login_required
+def daftar_tugas_murid(request):
+    tugas_list = Tugas.objects.all()  # nanti bisa difilter per mapel
+    return render(request, 'learning/daftar_tugas_murid.html', {'tugas_list': tugas_list})
+
+from django.shortcuts import render, get_object_or_404
+from .models import Tugas
+
+def detail_tugas_murid(request, tugas_id):
+    tugas = get_object_or_404(Tugas, id=tugas_id)
+    return render(request, 'learning/detail_tugas_murid.html', {'tugas': tugas})
+
+
+from .models import PengumpulanTugas
+
+@login_required
+def kirim_tugas(request, tugas_id):
+    tugas = Tugas.objects.get(id=tugas_id)
+
+    if request.method == 'POST':
+        file = request.FILES.get('file_jawaban')
+        catatan = request.POST.get('catatan')
+
+        PengumpulanTugas.objects.create(
+            tugas=tugas,
+            siswa=request.user,
+            file_jawaban=file,
+            catatan=catatan
+        )
+        messages.success(request, 'Tugas berhasil dikumpulkan!')
+        return redirect('detail_tugas_murid', tugas_id=tugas.id)
+
+    return render(request, 'learning/kirim_tugas.html', {'tugas': tugas})
+
+def daftar_tugas_per_mapel(request, mapel_id):
+    mapel = Mapel.objects.get(id=mapel_id)
+    tugas_list = Tugas.objects.filter(bab__mapel=mapel)
+    context = {
+        'mapel': mapel,
+        'tugas_list': tugas_list
+    }
+    return render(request, 'learning/daftar_tugas_per_mapel.html', context)
