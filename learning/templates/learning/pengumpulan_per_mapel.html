@@ -1,0 +1,29 @@
+{% extends 'learning/base.html' %}
+{% block title %}Pengumpulan Tugas - {{ mapel.nama_mapel }}{% endblock %}
+
+{% block content %}
+<h2>Pengumpulan Tugas - {{ mapel.nama_mapel }}</h2>
+
+{% if pengumpulan_list %}
+<table>
+  <tr>
+    <th>Siswa</th>
+    <th>Tugas</th>
+    <th>Catatan</th>
+    <th>File</th>
+    <th>Tanggal</th>
+  </tr>
+  {% for p in pengumpulan_list %}
+  <tr>
+    <td>{{ p.siswa.username }}</td>
+    <td>{{ p.tugas.judul }}</td>
+    <td>{{ p.catatan|default:"-" }}</td>
+    <td><a href="{{ p.file_jawaban.url }}">Download</a></td>
+    <td>{{ p.tanggal_kumpul|date:"d M Y, H:i" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Belum ada tugas yang dikumpulkan untuk mapel ini.</p>
+{% endif %}
+{% endblock %}

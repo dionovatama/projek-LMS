@@ -22,6 +22,8 @@ class CustomUser(AbstractUser):
 class Mapel(models.Model):
     nama = models.CharField(max_length=100)
     guru = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'guru'})
+    gambar = models.ImageField(upload_to='mapel/', blank=True, null=True)
+    deskripsi = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.nama
@@ -34,6 +36,7 @@ class Bab(models.Model):
     mapel = models.ForeignKey(Mapel, on_delete=models.CASCADE, related_name='bab_list')
     judul = models.CharField(max_length=200)
     deskripsi = models.TextField(default='', blank=True)  # <-- fix ini bro
+
 
     def __str__(self):
         return f"{self.judul} - {self.mapel.nama}"
@@ -50,10 +53,24 @@ class Tugas(models.Model):
 
     def __str__(self):
         return f"{self.judul} ({self.bab.judul})"
+    
+
+# ==========================
+# 5.pengumpulan Tugas
+# ==========================
+
+class PengumpulanTugas(models.Model):
+    tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE)
+    siswa = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    file_jawaban = models.FileField(upload_to='tugas_siswa/')
+    catatan = models.TextField(blank=True)
+    nilai = models.FloatField(blank=True, null=True)
+    tanggal_kumpul = models.DateTimeField(auto_now_add=True)
+
 
 
 # ==========================
-# 5. Nilai (Otomatis untuk Siswa per Tugas)
+# 6. Nilai (Otomatis untuk Siswa per Tugas)
 # ==========================
 class Nilai(models.Model):
     tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE, related_name='nilai_tugas')

@@ -1,11 +1,24 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<div class="container mt-4">
-  <h2>Tambah Bab Baru</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Simpan Bab</button>
-  </form>
-</div>
+<h2>Tambah Bab Baru</h2>
+
+<form method="POST">
+  {% csrf_token %}
+
+  <label for="mapel">Pilih Mata Pelajaran:</label>
+  <select name="mapel" id="mapel" required>
+    <option value="">-- Pilih Mapel --</option>
+    {% for m in mapel_list %}
+      <option value="{{ m.id }}">{{ m.nama}}</option>
+    {% endfor %}
+  </select>
+
+  <label for="judul">Judul Bab:</label>
+  <input type="text" name="judul" id="judul" required>
+
+  <label for="deskripsi">Deskripsi:</label>
+  <textarea name="deskripsi" id="deskripsi" rows="3"></textarea>
+
+  <button type="submit">Tambah Bab</button>
+</form>
 {% endblock %}

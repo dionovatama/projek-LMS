@@ -7,5 +7,15 @@
     ➕ Tambah Tugas
 </a>
 
+<a href="{% url 'daftar_pengumpulan_tugas' %}" class="btn">📥 Lihat Pengumpulan Tugas</a>
+
+
+<div style="text-align: right; margin-bottom: 20px;">
+  <a href="{% url 'tambah_bab' %}" class="btn btn-primary">+ Tambah Bab</a>
+</div>
+{% if user.role == 'guru' %}
+  <a href="{% url 'tambah_bab' %}" class="btn">+ Tambah Bab</a>
+{% endif %}
+
 
 {% endblock content %}

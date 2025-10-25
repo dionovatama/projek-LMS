@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Mapel, Bab, Tugas
+from .models import Mapel
 
 
 class CustomUserAdmin(UserAdmin):

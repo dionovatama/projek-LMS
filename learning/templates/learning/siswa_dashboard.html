@@ -19,7 +19,11 @@
 <div class="mapel-container">
   {% for m in mapel_list %}
   <div class="card">
-    <img src="{% static 'image/mtk.jpg' %}" alt="{{ m.nama_mapel }}">
+    {% if m.gambar %}
+      <img src="{{ m.gambar.url }}" alt="{{ m.nama_mapel }}">
+    {% else %}
+      <img src="{% static 'image/default.jpg' %}" alt="Default">
+    {% endif %}
     <h3>{{ m.nama_mapel }}</h3>
     <p>{{ m.deskripsi|default:"Belum ada deskripsi mapel." }}</p>
     <a href="{% url 'daftar_tugas_per_mapel' m.id %}">Lihat Tugas</a>

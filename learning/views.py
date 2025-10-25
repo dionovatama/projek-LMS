@@ -12,12 +12,33 @@ def home(request):
 def guru_dashboard(request):
     return render(request, 'learning/guru_dashboard.html')
 
-from .models import Mapel
+from .models import Mapel, Bab
 
 def siswa_dashboard(request):
     mapel_list = Mapel.objects.all()  # ambil semua mapel
     context = {'mapel_list': mapel_list}
     return render(request, 'learning/siswa_dashboard.html', context)
+
+from .models import Mapel, Bab
+
+def tambah_bab(request):
+    mapel_list = Mapel.objects.all()
+
+    if request.method == "POST":
+        mapel_id = request.POST.get("mapel")
+        judul = request.POST.get("judul")
+        deskripsi = request.POST.get("deskripsi")
+
+        # Ambil mapel sesuai id yang dipilih
+        mapel = Mapel.objects.get(id=mapel_id)
+
+        # Simpan bab baru
+        Bab.objects.create(mapel=mapel, judul=judul, deskripsi=deskripsi)
+
+        return redirect('dashboard_guru')  # balik ke dashboard setelah berhasil
+
+    return render(request, 'learning/tambah_bab.html', {'mapel_list': mapel_list})
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -43,8 +64,33 @@ def login_view(request):
     return render(request, 'learning/login.html')
 
 
-from .models import Bab, Tugas
+from .models import Bab, Tugas, Mapel, PengumpulanTugas
 from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
+
+def pengumpulan_per_mapel(request, mapel_id):
+    mapel = get_object_or_404(Mapel, id=mapel_id)
+    tugas_list = Tugas.objects.filter(bab__mapel=mapel)
+    pengumpulan_list = PengumpulanTugas.objects.filter(tugas__in=tugas_list)
+
+    context = {
+        'mapel': mapel,
+        'pengumpulan_list': pengumpulan_list
+    }
+    return render(request, 'learning/pengumpulan_per_mapel.html', context)
+
+
+# Pengumpulan per Bab
+def pengumpulan_per_bab(request, bab_id):
+    bab = get_object_or_404(Bab, id=bab_id)
+    tugas_list = Tugas.objects.filter(bab=bab)
+    pengumpulan_list = PengumpulanTugas.objects.filter(tugas__in=tugas_list)
+
+    context = {
+        'bab': bab,
+        'pengumpulan_list': pengumpulan_list
+    }
+    return render(request, 'learning/pengumpulan_per_bab.html', context)
 
 
 def buat_tugas(request):
@@ -71,21 +117,24 @@ def buat_tugas(request):
     bab_list = Bab.objects.filter(mapel__guru=request.user)
     return render(request, 'learning/tambah_tugas.html', {'bab_list': bab_list})
 
-from .models import Bab
+@login_required
+def daftar_pengumpulan_tugas(request):
+    if request.user.role != 'guru':
+        messages.error(request, "Hanya guru yang bisa melihat pengumpulan tugas.")
+        return redirect('dashboard_siswa')
+    
+    # Ambil semua pengumpulan tugas dari mapel yang diajar guru
+    pengumpulan_list = PengumpulanTugas.objects.filter(
+        tugas__bab__mapel__guru=request.user
+    ).select_related('tugas', 'siswa', 'tugas__bab__mapel')
+
+    return render(request, 'learning/daftar_pengumpulan_tugas.html', {
+        'pengumpulan_list': pengumpulan_list
+    })
+
+
 from django.contrib.auth.decorators import login_required
 
-
-def tambah_bab(request):
-    if request.method == 'POST':
-        nama_bab = request.POST.get('nama_bab')
-        mapel_id = request.POST.get('mapel_id')
-
-        if nama_bab and mapel_id:
-            bab = Bab.objects.create(nama_bab=nama_bab, mapel_id=mapel_id)
-            bab.save()
-            return redirect('dashboard_guru')  # arahkan ke halaman dashboard guru setelah tambah
-
-    return render(request, 'learning/tambah_bab.html')
 
 from .models import Tugas
 
