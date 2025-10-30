@@ -8,6 +8,7 @@ from .forms import  MapelForm, PengumpulanTugasForm
 from django import forms
 from django.utils import timezone
 from datetime import datetime
+from .forms import TugasForm
 
 
 from .models import (
@@ -216,8 +217,6 @@ def rekap_nilai_view(request, bab_id):
     return render(request, 'learning/rekap_nilai.html', context)
 
 
-
-
 @login_required
 def tambah_tugas(request):
     if request.user.role != 'guru':
@@ -233,28 +232,25 @@ def tambah_tugas(request):
         bab_obj = get_object_or_404(Bab, id=bab_id_default)
 
     if request.method == 'POST':
-        bab_id = request.POST.get('bab') or bab_id_default
-        judul = request.POST.get('judul')
-        deskripsi = request.POST.get('deskripsi')
-        deadline = request.POST.get('deadline')
-
-        bab = get_object_or_404(Bab, id=bab_id)
-        Tugas.objects.create(
-            bab=bab,
-            judul=judul,
-            deskripsi=deskripsi,
-            deadline=deadline
-        )
-        messages.success(request, 'Tugas berhasil ditambahkan!')
-        return redirect('detail_bab_guru', bab_id=bab.id)
+        form = TugasForm(request.POST, request.FILES)  # <-- tambahkan FILES
+        if form.is_valid():
+            tugas = form.save(commit=False)
+            bab_id = request.POST.get('bab') or bab_id_default
+            bab = get_object_or_404(Bab, id=bab_id)
+            tugas.bab = bab
+            tugas.save()
+            messages.success(request, 'Tugas berhasil ditambahkan!')
+            return redirect('detail_bab_guru', bab_id=bab.id)
+        else:
+            messages.error(request, 'Terjadi kesalahan, periksa kembali inputan Anda.')
+    else:
+        form = TugasForm()
 
     return render(request, 'learning/tambah_tugas.html', {
+        'form': form,
         'bab_list': bab_list,
-        'bab': bab_obj  # <── ini penting biar template gak error
+        'bab': bab_obj
     })
-
-
-
 
 
 # ========================

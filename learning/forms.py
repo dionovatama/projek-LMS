@@ -10,7 +10,7 @@ class MapelForm(forms.ModelForm):
 class TugasForm(forms.ModelForm):
     class Meta:
         model = Tugas
-        fields = ['bab', 'judul', 'deskripsi', 'file_tugas', 'deadline']
+        fields = ['judul', 'deskripsi', 'file_tugas', 'deadline']
 
 
 class PenilaianForm(forms.ModelForm):

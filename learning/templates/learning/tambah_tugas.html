@@ -1,40 +1,21 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3>📝 Tambah Tugas</h3>
-    <hr>
+<h2>Tambah Tugas Baru</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="bab">Pilih Bab:</label>
+    <select name="bab" required>
+        {% for bab in bab_list %}
+            <option value="{{ bab.id }}" {% if bab_obj and bab_obj.id == bab.id %}selected{% endif %}>
+                {{ bab.judul }} - {{ bab.mapel.nama }}
+            </option>
+        {% endfor %}
+    </select><br><br>
 
-  <form method="POST">
-  {% csrf_token %}
+    {{ form.as_p }}
 
-  <div class="mb-3">
-    <label for="bab" class="form-label">Pilih Bab</label>
-    <select name="bab" id="bab" class="form-control" required>
-      <option value="">-- Pilih Bab --</option>
-      {% for bab in bab_list %}
-        <option value="{{ bab.id }}" {% if bab.id|stringformat:"s" == request.GET.bab %}selected{% endif %}>
-          {{ bab.judul }} ({{ bab.mapel.nama }})
-        </option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label for="judul" class="form-label">Judul Tugas</label>
-    <input type="text" name="judul" id="judul" class="form-control" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="deskripsi" class="form-label">Deskripsi</label>
-    <textarea name="deskripsi" id="deskripsi" class="form-control" rows="4"></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label for="deadline" class="form-label">Deadline</label>
-    <input type="datetime-local" name="deadline" id="deadline" class="form-control">
-  </div>
-
-  <button type="submit" class="btn btn-primary">Tambah Tugas</button>
+    <button type="submit" class="btn btn-primary">Simpan</button>
 </form>
 
+<a href="{% url 'dashboard_guru' %}">⬅️ Kembali</a>
 {% endblock %}
