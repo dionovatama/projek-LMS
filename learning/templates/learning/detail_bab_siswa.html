@@ -1,0 +1,28 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h1>{{ bab.judul }}</h1>
+<p>{{ bab.deskripsi }}</p>
+
+<hr>
+<h2>Daftar Tugas</h2>
+{% if tugas_list %}
+    <ul>
+        {% for tugas in tugas_list %}
+            <li style="margin-bottom: 10px;">
+                <strong>{{ tugas.judul }}</strong><br>
+                {{ tugas.deskripsi }}<br>
+                Deadline: {{ tugas.deadline|date:"d M Y H:i" }}<br>
+                <a href="{% url 'detail_tugas_siswa' tugas.id %}" style="text-decoration: none; color: blue;">
+                    📘 Lihat Detail
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Belum ada tugas di bab ini.</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'detail_mapel_siswa' bab.mapel.id %}">⬅️ Kembali ke {{ bab.mapel.nama }}</a>
+
+{% endblock %}

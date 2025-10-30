@@ -1,0 +1,40 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+
+<h2>Pengumpulan Tugas: {{ tugas.judul }}</h2>
+<hr>
+
+{% if pengumpulan_list %}
+    <ul>
+        {% for p in pengumpulan_list %}
+            <li>
+                <strong>Nama Siswa:</strong> {{ p.siswa.username }}<br>
+                <small>Waktu: {{ p.waktu_dikumpulkan|date:"d M Y, H:i" }}</small><br><br>
+
+                {% if p.jawaban_teks %}
+                    <p><strong>Jawaban Teks:</strong><br>{{ p.jawaban_teks }}</p>
+                {% endif %}
+
+                {% if p.jawaban_file %}
+                    <p><a href="{{ p.jawaban_file.url }}" target="_blank">📄 Lihat File Jawaban</a></p>
+                {% endif %}
+
+                {% if p.nilai %}
+                    <p><strong>Nilai:</strong> {{ p.nilai }}</p>
+                {% else %}
+                    <p><em>Belum dinilai</em></p>
+                {% endif %}
+
+                <a href="{% url 'nilai_tugas' p.id %}">✏️ Beri Nilai</a>
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Belum ada siswa yang mengumpulkan tugas ini.</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'dashboard_guru' %}">⬅️ Kembali ke Dashboard Guru</a>
+
+{% endblock %}

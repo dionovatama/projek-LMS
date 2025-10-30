@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah Mapel</title>
+</head>
+<body>
+    <h1>Tambah Mapel Baru</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Nama Mapel:</label><br>
+        <input type="text" name="nama" required><br><br>
+
+        <label>Kelas:</label><br>
+        <select name="kelas" required>
+            <option value="">-- Pilih Kelas --</option>
+            {% for k in kelas_list %}
+                <option value="{{ k.id }}">{{ k.nama }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label>Deskripsi:</label><br>
+        <textarea name="deskripsi" rows="4" cols="50"></textarea><br><br>
+
+        <label>Gambar:</label><br>
+        <input type="file" name="gambar"><br><br>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <br>
+    <a href="{% url 'dashboard_guru' %}">Kembali</a>
+</body>
+</html>

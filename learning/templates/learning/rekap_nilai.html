@@ -1,0 +1,41 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>📈 Rekap Nilai Siswa - {{ bab.judul }}</h3>
+    <p><strong>Mapel:</strong> {{ bab.mapel.nama }}</p>
+    <hr>
+
+    {% if rekap %}
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-success">
+            <tr>
+                <th>No</th>
+                <th>Nama Siswa</th>
+                <th>Jumlah Tugas Dikerjakan</th>
+                <th>Rata-rata Nilai</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in rekap %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ data.siswa__username }}</td>
+                <td>{{ data.jumlah_tugas }}</td>
+                <td>
+                    {% if data.rata_rata %}
+                        {{ data.rata_rata|floatformat:2 }}
+                    {% else %}
+                        <span class="text-muted">Belum Dinilai</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="text-muted">Belum ada nilai untuk bab ini.</p>
+    {% endif %}
+
+    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn btn-secondary mt-3">⬅ Kembali ke Bab</a>
+</div>
+{% endblock %}

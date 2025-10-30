@@ -1,29 +1,39 @@
 {% extends 'learning/base.html' %}
-{% block title %}Pengumpulan Tugas - {{ mapel.nama_mapel }}{% endblock %}
-
 {% block content %}
-<h2>Pengumpulan Tugas - {{ mapel.nama_mapel }}</h2>
+<h2>Pengumpulan Tugas: {{ tugas.judul }}</h2>
 
 {% if pengumpulan_list %}
-<table>
-  <tr>
-    <th>Siswa</th>
-    <th>Tugas</th>
-    <th>Catatan</th>
-    <th>File</th>
-    <th>Tanggal</th>
-  </tr>
-  {% for p in pengumpulan_list %}
-  <tr>
-    <td>{{ p.siswa.username }}</td>
-    <td>{{ p.tugas.judul }}</td>
-    <td>{{ p.catatan|default:"-" }}</td>
-    <td><a href="{{ p.file_jawaban.url }}">Download</a></td>
-    <td>{{ p.tanggal_kumpul|date:"d M Y, H:i" }}</td>
-  </tr>
-  {% endfor %}
-</table>
+    <ul>
+    {% for pengumpulan in pengumpulan_list %}
+        <li>
+            <strong>{{ pengumpulan.siswa.username }}</strong><br>
+            <small>Waktu: {{ pengumpulan.waktu_dikumpulkan|date:"d M Y, H:i" }}</small><br><br>
+
+            {% if pengumpulan.jawaban_teks %}
+                <p><strong>Jawaban Teks:</strong></p>
+                <p>{{ pengumpulan.jawaban_teks }}</p>
+            {% endif %}
+
+            {% if pengumpulan.jawaban_file %}
+                <p><a href="{{ pengumpulan.jawaban_file.url }}" target="_blank">📄 Lihat File Jawaban</a></p>
+            {% endif %}
+
+            {% if pengumpulan.nilai %}
+                <p><strong>Nilai:</strong> {{ pengumpulan.nilai }}</p>
+            {% else %}
+                <p><em>Belum dinilai</em></p>
+            {% endif %}
+
+            {% if pengumpulan.komentar_guru %}
+                <p><strong>Komentar Guru:</strong> {{ pengumpulan.komentar_guru }}</p>
+            {% endif %}
+        </li>
+        <hr>
+    {% endfor %}
+    </ul>
 {% else %}
-<p>Belum ada tugas yang dikumpulkan untuk mapel ini.</p>
+    <p>Belum ada siswa yang mengumpulkan tugas ini.</p>
 {% endif %}
+
+<a href="{% url 'dashboard_guru' %}">⬅️ Kembali ke Dashboard Guru</a>
 {% endblock %}

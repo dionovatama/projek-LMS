@@ -1,0 +1,24 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h1>{{ mapel.nama }} - {{ mapel.kelas.nama }}</h1>
+
+    <h2>Daftar Bab</h2>
+    {% if bab_list %}
+        <ul>
+            {% for bab in bab_list %}
+                <li>
+                    <a href="{% url 'detail_bab_siswa' bab.id %}">
+                        {{ bab.judul }}
+                    </a><br>
+                    {{ bab.deskripsi }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Belum ada bab untuk mapel ini.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'dashboard_siswa' %}">⬅️ Kembali ke Dashboard</a>
+    
+{% endblock %}

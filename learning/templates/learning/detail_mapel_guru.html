@@ -1,0 +1,32 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+
+<a href="{% url 'absensi_mapel' mapel.id %}" class="btn btn-warning mt-3">📋 Lihat / Tambah Absensi</a>
+
+<div class="container mt-4">
+    <h3>📘 {{ mapel.nama }} - {{ mapel.kelas.nama }}</h3>
+    <hr>
+
+    <div class="mb-3">
+        <a href="{% url 'tambah_bab' %}" class="btn btn-success">+ Tambah Bab</a>
+    </div>
+
+    {% if bab_list %}
+        <ul class="list-group">
+            {% for bab in bab_list %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ bab.judul }}</strong><br>
+                        <small class="text-muted">{{ bab.deskripsi }}</small>
+                    </div>
+                    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn btn-primary btn-sm">
+                        Lihat Tugas
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Belum ada Bab di mapel ini.</p>
+    {% endif %}
+</div>
+{% endblock %}

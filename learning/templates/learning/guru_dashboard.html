@@ -1,21 +1,34 @@
+<!DOCTYPE html>
 {% extends 'learning/base.html' %}
-{% load static %}
-
+<html>
+<head>
+    <title>Dashboard Guru</title>
+</head>
 {% block content %}
+<body>
+    <h1>Dashboard Guru</h1>
+    <h2>Daftar Mapel yang Anda Ajar</h2>
 
-<a href="{% url 'tambah_tugas' %}" class="btn btn-primary" style="margin-top: 20px;">
-    ➕ Tambah Tugas
-</a>
+    <a href="{% url 'tambah_mapel' %}">➕ Tambah Mapel Baru</a>
+    <br><br>
 
-<a href="{% url 'daftar_pengumpulan_tugas' %}" class="btn">📥 Lihat Pengumpulan Tugas</a>
+    {% if mapel_list %}
+        {% for mapel in mapel_list %}
+            <div style="margin-bottom: 30px;">
+                {% if mapel.gambar %}
+                    <img src="{{ mapel.gambar.url }}" width="150" alt="{{ mapel.nama }}">
+                {% endif %}
+                <h3>{{ mapel.nama }} - {{ mapel.kelas.nama }}</h3>
+                <p>{{ mapel.deskripsi|default:"(Tidak ada deskripsi)" }}</p>
 
-
-<div style="text-align: right; margin-bottom: 20px;">
-  <a href="{% url 'tambah_bab' %}" class="btn btn-primary">+ Tambah Bab</a>
-</div>
-{% if user.role == 'guru' %}
-  <a href="{% url 'tambah_bab' %}" class="btn">+ Tambah Bab</a>
-{% endif %}
-
-
+                <a href="{% url 'detail_mapel_guru' mapel.id %}">📘 Lihat Detail</a> |
+                <a href="{% url 'edit_mapel' mapel.id %}">✏️ Edit Mapel</a>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>Belum ada mapel yang Anda ajar.</p>
+    {% endif %}
+</body>
+</html>
 {% endblock content %}

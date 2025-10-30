@@ -1,0 +1,36 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+{% if pengumpulan %}
+        <p><strong>Status:</strong> Sudah dikumpulkan</p>
+        {% if pengumpulan.nilai %}
+            <p><strong>Nilai:</strong> {{ pengumpulan.nilai }}</p>
+        {% else %}
+            <p><strong>Nilai:</strong> Belum dinilai</p>
+        {% endif %}
+        {% if pengumpulan.file %}
+            <p><strong>File dikumpulkan:</strong>
+                <a href="{{ pengumpulan.file.url }}">Download</a>
+            </p>
+        {% endif %}
+        {% if pengumpulan.komentar_guru %}
+            <p><strong>Komentar Guru:</strong> {{ pengumpulan.komentar_guru }}</p>
+        {% endif %}
+    {% else %}
+        <p><strong>Status:</strong> Belum dikumpulkan</p>
+    {% endif %}
+
+    <hr>
+    <h2>Kumpulkan Jawaban</h2>
+   <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Upload File (opsional):</label><br>
+    <input type="file" name="jawaban_file"><br><br>  <!-- sesuai view -->
+
+    <label>Tulis Jawaban (opsional):</label><br>
+    <textarea name="jawaban_teks" rows="4" cols="50"></textarea><br><br>
+
+    <button type="submit">Kirim Jawaban</button>
+</form>
+
+
+{% endblock %}

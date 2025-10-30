@@ -1,0 +1,51 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h2>Absensi {{ mapel.nama }}</h2>
+
+<form method="get" class="mb-3">
+  <label for="tanggal">Pilih tanggal:</label>
+  <input type="date" id="tanggal" name="tanggal" value="{{ tanggal|date:'Y-m-d' }}">
+  <button type="submit">Lihat</button>
+</form>
+
+<h3>Absensi Tanggal: {{ tanggal|date:"M. d, Y" }}</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Nama Siswa</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for siswa in siswa_list %}
+        <tr>
+          <td>{{ siswa.user.username }}</td>
+          <td>
+            <select name="status_{{ siswa.id }}">
+              <option value="">-- Pilih --</option>
+              <option value="hadir" {% if siswa.status_absen == 'hadir' %}selected{% endif %}>Hadir</option>
+              <option value="izin" {% if siswa.status_absen == 'izin' %}selected{% endif %}>Izin</option>
+              <option value="sakit" {% if siswa.status_absen == 'sakit' %}selected{% endif %}>Sakit</option>
+              <option value="alpa" {% if siswa.status_absen == 'alpa' %}selected{% endif %}>Alpa</option>
+            </select>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <br>
+  <button type="submit">Simpan</button>
+</form>
+
+{% if sudah_ada %}
+  <p style="margin-top: 10px;">
+    <a href="{% url 'ubah_absensi_view' mapel.id tanggal|date:'Y-m-d' %}">
+      ✏️ Ubah absensi tanggal ini
+    </a>
+  </p>
+{% endif %}
+{% endblock %}

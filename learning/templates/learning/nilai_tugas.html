@@ -1,0 +1,36 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<h2>Nilai Tugas: {{ pengumpulan.tugas.judul }}</h2>
+
+<p><strong>Siswa:</strong> {{ pengumpulan.siswa.username }}</p>
+
+{% if pengumpulan.jawaban_teks %}
+    <p><strong>Jawaban Teks:</strong><br>{{ pengumpulan.jawaban_teks }}</p>
+{% endif %}
+
+{% if pengumpulan.jawaban_file %}
+    <p><strong>File Jawaban:</strong>
+        <a href="{{ pengumpulan.jawaban_file.url }}" target="_blank">📄 Lihat File</a>
+    </p>
+{% endif %}
+
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="id_nilai">Nilai:</label>
+        {{ form.nilai }}
+    </div>
+    <br>
+    <div>
+        <label for="id_komentar_guru">Komentar guru:</label><br>
+        {{ form.komentar_guru }}
+    </div>
+    <br>
+    <button type="submit">💾 Simpan Nilai</button>
+</form>
+
+<hr>
+<a href="{% url 'pengumpulan_tugas' pengumpulan.tugas.id %}">⬅️ Kembali ke Daftar Pengumpulan</a>
+{% endblock %}

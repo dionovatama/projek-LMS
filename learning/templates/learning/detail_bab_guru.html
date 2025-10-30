@@ -1,0 +1,30 @@
+{% extends 'learning/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3 class="fw-bold text-success">📘 {{ bab.judul }}</h3>
+    <p class="text-muted">{{ bab.deskripsi }}</p>
+    <hr>
+
+    <a href="{% url 'tambah_tugas' %}?bab={{ bab.id }}" class="btn btn-primary mb-4">Tambah Tugas</a>
+
+    {% if tugas_list %}
+        {% for tugas in tugas_list %}
+            <div class="card mb-3 shadow-sm border-0" style="background-color: #f8f9fa;">
+                <div class="card-body">
+                    <h5 class="card-title fw-semibold text-dark">{{ tugas.judul }}</h5>
+                    <p class="card-text">{{ tugas.deskripsi }}</p>
+                    <p class="mb-2"><strong>Deadline:</strong> {{ tugas.deadline|date:"M d, Y, H:i a" }}</p>
+
+                    <a href="{% url 'pengumpulan_tugas' tugas.id %}" class="btn btn-outline-primary btn-sm">
+                        📥 Lihat Pengumpulan
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted fst-italic">Belum ada tugas di bab ini.</p>
+    {% endif %}
+</div>
+<a href="{% url 'rekap_nilai' bab.id %}" class="btn btn-success mt-2">📊 Rekap Nilai</a>
+
+{% endblock %}

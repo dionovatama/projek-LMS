@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Mapel, Bab, Tugas
-from .models import Mapel
+from .models import CustomUser
+from .models import Kelas, Mapel, Bab, Tugas, PengumpulanTugas, GuruProfile, SiswaProfile
+
 
 
 class CustomUserAdmin(UserAdmin):
@@ -28,4 +29,7 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Mapel)
 admin.site.register(Bab)
 admin.site.register(Tugas)
-
+admin.site.register(Kelas)
+admin.site.register(PengumpulanTugas)
+admin.site.register(GuruProfile)
+admin.site.register(SiswaProfile)
