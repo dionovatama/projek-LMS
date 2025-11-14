@@ -76,13 +76,20 @@ nav ul li a:hover {
     
 .btn-home {
     justify-content: center;
-    color: rgb(255, 255, 255);
+    color: rgb(255, 254, 254);
     text-align: center;
     padding-left: 20px;
 }
 
+.login-home {
+    background-color: rgb(40, 40, 82);
+    color: white;
+    font-size: medium;
+}
+
+
 .btn-home a {
-    background-color: rgb(11, 7, 109);
+    background-color: rgb(5, 5, 17);
     text-decoration: none;
     border: 30px;
     background-size: cover;

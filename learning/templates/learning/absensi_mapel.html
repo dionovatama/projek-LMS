@@ -1,51 +1,111 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<h2>Absensi {{ mapel.nama }}</h2>
 
-<form method="get" class="mb-3">
-  <label for="tanggal">Pilih tanggal:</label>
-  <input type="date" id="tanggal" name="tanggal" value="{{ tanggal|date:'Y-m-d' }}">
-  <button type="submit">Lihat</button>
-</form>
+<style>
+    body {
+        background: #f0f3ff;
+    }
+    .card-custom {
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .header-grad {
+        background: linear-gradient(90deg, #0d47a1, #2962ff);
+        padding: 20px 25px;
+        border-radius: 0 0 20px 20px;
+        color: white;
+    }
+    select {
+        border-radius: 10px !important;
+    }
+    .btn-modern {
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        padding: 8px 20px;
+    }
+</style>
 
-<h3>Absensi Tanggal: {{ tanggal|date:"M. d, Y" }}</h3>
 
-<form method="post">
-  {% csrf_token %}
-  <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Nama Siswa</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for siswa in siswa_list %}
-        <tr>
-          <td>{{ siswa.user.username }}</td>
-          <td>
-            <select name="status_{{ siswa.id }}">
-              <option value="">-- Pilih --</option>
-              <option value="hadir" {% if siswa.status_absen == 'hadir' %}selected{% endif %}>Hadir</option>
-              <option value="izin" {% if siswa.status_absen == 'izin' %}selected{% endif %}>Izin</option>
-              <option value="sakit" {% if siswa.status_absen == 'sakit' %}selected{% endif %}>Sakit</option>
-              <option value="alpa" {% if siswa.status_absen == 'alpa' %}selected{% endif %}>Alpa</option>
-            </select>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<!-- HEADER -->
+<div class="header-grad mb-4">
+    <h3 class="m-0">📋 Absensi {{ mapel.nama }}</h3>
+    <small>Pilih tanggal dan catat status kehadiran siswa</small>
+</div>
 
-  <br>
-  <button type="submit">Simpan</button>
-</form>
 
-{% if sudah_ada %}
-  <p style="margin-top: 10px;">
-    <a href="{% url 'ubah_absensi_view' mapel.id tanggal|date:'Y-m-d' %}">
-      ✏️ Ubah absensi tanggal ini
-    </a>
-  </p>
-{% endif %}
+<div class="container">
+
+    <!-- CARD FILTER TANGGAL -->
+    <div class="card card-custom p-4 mb-4">
+        <h5 class="mb-3">🔍 Pilih Tanggal</h5>
+
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="fw-bold mb-1">Tanggal</label>
+                <input type="date" class="form-control" name="tanggal" value="{{ tanggal|date:'Y-m-d' }}">
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary btn-modern w-100">
+                    Tampilkan Absensi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- TANGGAL -->
+    <h4 class="fw-bold mb-3">
+        🗓 Absensi Tanggal: {{ tanggal|date:"d M Y" }}
+    </h4>
+
+
+    <!-- CARD ABSENSI -->
+    <div class="card card-custom p-4">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nama Siswa</th>
+                        <th>Status Kehadiran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for siswa in siswa_list %}
+                    <tr>
+                        <td class="fw-bold">{{ siswa.user.username }}</td>
+
+                        <td>
+                            <select name="status_{{ siswa.id }}" class="form-select">
+                                <option value="">-- Pilih --</option>
+                                <option value="hadir" {% if siswa.status_absen == 'hadir' %}selected{% endif %}>Hadir</option>
+                                <option value="izin" {% if siswa.status_absen == 'izin' %}selected{% endif %}>Izin</option>
+                                <option value="sakit" {% if siswa.status_absen == 'sakit' %}selected{% endif %}>Sakit</option>
+                                <option value="alpa" {% if siswa.status_absen == 'alpa' %}selected{% endif %}>Alpa</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn btn-success btn-modern mt-3">
+                💾 Simpan Absensi
+            </button>
+        </form>
+
+        {% if sudah_ada %}
+            <hr>
+            <a href="{% url 'ubah_absensi_view' mapel.id tanggal|date:'Y-m-d' %}" class="btn btn-warning btn-modern mt-2">
+                ✏️ Ubah Absensi Tanggal Ini
+            </a>
+        {% endif %}
+
+    </div>
+</div>
+
 {% endblock %}

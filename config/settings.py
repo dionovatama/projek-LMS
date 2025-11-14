@@ -76,10 +76,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'elearning_db',      # nama DB yang lu buat di pgAdmin
+        'USER': 'postgres',          # username PostgreSQL
+        'PASSWORD': 'smkn2be',       # password PostgreSQL lu
+        'HOST': 'localhost',         # tetap localhost
+        'PORT': '5432',              # port default PostgreSQL
     }
 }
+
 
 
 # Password validation
@@ -117,7 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS= [BASE_DIR / "learning" / "static", ]
+STATICFILES_DIRS= [BASE_DIR / "static", ]
 
 
 # Default primary key field type
@@ -130,4 +135,6 @@ AUTH_USER_MODEL = 'learning.CustomUser'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
 

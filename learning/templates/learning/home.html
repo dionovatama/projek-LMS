@@ -3,15 +3,107 @@
 
 {% block title %}Beranda - E-Learning{% endblock %}
 {% block content %}
-<div class="home">
-</div>
-<div class="home_button">
-    <div class="btn-home">    
-    <h2>SMKN 2 Baleendah</h2>
-    <a href="{% url "login" %}">
-        <button>login</button>   
-     </a>
-</div>
- 
+
+<!-- HERO SECTION -->
+<section class="hero-section py-5" 
+    style="background: linear-gradient(135deg, #4e1ac7, #7b27f2);">
+    <div class="container text-center text-white py-5">
+        <h1 class="fw-bold display-5">Platform E-Learning Modern</h1>
+        <p class="mt-3 fs-5">
+            Sistem pembelajaran online SMKN 2 Baleendah  
+            yang interaktif, tertata, dan mudah digunakan.
+        </p>
+        <a href="{% url 'login' %}" class="btn btn-light btn-lg mt-3 px-4">
+            Masuk Sekarang
+        </a>
+    </div>
+</section>
+
+
+<!-- FEATURE CARDS -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <div class="row g-4">
+
+            <div class="col-12 col-md-4">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
+                    <img src="{% static 'image/users.png' %}" width="60">
+                    <h5 class="fw-bold mt-3">E-Learning Terpusat</h5>
+                    <p class="text-muted">Semua materi, tugas, dan absensi dalam satu sistem.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
+                    <img src="{% static 'image/computer.png' %}" width="60">
+                    <h5 class="fw-bold mt-3">Akses Mudah</h5>
+                    <p class="text-muted">Bisa dibuka dari HP, laptop, atau tablet tanpa ribet.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
+                    <img src="{% static 'image/time-check.png' %}" width="60">
+                    <h5 class="fw-bold mt-3">Sistem Cepat</h5>
+                    <p class="text-muted">Optimasi performa agar siswa belajar tanpa hambatan.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- INFO SEKOLAH + DAFTAR JURUSAN -->
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <h2 class="fw-bold text-center mb-4">SMKN 2 BALEENDAH</h2>
+        <p class="text-center text-muted mb-5 fs-5">
+            Sekolah Kejuruan unggulan dengan berbagai kompetensi keahlian modern
+            yang siap mencetak lulusan berdaya saing tinggi.
+        </p>
+
+        <div class="row g-4 justify-content-center">
+
+            <!-- Responsive: 2 kolom HP | 3 Tablet | 4 PC -->
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
+                    <h5 class="fw-bold">Kuliner</h5>
+                    <p class="text-muted">Tata boga dan pengolahan makanan.</p>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
+                    <h5 class="fw-bold">Busana</h5>
+                    <p class="text-muted">Fashion, menjahit, dan produksi pakaian.</p>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
+                    <h5 class="fw-bold">Kecantikan</h5>
+                    <p class="text-muted">Make-up, perawatan wajah & rambut.</p>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
+                    <h5 class="fw-bold">Kimia Industri</h5>
+                    <p class="text-muted">Laboratorium & proses industri.</p>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
+                    <h5 class="fw-bold">TJKT</h5>
+                    <p class="text-muted">Jaringan Komputer & Telekomunikasi.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 {% endblock %}

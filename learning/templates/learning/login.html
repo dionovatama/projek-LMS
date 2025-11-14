@@ -1,25 +1,166 @@
 {% extends 'learning/base.html' %}
+{% load static %}
 {% block content %}
-<form method="POST">
-    {% csrf_token %}
-    <div class="welcome_login">
-        <h4>SILAHKAN LOGIN MENGGUNAKAN AKUN MASING-MASING</h4>
+
+<style>
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url("{% static 'image/bg-blur-green.jpg' %}") center/cover no-repeat;
+        padding: 20px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 900px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(18px);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        display: flex;
+        flex-direction: row;
+    }
+
+    .login-left {
+        width: 50%;
+        background: url("{% static 'image/siswa.jpg' %}") center/cover no-repeat;
+    }
+
+    .login-right {
+        width: 50%;
+        padding: 40px 35px;
+        background: rgba(255,255,255,0.35);
+        backdrop-filter: blur(20px);
+    }
+
+    .input-group {
+        position: relative;
+        margin-top: 12px;
+    }
+
+    .input-group i {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #1e3a8a; /* biru */
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 14px;     /* ⬅ geser mentok kanan */
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #1e3a8a;
+        cursor: pointer;
+    }
+
+    .login-right input {
+        background: #ffffff;
+        border: 1px solid #d1d1d1;
+        padding: 12px 38px 12px 40px;
+        border-radius: 10px;
+        width: 100%;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+
+    .login-right input:focus {
+        background: #ffffff;
+        border: 1px solid #1e40af;
+        box-shadow: 0 0 8px rgba(30, 64, 175, 0.35);
+        outline: none;
+    }
+
+    .login-btn {
+        background: #1e3a8a; /* biru gelap */
+        border: none;
+        padding: 12px 0;
+        border-radius: 10px;
+        width: 100%;
+        color: white;
+        font-weight: bold;
+        margin-top: 20px;
+        transition: 0.2s;
+    }
+
+    .login-btn:hover {
+        background: #162d71;
+    }
+
+    @media (max-width: 768px) {
+        .login-card {
+            flex-direction: column;
+        }
+        .login-left {
+            width: 100%;
+            height: 200px;
+        }
+        .login-right {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="login-wrapper">
+
+    <div class="login-card">
+
+        <div class="login-left"></div>
+
+        <div class="login-right">
+
+            <h2 class="fw-bold text-center mb-1" style="color:#1e3a8a;">Welcome!</h2>
+            <p class="text-center text-muted mb-4">Silahkan login menggunakan akun anda</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label class="fw-semibold mt-2">Username</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" required>
+                </div>
+
+                <label class="fw-semibold mt-3">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input id="password" type="password" name="password" required>
+                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger mt-3">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <button class="login-btn" type="submit">LOGIN</button>
+            </form>
+
+        </div>
     </div>
+</div>
 
-    <div class="form_login">
-        <label>Username:</label>
-        <input type="text" name="username" required><br>
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        <label>Password:</label>
-        <input type="password" name="password" required><br>
+<script>
+    const toggle = document.getElementById("togglePassword");
+    const passwordInput = document.getElementById("password");
 
-        <button type="submit">Login</button>
-    </div>
+    toggle.addEventListener("click", () => {
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
 
-    {% if messages %}
-        {% for message in messages %}
-            <p style="color:red;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-</form>
+        toggle.classList.toggle("fa-eye");
+        toggle.classList.toggle("fa-eye-slash");
+    });
+</script>
+
 {% endblock %}
