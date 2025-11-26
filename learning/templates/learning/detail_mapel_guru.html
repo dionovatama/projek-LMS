@@ -1,32 +1,176 @@
 {% extends 'learning/base.html' %}
+{% load static %}
 {% block content %}
 
-<a href="{% url 'absensi_mapel' mapel.id %}" class="btn btn-warning mt-3">📋 Lihat / Tambah Absensi</a>
+<style>
+    /* ===== HEADER ===== */
+    .header-dashboard {
+        background: linear-gradient(135deg, #0d6efd, #2563eb);
+        padding: 25px;
+        border-radius: 18px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.20);
+        margin-bottom: 20px;
+    }
 
-<div class="container mt-4">
-    <h3>📘 {{ mapel.nama }} - {{ mapel.kelas.nama }}</h3>
-    <hr>
+    .mapel-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0;
+    }
 
-    <div class="mb-3">
-        <a href="{% url 'tambah_bab' %}" class="btn btn-success">+ Tambah Bab</a>
+    .header-info {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 3px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-absen {
+        background: #0d6efd;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 18px;
+    }
+
+    .btn-absen:hover {
+        background: #0b5ed7;
+    }
+
+    .btn-tambah-bab {
+        background: #198754;
+        color: white;
+        padding: 7px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .btn-tambah-bab:hover {
+        background: #146c43;
+    }
+
+    /* ===== CARD BAB ===== */
+    .bab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+    }
+
+    .bab-card {
+        background: white;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        transition: 0.2s;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .bab-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+    }
+
+    .bab-icon {
+        font-size: 22px;
+        color: #0d6efd;
+        margin-bottom: 6px;
+    }
+
+    .bab-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+        color: #111;
+    }
+
+    .bab-desc {
+        font-size: 12px;
+        color: #666;
+        margin-top: 3px;
+        min-height: 28px;
+        line-height: 1.2;
+    }
+
+    .btn-lihat {
+        margin-top: 8px;
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .btn-lihat:hover {
+        text-decoration: underline;
+    }
+</style>
+
+
+<div class="container mt-3">
+
+    <!-- ===== HEADER MAPEL ===== -->
+    <div class="header-dashboard">
+        <h1 class="mapel-title">{{ mapel.nama }} — {{ mapel.kelas.nama }}</h1>
+        <div class="header-info" id="greeting"></div>
+        <div class="header-info" id="tanggal"></div>
     </div>
 
+    <!-- ===== BUTTON ABSENSI ===== -->
+    <a href="{% url 'absensi_mapel' mapel.id %}" class="btn-absen">📋 Lihat / Tambah Absensi</a>
+
+    <!-- ===== TOMBOL TAMBAH BAB ===== -->
+    <div class="mb-4">
+        <a href="{% url 'tambah_bab' %}" class="btn-tambah-bab">+ Tambah Bab</a>
+    </div>
+
+    <!-- ===== LIST BAB ===== -->
     {% if bab_list %}
-        <ul class="list-group">
+        <div class="bab-grid">
             {% for bab in bab_list %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ bab.judul }}</strong><br>
-                        <small class="text-muted">{{ bab.deskripsi }}</small>
-                    </div>
-                    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn btn-primary btn-sm">
-                        Lihat Tugas
+                <div class="bab-card">
+                    <div class="bab-icon">📘</div>
+
+                    <div class="bab-title">{{ bab.judul }}</div>
+                    <div class="bab-desc">{{ bab.deskripsi|default:"(Tidak ada deskripsi)" }}</div>
+
+                    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn-lihat">
+                        ➜ Lihat Tugas
                     </a>
-                </li>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
         <p>Belum ada Bab di mapel ini.</p>
     {% endif %}
 </div>
+
+
+<!-- ===== SCRIPT GREETING ===== -->
+<script>
+    const hours = new Date().getHours();
+    let greet = "";
+
+    if (hours >= 4 && hours < 11) greet = "Selamat Pagi";
+    else if (hours >= 11 && hours < 15) greet = "Selamat Siang";
+    else if (hours >= 15 && hours < 18) greet = "Selamat Sore";
+    else greet = "Selamat Malam";
+
+    document.getElementById("greeting").textContent =
+        greet + " • {{ user.first_name }} {{ user.last_name }}";
+
+    document.getElementById("tanggal").textContent =
+        new Date().toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+</script>
+
 {% endblock %}

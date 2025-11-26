@@ -26,7 +26,7 @@
 
     .login-left {
         width: 50%;
-        background: url("{% static 'image/siswa.jpg' %}") center/cover no-repeat;
+        background: url("{% static 'image/logo smk.jpg' %}") center/cover no-repeat;
     }
 
     .login-right {
@@ -41,19 +41,21 @@
         margin-top: 12px;
     }
 
-    .input-group i {
+    /* Ikon kiri (username & lock) */
+    .icon-left {
         position: absolute;
         top: 50%;
         left: 12px;
         transform: translateY(-50%);
         font-size: 18px;
-        color: #1e3a8a; /* biru */
+        color: #1e3a8a;
     }
 
+    /* Show/Hide Password */
     .toggle-password {
         position: absolute;
         top: 50%;
-        right: 14px;     /* ⬅ geser mentok kanan */
+        right: 14px;
         transform: translateY(-50%);
         font-size: 18px;
         color: #1e3a8a;
@@ -78,7 +80,7 @@
     }
 
     .login-btn {
-        background: #1e3a8a; /* biru gelap */
+        background: #1e3a8a;
         border: none;
         padding: 12px 0;
         border-radius: 10px;
@@ -121,15 +123,15 @@
             <form method="POST">
                 {% csrf_token %}
 
-                <label class="fw-semibold mt-2">Username</label>
+                <label class="fw-semibold mt-2">E-mail</label>
                 <div class="input-group">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user icon-left"></i>
                     <input type="text" name="username" required>
                 </div>
 
                 <label class="fw-semibold mt-3">Password</label>
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock icon-left"></i>
                     <input id="password" type="password" name="password" required>
                     <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                 </div>

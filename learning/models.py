@@ -35,8 +35,19 @@ class Kelas(models.Model):
 
 class GuruProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    kelas = models.ManyToManyField('Kelas', related_name='guru_kelas', blank=True)
-    mapel = models.ManyToManyField('Mapel', related_name='pengajar_mapel', blank=True)  # ubah related_name-nya
+
+    # ganti "kelas" → "kelas_diajar"
+    kelas_diajar = models.ManyToManyField(
+        'Kelas',
+        related_name='guru_yang_mengajar',
+        blank=True
+    )
+
+    mapel = models.ManyToManyField(
+        'Mapel',
+        related_name='pengajar_mapel',
+        blank=True
+    )
 
     def __str__(self):
         return self.user.username

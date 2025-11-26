@@ -1,34 +1,178 @@
-<!DOCTYPE html>
 {% extends 'learning/base.html' %}
-<html>
-<head>
-    <title>Dashboard Guru</title>
-</head>
+{% load static %}
 {% block content %}
-<body>
-    <h1>Dashboard Guru</h1>
-    <h2>Daftar Mapel yang Anda Ajar</h2>
 
-    <a href="{% url 'tambah_mapel' %}">➕ Tambah Mapel Baru</a>
-    <br><br>
+<style>
+    /* ----- HEADER ----- */
+    .header-box {
+        background: linear-gradient(90deg, #34078dff, #1e09a5ff, #250cc9ff);
+        padding: 35px 30px;
+        color: white;
+        border-radius: 18px;
+        margin-bottom: 30px;
+        position: relative;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+    }
 
-    {% if mapel_list %}
-        {% for mapel in mapel_list %}
-            <div style="margin-bottom: 30px;">
-                {% if mapel.gambar %}
-                    <img src="{{ mapel.gambar.url }}" width="150" alt="{{ mapel.nama }}">
-                {% endif %}
-                <h3>{{ mapel.nama }} - {{ mapel.kelas.nama }}</h3>
-                <p>{{ mapel.deskripsi|default:"(Tidak ada deskripsi)" }}</p>
+    .header-title {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0;
+    }
 
-                <a href="{% url 'detail_mapel_guru' mapel.id %}">📘 Lihat Detail</a> |
-                <a href="{% url 'edit_mapel' mapel.id %}">✏️ Edit Mapel</a>
-            </div>
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>Belum ada mapel yang Anda ajar.</p>
-    {% endif %}
-</body>
-</html>
-{% endblock content %}
+    .header-sub {
+        font-size: 18px;
+        opacity: 0.9;
+    }
+
+    /* ----- GRID MAPEL ----- */
+    .mapel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
+    }
+
+    .mapel-card {
+        background: white;
+        border-radius: 18px;
+        padding: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: 0.2s;
+        border-top: 5px solid #6a11cb;
+    }
+
+    .mapel-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .mapel-img {
+        width: 100%;
+        height: 130px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-bottom: 10px;
+    }
+
+    .mapel-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #111;
+    }
+
+    .mapel-kelas {
+        font-size: 14px;
+        color: gray;
+        margin-bottom: 10px;
+    }
+
+    .mapel-actions a {
+        text-decoration: none;
+        font-weight: bold;
+        margin-right: 12px;
+    }
+
+    .mapel-actions .delete {
+        color: red;
+    }
+
+    .btn-tambah {
+        display: inline-block;
+        margin-bottom: 20px;
+        background: #6a11cb;
+        color: white;
+        padding: 10px 20px;
+        font-weight: bold;
+        border-radius: 12px;
+        transition: 0.2s;
+    }
+
+    .btn-tambah:hover {
+        background: #5210b0;
+    }
+
+    @media (max-width: 768px) {
+        .mapel-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 500px) {
+        .mapel-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header-box">
+        <h1 class="header-title" id="greeting"></h1>
+
+        <p class="header-sub">
+            {{ request.user.first_name }} {{ request.user.last_name }} • Guru SMK
+        </p>
+
+        <div class="header-sub" style="margin-top:5px;">
+            <span id="tanggal"></span>
+        </div>
+    </div>
+
+    <!-- TAMBAH MAPEL -->
+    <a href="{% url 'tambah_mapel' %}" class="btn-tambah">+ Tambah Mapel Baru</a>
+
+    <!-- ===== DAFTAR MAPEL ===== -->
+    <div class="mapel-grid">
+        {% if mapel_list %}
+            {% for mapel in mapel_list %}
+                <div class="mapel-card">
+                    
+                    {% if mapel.gambar %}
+                        <img src="{{ mapel.gambar.url }}" class="mapel-img">
+                    {% else %}
+                        <img src="{% static 'image/default-mapel.jpg' %}" class="mapel-img">
+                    {% endif %}
+
+                    <div class="mapel-name">{{ mapel.nama }}</div>
+                    <div class="mapel-kelas">Kelas: {{ mapel.kelas.nama }}</div>
+
+                    <div class="mapel-actions">
+                        <a href="{% url 'detail_mapel_guru' mapel.id %}">📘 Lihat</a>
+                        <a href="{% url 'edit_mapel' mapel.id %}">✏️ Edit</a>
+
+                        <!-- TOMBOL HAPUS MAPEL -->
+                        <a href="{% url 'hapus_mapel' mapel.id %}"
+                           class="delete"
+                           onclick="return confirm('Yakin ingin menghapus mapel {{ mapel.nama }}?');">
+                            🗑 Hapus
+                        </a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Belum ada mapel yang Anda ajar.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- ===== SCRIPT GREETING + TANGGAL ===== -->
+<script>
+    const hours = new Date().getHours();
+    let greet = "";
+
+    if (hours >= 4 && hours < 11) greet = "Selamat Pagi 👋";
+    else if (hours >= 11 && hours < 15) greet = "Selamat Siang 👋";
+    else if (hours >= 15 && hours < 18) greet = "Selamat Sore 👋";
+    else greet = "Selamat Malam 👋";
+
+    document.getElementById("greeting").textContent = greet;
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("tanggal").textContent =
+        new Date().toLocaleDateString('id-ID', options);
+</script>
+
+{% endblock %}

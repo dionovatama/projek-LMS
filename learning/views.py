@@ -124,6 +124,22 @@ def edit_mapel(request, mapel_id):
         'kelas_list': kelas_list
     })
 
+@login_required
+def hapus_mapel(request, id):
+    guru_profile = GuruProfile.objects.get(user=request.user)
+
+    # Hanya guru pemilik mapel yang boleh hapus
+    mapel = get_object_or_404(Mapel, id=id, guru=guru_profile)
+
+    if request.method == "POST":
+        mapel.delete()
+        messages.success(request, "Mapel berhasil dihapus.")
+        return redirect('dashboard_guru')
+
+    # Jika GET → tampilkan halaman konfirmasi
+    return render(request, 'learning/guru/konfirmasi_hapus_mapel.html', {
+        'mapel': mapel
+    })
 
 
 @login_required
@@ -292,6 +308,7 @@ class PenilaianForm(forms.ModelForm):
 
 
 login_required
+@login_required
 def nilai_tugas(request, pengumpulan_id):
     pengumpulan = get_object_or_404(PengumpulanTugas, id=pengumpulan_id)
 
@@ -300,7 +317,6 @@ def nilai_tugas(request, pengumpulan_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Nilai dan komentar berhasil disimpan!')
-            # Balik lagi ke daftar pengumpulan tugas
             return redirect('pengumpulan_tugas', tugas_id=pengumpulan.tugas.id)
     else:
         form = PenilaianForm(instance=pengumpulan)
@@ -309,6 +325,7 @@ def nilai_tugas(request, pengumpulan_id):
         'form': form,
         'pengumpulan': pengumpulan
     })
+
 # ========================
 # KIRIM TUGAS SISWA
 # ========================
@@ -481,10 +498,11 @@ def siswa_dashboard(request):
 # ========================
 # DETAIL MAPEL SISWA & BAB & tugas
 # ========================
-login_required
+@login_required
+@login_required
 def detail_mapel_siswa(request, mapel_id):
     mapel = get_object_or_404(Mapel, id=mapel_id)
-    bab_list = Bab.objects.filter(mapel=mapel)
+    bab_list = Bab.objects.filter(mapel=mapel).order_by('id')
 
     context = {
         'mapel': mapel,
@@ -497,6 +515,7 @@ def detail_mapel_siswa(request, mapel_id):
 def detail_bab_siswa(request, bab_id):
     bab = get_object_or_404(Bab, id=bab_id)
     tugas_list = Tugas.objects.filter(bab=bab)
+
 
     context = {
         'bab': bab,

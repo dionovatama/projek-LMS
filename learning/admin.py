@@ -25,11 +25,14 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username', 'email')
     ordering = ('username',)
 
+@admin.register(GuruProfile)
+class GuruProfileAdmin(admin.ModelAdmin):
+    filter_horizontal = ('kelas_diajar', 'mapel')   
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Mapel)
 admin.site.register(Bab)
 admin.site.register(Tugas)
 admin.site.register(Kelas)
 admin.site.register(PengumpulanTugas)
-admin.site.register(GuruProfile)
 admin.site.register(SiswaProfile)

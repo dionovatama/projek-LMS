@@ -23,6 +23,9 @@ urlpatterns = [
     path('guru/tambah-bab/', views.tambah_bab, name='tambah_bab'),
     path('tambah-tugas/', views.tambah_tugas, name='tambah_tugas'),
 
+    # ==== FORM HAPUS =====
+    path('guru/mapel/hapus/<int:id>/', views.hapus_mapel, name='hapus_mapel'),
+
 
 
     # ===== PENILAIAN =====
