@@ -1,36 +1,92 @@
 {% extends 'learning/base.html' %}
+
 {% block content %}
-{% if pengumpulan %}
-        <p><strong>Status:</strong> Sudah dikumpulkan</p>
-        {% if pengumpulan.nilai %}
-            <p><strong>Nilai:</strong> {{ pengumpulan.nilai }}</p>
-        {% else %}
-            <p><strong>Nilai:</strong> Belum dinilai</p>
-        {% endif %}
-        {% if pengumpulan.file %}
-            <p><strong>File dikumpulkan:</strong>
-                <a href="{{ pengumpulan.file.url }}">Download</a>
+<div class="container mt-4">
+
+    <!-- Header Tugas -->
+    <div class="card shadow-lg border-0 mb-4"
+         style="background: linear-gradient(135deg, #f6c23e, #e74a3b);">
+        <div class="card-body text-white">
+            <h4 class="fw-bold mb-1">📘 Detail Tugas</h4>
+            <p class="mb-0 opacity-75">
+                Silakan cek status dan kumpulkan jawaban tugas
             </p>
-        {% endif %}
-        {% if pengumpulan.komentar_guru %}
-            <p><strong>Komentar Guru:</strong> {{ pengumpulan.komentar_guru }}</p>
-        {% endif %}
-    {% else %}
-        <p><strong>Status:</strong> Belum dikumpulkan</p>
-    {% endif %}
+        </div>
+    </div>
 
-    <hr>
-    <h2>Kumpulkan Jawaban</h2>
-   <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label>Upload File (opsional):</label><br>
-    <input type="file" name="jawaban_file"><br><br>  <!-- sesuai view -->
+    <!-- Status Pengumpulan -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0">📌 Status Pengumpulan</h6>
+        </div>
 
-    <label>Tulis Jawaban (opsional):</label><br>
-    <textarea name="jawaban_teks" rows="4" cols="50"></textarea><br><br>
+        <div class="card-body">
+            {% if pengumpulan %}
+                <span class="badge bg-success mb-2">Sudah dikumpulkan</span>
 
-    <button type="submit">Kirim Jawaban</button>
-</form>
+                <p class="mb-1">
+                    <strong>Nilai:</strong>
+                    {% if pengumpulan.nilai %}
+                        <span class="text-success fw-bold">{{ pengumpulan.nilai }}</span>
+                    {% else %}
+                        <span class="text-muted">Belum dinilai</span>
+                    {% endif %}
+                </p>
 
+                {% if pengumpulan.file %}
+                    <p class="mb-1">
+                        <strong>File:</strong>
+                        <a href="{{ pengumpulan.file.url }}" class="btn btn-sm btn-outline-primary">
+                            ⬇ Download
+                        </a>
+                    </p>
+                {% endif %}
 
+                {% if pengumpulan.komentar_guru %}
+                    <div class="alert alert-info mt-3">
+                        <strong>Komentar Guru:</strong><br>
+                        {{ pengumpulan.komentar_guru }}
+                    </div>
+                {% endif %}
+            {% else %}
+                <span class="badge bg-danger">Belum dikumpulkan</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Form Pengumpulan -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">📝 Kumpulkan Jawaban</h6>
+        </div>
+
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        Upload File (opsional)
+                    </label>
+                    <input type="file" name="jawaban_file" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        Tulis Jawaban (opsional)
+                    </label>
+                    <textarea name="jawaban_teks"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Tulis jawaban kamu di sini..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    🚀 Kirim Jawaban
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

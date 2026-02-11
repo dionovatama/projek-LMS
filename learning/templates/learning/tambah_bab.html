@@ -1,24 +1,77 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<h2>Tambah Bab Baru</h2>
 
-<form method="POST">
-  {% csrf_token %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-  <label for="mapel">Pilih Mata Pelajaran:</label>
-  <select name="mapel" id="mapel" required>
-    <option value="">-- Pilih Mapel --</option>
-    {% for m in mapel_list %}
-      <option value="{{ m.id }}">{{ m.nama}}</option>
-    {% endfor %}
-  </select>
+            <!-- CARD -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        📚 Tambah Bab – {{ mapel.nama }}
+                    </h5>
+                </div>
 
-  <label for="judul">Judul Bab:</label>
-  <input type="text" name="judul" id="judul" required>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
 
-  <label for="deskripsi">Deskripsi:</label>
-  <textarea name="deskripsi" id="deskripsi" rows="3"></textarea>
+                        <!-- INFO MAPEL (READ ONLY) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Mata Pelajaran
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ mapel.nama }}"
+                                   disabled>
+                        </div>
 
-  <button type="submit">Tambah Bab</button>
-</form>
+                        <!-- JUDUL BAB -->
+                        <div class="mb-3">
+                            <label for="judul" class="form-label fw-semibold">
+                                Judul Bab
+                            </label>
+                            <input type="text"
+                                   name="judul"
+                                   id="judul"
+                                   class="form-control"
+                                   placeholder="Contoh: Persamaan Linear"
+                                   required>
+                        </div>
+
+                        <!-- DESKRIPSI -->
+                        <div class="mb-3">
+                            <label for="deskripsi" class="form-label fw-semibold">
+                                Deskripsi
+                            </label>
+                            <textarea name="deskripsi"
+                                      id="deskripsi"
+                                      rows="3"
+                                      class="form-control"
+                                      placeholder="Deskripsi singkat bab (opsional)"></textarea>
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'detail_mapel_guru' mapel.id %}"
+                               class="btn btn-secondary">
+                                ⬅ Kembali
+                            </a>
+
+                            <button type="submit" class="btn btn-success">
+                                ➕ Tambah Bab
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <!-- END CARD -->
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}

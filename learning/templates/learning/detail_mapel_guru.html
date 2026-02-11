@@ -109,6 +109,10 @@
     .btn-lihat:hover {
         text-decoration: underline;
     }
+
+    /* NO UNDERLINE DELETE BUTTON */
+    .btn-link { text-decoration: none !important; }
+    .btn-link:hover { text-decoration: none !important; }
 </style>
 
 
@@ -126,7 +130,7 @@
 
     <!-- ===== TOMBOL TAMBAH BAB ===== -->
     <div class="mb-4">
-        <a href="{% url 'tambah_bab' %}" class="btn-tambah-bab">+ Tambah Bab</a>
+        <a href="{% url 'tambah_bab' mapel.id %}"class="btn btn-primary">➕ Tambah Bab</a>
     </div>
 
     <!-- ===== LIST BAB ===== -->
@@ -142,7 +146,45 @@
                     <a href="{% url 'detail_bab_guru' bab.id %}" class="btn-lihat">
                         ➜ Lihat Tugas
                     </a>
+
+                    <!-- === TOMBOL HAPUS BAB (TANPA GARIS BAWAH) === -->
+                    <button class="btn btn-link text-danger p-0 mt-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalHapusBab{{ bab.id }}">
+                        🗑️ Hapus
+                    </button>
                 </div>
+
+                <!-- === MODAL KONFIRMASI HAPUS BAB === -->
+                <div class="modal fade" id="modalHapusBab{{ bab.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 15px;">
+
+                            <div class="modal-header bg-danger text-white"
+                                 style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <p>
+                                    Yakin ingin menghapus bab <strong>"{{ bab.judul }}"</strong>?<br>
+                                    Semua materi & tugas yang terkait akan ikut terhapus.
+                                </p>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+
+                                <a href="{% url 'hapus_bab' bab.id %}" class="btn btn-danger">
+                                    Ya, Hapus
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
             {% endfor %}
         </div>
     {% else %}

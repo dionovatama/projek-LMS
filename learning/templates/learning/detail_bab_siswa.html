@@ -1,28 +1,66 @@
 {% extends 'learning/base.html' %}
+
 {% block content %}
-<h1>{{ bab.judul }}</h1>
-<p>{{ bab.deskripsi }}</p>
+<div class="container mt-4">
 
-<hr>
-<h2>Daftar Tugas</h2>
-{% if tugas_list %}
-    <ul>
-        {% for tugas in tugas_list %}
-            <li style="margin-bottom: 10px;">
-                <strong>{{ tugas.judul }}</strong><br>
-                {{ tugas.deskripsi }}<br>
-                Deadline: {{ tugas.deadline|date:"d M Y H:i" }}<br>
-                <a href="{% url 'detail_tugas_siswa' tugas.id %}" style="text-decoration: none; color: blue;">
-                    📘 Lihat Detail
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>Belum ada tugas di bab ini.</p>
-{% endif %}
+    <!-- Header Bab -->
+    <div class="card shadow-lg border-0 mb-4"
+         style="background: linear-gradient(135deg, #36b9cc, #4e73df);">
+        <div class="card-body text-white">
+            <h3 class="fw-bold mb-1">{{ bab.judul }}</h3>
+            <p class="mb-0 opacity-75">
+                {{ bab.deskripsi|default:"Tidak ada deskripsi bab" }}
+            </p>
+        </div>
+    </div>
 
-<hr>
-<a href="{% url 'detail_mapel_siswa' bab.mapel.id %}">⬅️ Kembali ke {{ bab.mapel.nama }}</a>
+    <!-- Daftar Tugas -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">📝 Daftar Tugas</h5>
+        </div>
 
+        <div class="card-body p-0">
+            {% if tugas_list %}
+                <div class="list-group list-group-flush">
+                    {% for tugas in tugas_list %}
+                        <a href="{% url 'detail_tugas_siswa' tugas.id %}"
+                           class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-semibold text-success mb-1">
+                                        {{ tugas.judul }}
+                                    </h6>
+                                    <small class="text-muted d-block">
+                                        {{ tugas.deskripsi|default:"Tidak ada deskripsi tugas" }}
+                                    </small>
+                                    <small class="text-danger">
+                                        ⏰ Deadline:
+                                        {{ tugas.deadline|date:"d M Y H:i" }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">
+                                    Detail
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning m-3">
+                    Belum ada tugas di bab ini.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tombol Kembali -->
+    <div class="mt-4">
+        <a href="{% url 'detail_mapel_siswa' bab.mapel.id %}"
+           class="btn btn-outline-secondary">
+            ← Kembali ke {{ bab.mapel.nama }}
+        </a>
+    </div>
+
+</div>
 {% endblock %}

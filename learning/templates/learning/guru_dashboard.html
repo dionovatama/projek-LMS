@@ -3,7 +3,7 @@
 {% block content %}
 
 <style>
-    /* ----- HEADER ----- */
+    /* ===== HEADER ===== */
     .header-box {
         background: linear-gradient(90deg, #34078dff, #1e09a5ff, #250cc9ff);
         padding: 35px 30px;
@@ -25,7 +25,7 @@
         opacity: 0.9;
     }
 
-    /* ----- GRID MAPEL ----- */
+    /* ===== GRID MAPEL ===== */
     .mapel-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -66,16 +66,6 @@
         margin-bottom: 10px;
     }
 
-    .mapel-actions a {
-        text-decoration: none;
-        font-weight: bold;
-        margin-right: 12px;
-    }
-
-    .mapel-actions .delete {
-        color: red;
-    }
-
     .btn-tambah {
         display: inline-block;
         margin-bottom: 20px;
@@ -85,22 +75,11 @@
         font-weight: bold;
         border-radius: 12px;
         transition: 0.2s;
+        text-decoration: none !important;
     }
 
     .btn-tambah:hover {
         background: #5210b0;
-    }
-
-    @media (max-width: 768px) {
-        .mapel-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 500px) {
-        .mapel-grid {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 
@@ -109,70 +88,105 @@
     <!-- ===== HEADER ===== -->
     <div class="header-box">
         <h1 class="header-title" id="greeting"></h1>
-
         <p class="header-sub">
             {{ request.user.first_name }} {{ request.user.last_name }} • Guru SMK
         </p>
-
         <div class="header-sub" style="margin-top:5px;">
             <span id="tanggal"></span>
         </div>
     </div>
 
     <!-- TAMBAH MAPEL -->
-    <a href="{% url 'tambah_mapel' %}" class="btn-tambah">+ Tambah Mapel Baru</a>
+    <a href="{% url 'tambah_mapel' %}" class="btn-tambah">
+        + Tambah Mapel Baru
+    </a>
 
     <!-- ===== DAFTAR MAPEL ===== -->
     <div class="mapel-grid">
-        {% if mapel_list %}
-            {% for mapel in mapel_list %}
-                <div class="mapel-card">
-                    
-                    {% if mapel.gambar %}
-                        <img src="{{ mapel.gambar.url }}" class="mapel-img">
-                    {% else %}
-                        <img src="{% static 'image/default-mapel.jpg' %}" class="mapel-img">
-                    {% endif %}
+        {% for mapel in mapel_list %}
+        <div class="mapel-card">
 
-                    <div class="mapel-name">{{ mapel.nama }}</div>
-                    <div class="mapel-kelas">Kelas: {{ mapel.kelas.nama }}</div>
+            {% if mapel.gambar %}
+                <img src="{{ mapel.gambar.url }}" class="mapel-img">
+            {% else %}
+                <img src="{% static 'image/default-mapel.jpg' %}" class="mapel-img">
+            {% endif %}
 
-                    <div class="mapel-actions">
-                        <a href="{% url 'detail_mapel_guru' mapel.id %}">📘 Lihat</a>
-                        <a href="{% url 'edit_mapel' mapel.id %}">✏️ Edit</a>
+            <div class="mapel-name">{{ mapel.nama }}</div>
+            <div class="mapel-kelas">Kelas: {{ mapel.kelas.nama }}</div>
 
-                        <!-- TOMBOL HAPUS MAPEL -->
-                        <a href="{% url 'hapus_mapel' mapel.id %}"
-                           class="delete"
-                           onclick="return confirm('Yakin ingin menghapus mapel {{ mapel.nama }}?');">
-                            🗑 Hapus
-                        </a>
+            <div class="mt-2">
+                <a href="{% url 'detail_mapel_guru' mapel.id %}" class="btn btn-sm btn-outline-primary">📘 Lihat</a>
+                <a href="{% url 'edit_mapel' mapel.id %}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+
+                <button class="btn btn-sm btn-outline-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#hapusMapelModal{{ mapel.id }}">
+                    🗑️ Hapus
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== MODAL HAPUS MAPEL ===== -->
+        <div class="modal fade" id="hapusMapelModal{{ mapel.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Konfirmasi Hapus</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        Yakin ingin menghapus mapel
+                        <strong>"{{ mapel.nama }}"</strong>?
+                        <br>
+                        <small class="text-danger">
+                            Semua bab & tugas akan ikut terhapus.
+                        </small>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+
+                        <form method="POST" action="{% url 'hapus_mapel' mapel.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                Ya, Hapus
+                            </button>
+                        </form>
                     </div>
 
                 </div>
-            {% endfor %}
-        {% else %}
-            <p>Belum ada mapel yang Anda ajar.</p>
-        {% endif %}
+            </div>
+        </div>
+        <!-- ============================= -->
+
+        {% empty %}
+        <p>Belum ada mapel.</p>
+        {% endfor %}
     </div>
 
 </div>
 
-<!-- ===== SCRIPT GREETING + TANGGAL ===== -->
+<!-- ===== SCRIPT GREETING ===== -->
 <script>
-    const hours = new Date().getHours();
-    let greet = "";
-
-    if (hours >= 4 && hours < 11) greet = "Selamat Pagi 👋";
-    else if (hours >= 11 && hours < 15) greet = "Selamat Siang 👋";
-    else if (hours >= 15 && hours < 18) greet = "Selamat Sore 👋";
-    else greet = "Selamat Malam 👋";
+    const h = new Date().getHours();
+    let greet = "Selamat Malam 👋";
+    if (h >= 4 && h < 11) greet = "Selamat Pagi 👋";
+    else if (h >= 11 && h < 15) greet = "Selamat Siang 👋";
+    else if (h >= 15 && h < 18) greet = "Selamat Sore 👋";
 
     document.getElementById("greeting").textContent = greet;
-
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById("tanggal").textContent =
-        new Date().toLocaleDateString('id-ID', options);
+        new Date().toLocaleDateString("id-ID", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
 </script>
 
 {% endblock %}

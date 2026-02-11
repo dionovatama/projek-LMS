@@ -1,34 +1,60 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tambah Mapel</title>
-</head>
-<body>
-    <h1>Tambah Mapel Baru</h1>
+{% extends 'learning/base.html' %}
+{% block content %}
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label>Nama Mapel:</label><br>
-        <input type="text" name="nama" required><br><br>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-        <label>Kelas:</label><br>
-        <select name="kelas" required>
-            <option value="">-- Pilih Kelas --</option>
-            {% for k in kelas_list %}
-                <option value="{{ k.id }}">{{ k.nama }}</option>
-            {% endfor %}
-        </select><br><br>
+            <!-- CARD -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">➕ Tambah Mapel Baru</h5>
+                </div>
 
-        <label>Deskripsi:</label><br>
-        <textarea name="deskripsi" rows="4" cols="50"></textarea><br><br>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
 
-        <label>Gambar:</label><br>
-        <input type="file" name="gambar"><br><br>
+                        <!-- Nama Mapel -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nama Mapel</label>
+                            <input type="text" name="nama" class="form-control" placeholder="Contoh: Matematika kelas:xxx" required>
+                        </div>
 
-        <button type="submit">Simpan</button>
-    </form>
+                        <!-- Kelas -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Kelas yang anda ajar</label>
+                            <select name="kelas" class="form-select" required>
+                                <option value="">-- Pilih Kelas Disini --</option>
+                                {% for k in kelas_list %}
+                                    <option value="{{ k.id }}">{{ k.nama }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-    <br>
-    <a href="{% url 'dashboard_guru' %}">Kembali</a>
-</body>
-</html>
+                        <!-- Gambar -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Gambar Mapel</label>
+                            <input type="file" name="gambar" class="form-control">
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'dashboard_guru' %}" class="btn btn-secondary">
+                                ⬅ Kembali
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                💾 Simpan Mapel
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <!-- END CARD -->
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,24 +1,83 @@
 {% extends 'learning/base.html' %}
 {% load static %}
 
-{% block title  %}dashboard murid{% endblock %}
+{% block title %}Dashboard Siswa{% endblock %}
+
 {% block content %}
-<h1>Daftar Mata Pelajaran</h1>
+<div class="container py-4">
+
+    <!-- JUDUL -->
+    <div class="mb-4">
+        <h2 class="fw-bold">📚 Daftar Mata Pelajaran</h2>
+        <p class="text-muted mb-0">
+            Mata pelajaran yang tersedia untuk kelas kamu
+        </p>
+    </div>
 
     {% if mapel_list %}
+    <div class="row g-4">
+
         {% for mapel in mapel_list %}
-            <div>
+        <div class="col-12 col-sm-6 col-lg-4">
+
+            <div class="card shadow-sm h-100 border-0 rounded-4">
+
+                <!-- GAMBAR -->
                 {% if mapel.gambar %}
-                    <img src="{{ mapel.gambar.url }}" alt="{{ mapel.nama }}" width="300">
+                <img src="{{ mapel.gambar.url }}"
+                     class="card-img-top rounded-top-4"
+                     style="height:180px; object-fit:cover;"
+                     alt="{{ mapel.nama }}">
+                {% else %}
+                <img src="{% static 'image/default-mapel.jpg' %}"
+                     class="card-img-top rounded-top-4"
+                     style="height:180px; object-fit:cover;"
+                     alt="Mapel">
                 {% endif %}
-                <a href="{% url 'detail_mapel_siswa' mapel.id %}">
-                    <h3>{{ mapel.nama }} - {{ mapel.kelas.nama }}</h3>
-                </a>
-                <p>38% complete</p>
-                <hr>
+
+                <!-- BODY -->
+                <div class="card-body d-flex flex-column">
+
+                    <h5 class="fw-bold mb-1">
+                        {{ mapel.nama }}
+                    </h5>
+
+                    <p class="text-muted small mb-3">
+                        Kelas {{ mapel.kelas.nama }}
+                    </p>
+
+                    <!-- PROGRESS -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>Progress</span>
+                            <span>38%</span>
+                        </div>
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar bg-success"
+                                 style="width:38%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <a href="{% url 'detail_mapel_siswa' mapel.id %}"
+                       class="btn btn-primary mt-auto w-100">
+                        📖 Lihat Materi
+                    </a>
+
+                </div>
             </div>
+
+        </div>
         {% endfor %}
+
+    </div>
+
     {% else %}
-        <p>Belum ada mata pelajaran untuk kelas ini.</p>
+    <div class="alert alert-info shadow-sm">
+        Belum ada mata pelajaran untuk kelas ini.
+    </div>
     {% endif %}
-{% endblock content %}
+
+</div>
+{% endblock %}

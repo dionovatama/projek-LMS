@@ -2,49 +2,72 @@
 {% load static %}
 
 {% block title %}Beranda - E-Learning{% endblock %}
+
 {% block content %}
 
-<!-- HERO SECTION -->
-<section class="hero-section py-5" 
-    style="background: linear-gradient(135deg, #4e1ac7, #7b27f2);">
-    <div class="container text-center text-white py-5">
-        <h1 class="fw-bold display-5">Platform E-Learning Modern</h1>
-        <p class="mt-3 fs-5">
-            Sistem pembelajaran online SMKN 2 Baleendah  
-            yang interaktif, tertata, dan mudah digunakan.
+<!-- ================= HERO ================= -->
+<section class="hero-section d-flex align-items-center text-white"
+    style="
+        min-height: calc(100svh - 56px);
+        background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url('{% static 'image/sekolah.jpg' %}') center/cover no-repeat;
+        padding: 4rem 1.25rem;
+    ">
+
+    <div class="container">
+        <span class="text-warning fw-bold small">
+            THE BEST PLATFORM FOR
+        </span>
+
+        <h1 class="fw-bold mt-2 display-5 display-lg-4">
+            EDUCATION
+        </h1>
+
+        <p class="mt-3 fs-6 fs-lg-5 col-lg-7">
+            Platform E-Learning SMKN 2 Baleendah untuk pembelajaran digital
+            yang modern, terstruktur, dan mudah digunakan.
         </p>
-        <a href="{% url 'login' %}" class="btn btn-light btn-lg mt-3 px-4">
-             mulai Belajar Sekarang       </a>
+
+        <a href="{% url 'login' %}"
+           class="btn btn-warning btn-lg mt-4 px-4">
+            Masuk ke Dashboard
+        </a>
     </div>
 </section>
 
-
-<!-- FEATURE CARDS -->
+<!-- ================= FEATURES ================= -->
 <section class="py-5 bg-light">
     <div class="container text-center">
         <div class="row g-4">
 
             <div class="col-12 col-md-4">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
-                    <img src="{% static 'image/users.png' %}" width="60">
-                    <h5 class="fw-bold mt-3">E-Learning Terpusat</h5>
-                    <p class="text-muted">Semua materi, tugas, dan absensi dalam satu sistem.</p>
+                <div class="p-4 bg-white shadow-sm rounded-4 h-100">
+                    <img src="{% static 'image/users.png' %}" width="55" class="mb-3">
+                    <h5 class="fw-bold">E-Learning Terpusat</h5>
+                    <p class="text-muted mb-0 small">
+                        Semua materi, tugas, dan absensi dalam satu sistem.
+                    </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-4">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
-                    <img src="{% static 'image/computer.png' %}" width="60">
-                    <h5 class="fw-bold mt-3">Akses Mudah</h5>
-                    <p class="text-muted">Bisa dibuka dari HP, laptop, atau tablet tanpa ribet.</p>
+                <div class="p-4 bg-white shadow-sm rounded-4 h-100">
+                    <img src="{% static 'image/computer.png' %}" width="55" class="mb-3">
+                    <h5 class="fw-bold">Akses Mudah</h5>
+                    <p class="text-muted mb-0 small">
+                        Bisa dibuka dari HP, laptop, atau tablet.
+                    </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-4">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100">
-                    <img src="{% static 'image/time-check.png' %}" width="60">
-                    <h5 class="fw-bold mt-3">Sistem Cepat</h5>
-                    <p class="text-muted">Optimasi performa agar siswa belajar tanpa hambatan.</p>
+                <div class="p-4 bg-white shadow-sm rounded-4 h-100">
+                    <img src="{% static 'image/time-check.png' %}" width="55" class="mb-3">
+                    <h5 class="fw-bold">Sistem Cepat</h5>
+                    <p class="text-muted mb-0 small">
+                        Performa optimal tanpa hambatan.
+                    </p>
                 </div>
             </div>
 
@@ -52,52 +75,57 @@
     </div>
 </section>
 
-
-<!-- INFO SEKOLAH + DAFTAR JURUSAN -->
-<section class="py-5 bg-light">
+<!-- ================= JURUSAN ================= -->
+<section class="py-5 bg-white">
     <div class="container">
 
-        <h2 class="fw-bold text-center mb-4">SMKN 2 BALEENDAH</h2>
-        <p class="text-center text-muted mb-5 fs-5">
-            Sekolah Kejuruan unggulan dengan berbagai kompetensi keahlian modern
-            yang siap mencetak lulusan berdaya saing tinggi.
+        <h2 class="fw-bold text-center mb-3">
+            SMKN 2 BALEENDAH
+        </h2>
+
+        <p class="text-center text-muted fs-6 fs-lg-5 mb-5">
+            Sekolah Kejuruan unggulan dengan berbagai kompetensi keahlian modern.
         </p>
 
         <div class="row g-4 justify-content-center">
 
-            <!-- Responsive: 2 kolom HP | 3 Tablet | 4 PC -->
+            <!-- KULINER -->
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
-                    <h5 class="fw-bold">Kuliner</h5>
-                    <p class="text-muted">Tata boga dan pengolahan makanan.</p>
+                <div class="p-4 rounded-4 h-100 text-center text-white fw-bold"
+                     style="background: linear-gradient(135deg, #16a34a, #22c55e);">
+                    Kuliner
                 </div>
             </div>
 
+            <!-- BUSANA -->
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
-                    <h5 class="fw-bold">Busana</h5>
-                    <p class="text-muted">Fashion, menjahit, dan produksi pakaian.</p>
+                <div class="p-4 rounded-4 h-100 text-center text-white fw-bold"
+                     style="background: linear-gradient(135deg, #2563eb, #3b82f6);">
+                    Busana
                 </div>
             </div>
 
+            <!-- KECANTIKAN -->
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
-                    <h5 class="fw-bold">Kecantikan</h5>
-                    <p class="text-muted">Make-up, perawatan wajah & rambut.</p>
+                <div class="p-4 rounded-4 h-100 text-center text-white fw-bold"
+                     style="background: linear-gradient(135deg, #db2777, #ec4899);">
+                    Kecantikan
                 </div>
             </div>
 
+            <!-- KIMIA INDUSTRI -->
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
-                    <h5 class="fw-bold">Kimia Industri</h5>
-                    <p class="text-muted">Laboratorium & proses industri.</p>
+                <div class="p-4 rounded-4 h-100 text-center text-white fw-bold"
+                     style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
+                    Kimia Industri
                 </div>
             </div>
 
+            <!-- TJKT -->
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="p-4 bg-white shadow-sm rounded-3 h-100 text-center">
-                    <h5 class="fw-bold">TJKT</h5>
-                    <p class="text-muted">Jaringan Komputer & Telekomunikasi.</p>
+                <div class="p-4 rounded-4 h-100 text-center fw-bold"
+                     style="background: linear-gradient(135deg, #ca8a04, #facc15); color:#1f2937;">
+                    TJKT
                 </div>
             </div>
 

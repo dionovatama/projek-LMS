@@ -4,9 +4,10 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    # ===== HALAMAN UTAMA & LOGIN =====
+    # ===== HALAMAN UTAMA LOGIN akun =====
     path('', views.home, name='home'),
     path('login/', views.login_view, name='login'),
+    
 
     # ===== DASHBOARD =====
     path('guru/dashboard/', views.guru_dashboard, name='dashboard_guru'),
@@ -20,11 +21,15 @@ urlpatterns = [
     # ===== FORM TAMBAH =====
     path('guru/tambah_mapel/', views.tambah_mapel, name='tambah_mapel'),
     path('guru/mapel/<int:mapel_id>/edit/', views.edit_mapel, name='edit_mapel'),
-    path('guru/tambah-bab/', views.tambah_bab, name='tambah_bab'),
+    path("guru/mapel/<int:mapel_id>/bab/tambah/",views.tambah_bab,name="tambah_bab"),
     path('tambah-tugas/', views.tambah_tugas, name='tambah_tugas'),
 
     # ==== FORM HAPUS =====
     path('guru/mapel/hapus/<int:id>/', views.hapus_mapel, name='hapus_mapel'),
+    path('bab/<int:pk>/hapus/', views.hapus_bab, name='hapus_bab'),
+    path("tugas/<int:id>/hapus/", views.hapus_tugas, name="hapus_tugas"),
+
+
 
 
 

@@ -18,13 +18,43 @@
                     <a href="{% url 'pengumpulan_tugas' tugas.id %}" class="btn btn-outline-primary btn-sm">
                         📥 Lihat Pengumpulan
                     </a>
+
+                    <!-- Tombol Hapus -->
+                    <a href="#" class="text-danger text-decoration-none ms-3" 
+                       data-bs-toggle="modal" 
+                       data-bs-target="#hapusTugasModal{{ tugas.id }}">
+                        <i class="bi bi-trash"></i> Hapus
+                    </a>
                 </div>
             </div>
+
+            <!-- Modal Konfirmasi Hapus -->
+            <div class="modal fade" id="hapusTugasModal{{ tugas.id }}" tabindex="-1" aria-labelledby="hapusTugasLabel{{ tugas.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-3">
+                  <div class="modal-header bg-danger text-white rounded-top">
+                    <h5 class="modal-title" id="hapusTugasLabel{{ tugas.id }}">Konfirmasi Hapus Tugas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    Apakah kamu yakin ingin menghapus tugas <strong>"{{ tugas.judul }}"</strong>?
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <a href="{% url 'hapus_tugas' tugas.id %}" class="btn btn-danger">Hapus</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
         {% endfor %}
     {% else %}
         <p class="text-muted fst-italic">Belum ada tugas di bab ini.</p>
     {% endif %}
 </div>
+
 <a href="{% url 'rekap_nilai' bab.id %}" class="btn btn-success mt-2">📊 Rekap Nilai</a>
 
 {% endblock %}

@@ -1,24 +1,61 @@
 {% extends 'learning/base.html' %}
+
 {% block content %}
-<h1>{{ mapel.nama }} - {{ mapel.kelas.nama }}</h1>
+<div class="container mt-4">
 
-    <h2>Daftar Bab</h2>
-    {% if bab_list %}
-        <ul>
-            {% for bab in bab_list %}
-                <li>
-                    <a href="{% url 'detail_bab_siswa' bab.id %}">
-                        {{ bab.judul }}
-                    </a><br>
-                    {{ bab.deskripsi }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Belum ada bab untuk mapel ini.</p>
-    {% endif %}
+    <!-- Header Mapel -->
+    <div class="card shadow-lg border-0 mb-4"
+         style="background: linear-gradient(135deg, #4e73df, #1cc88a);">
+        <div class="card-body text-white">
+            <h3 class="mb-1 fw-bold">{{ mapel.nama }}</h3>
+            <p class="mb-0 opacity-75">
+                Kelas {{ mapel.kelas.nama }}
+            </p>
+        </div>
+    </div>
 
-    <hr>
-    <a href="{% url 'dashboard_siswa' %}">⬅️ Kembali ke Dashboard</a>
-    
+    <!-- Daftar Bab -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📘 Daftar Bab</h5>
+        </div>
+
+        <div class="card-body p-0">
+            {% if bab_list %}
+                <div class="list-group list-group-flush">
+                    {% for bab in bab_list %}
+                        <a href="{% url 'detail_bab_siswa' bab.id %}"
+                           class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-semibold text-primary">
+                                        {{ bab.judul }}
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ bab.deskripsi|default:"Tidak ada deskripsi" }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">
+                                    Buka
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning m-3">
+                    Belum ada bab untuk mapel ini.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tombol Kembali -->
+    <div class="mt-4">
+        <a href="{% url 'dashboard_siswa' %}" class="btn btn-outline-primary">
+            ← Kembali ke Dashboard
+        </a>
+    </div>
+
+</div>
 {% endblock %}

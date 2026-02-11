@@ -25,7 +25,7 @@ def home(request):
 
 
 # ========================
-# LOGIN
+# LOGIN & akun 
 # ========================
 def login_view(request):
     if request.method == 'POST':
@@ -46,6 +46,10 @@ def login_view(request):
 
     return render(request, 'learning/login.html')
 
+@login_required
+def profile(request):
+    return render(request, 'accounts/profile.html')
+
 
 
 
@@ -63,7 +67,7 @@ def guru_dashboard(request):
         nama = request.POST.get('nama')
         deskripsi = request.POST.get('deskripsi')
         gambar = request.FILES.get('gambar')
-
+    
         Mapel.objects.create(
             nama=nama,
             deskripsi=deskripsi,
@@ -79,7 +83,6 @@ def guru_dashboard(request):
 def tambah_mapel(request):
     guru_profile = GuruProfile.objects.get(user=request.user)
     kelas_list = Kelas.objects.all()  # semua kelas tampil
-
     if request.method == 'POST':
         nama = request.POST.get('nama')
         deskripsi = request.POST.get('deskripsi')
@@ -87,7 +90,6 @@ def tambah_mapel(request):
         gambar = request.FILES.get('gambar')
 
         kelas = get_object_or_404(Kelas, id=kelas_id)
-
         Mapel.objects.create(
             nama=nama,
             deskripsi=deskripsi,
@@ -95,7 +97,10 @@ def tambah_mapel(request):
             guru=guru_profile,
             gambar=gambar
         )
+
+        messages.success(request, "Mapel berhasil ditambahkan.")
         return redirect('dashboard_guru')
+    
 
     return render(request, 'learning/tambah_mapel.html', {'kelas_list': kelas_list})
 
@@ -117,6 +122,7 @@ def edit_mapel(request, mapel_id):
             mapel.gambar = request.FILES['gambar']
 
         mapel.save()
+        messages.info(request, "Mapel berhasil diperbarui.")
         return redirect('dashboard_guru')
 
     return render(request, 'learning/edit_mapel.html', {
@@ -128,7 +134,7 @@ def edit_mapel(request, mapel_id):
 def hapus_mapel(request, id):
     guru_profile = GuruProfile.objects.get(user=request.user)
 
-    # Hanya guru pemilik mapel yang boleh hapus
+    # hanya guru pemilik mapel yang boleh hapus
     mapel = get_object_or_404(Mapel, id=id, guru=guru_profile)
 
     if request.method == "POST":
@@ -136,10 +142,28 @@ def hapus_mapel(request, id):
         messages.success(request, "Mapel berhasil dihapus.")
         return redirect('dashboard_guru')
 
-    # Jika GET → tampilkan halaman konfirmasi
-    return render(request, 'learning/guru/konfirmasi_hapus_mapel.html', {
-        'mapel': mapel
-    })
+    # GET → tampilkan halaman konfirmasi
+    return render(
+        request,
+        'learning/guru/konfirmasi_hapus_mapel.html',
+        {'mapel': mapel}
+    )
+
+
+def hapus_bab(request, pk):
+    bab = get_object_or_404(Bab, id=pk)
+    mapel_id = bab.mapel.id
+    bab.delete()
+    messages.error(request, "Bab berhasil dihapus.")
+    return redirect('detail_mapel_guru', mapel_id)
+
+def hapus_tugas(request, id):
+    tugas = get_object_or_404(Tugas, id=id)
+    bab = tugas.bab
+    tugas.delete()
+    messages.error(request, "Tugas berhasil dihapus.")
+    return redirect('detail_bab', bab.id)
+
 
 
 @login_required
@@ -261,7 +285,7 @@ def tambah_tugas(request):
             messages.error(request, 'Terjadi kesalahan, periksa kembali inputan Anda.')
     else:
         form = TugasForm()
-
+    
     return render(request, 'learning/tambah_tugas.html', {
         'form': form,
         'bab_list': bab_list,
@@ -273,21 +297,32 @@ def tambah_tugas(request):
 # FORM TAMBAH BAB
 # ========================
 @login_required
-def tambah_bab(request):
+def tambah_bab(request, mapel_id):
     guru_profile = GuruProfile.objects.get(user=request.user)
-    mapel_list = Mapel.objects.filter(guru=guru_profile)
+
+    mapel = get_object_or_404(
+        Mapel,
+        id=mapel_id,
+        guru=guru_profile
+    )
 
     if request.method == "POST":
-        mapel_id = request.POST.get("mapel")
         judul = request.POST.get("judul")
         deskripsi = request.POST.get("deskripsi")
 
-        mapel = get_object_or_404(Mapel, id=mapel_id)
-        Bab.objects.create(mapel=mapel, judul=judul, deskripsi=deskripsi)
-        messages.success(request, 'Bab berhasil ditambahkan!')
-        return redirect('dashboard_guru')
+        Bab.objects.create(
+            mapel=mapel,
+            judul=judul,
+            deskripsi=deskripsi
+        )
 
-    return render(request, 'learning/tambah_bab.html', {'mapel_list': mapel_list})
+        messages.success(request, "Bab berhasil ditambahkan.")
+        return redirect("detail_mapel_guru", mapel.id)
+
+    return render(request, "learning/tambah_bab.html", {
+        "mapel": mapel
+    })
+
 
 
 
@@ -304,10 +339,7 @@ class PenilaianForm(forms.ModelForm):
             'nilai': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'komentar_guru': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
-
-
-
-login_required
+        
 @login_required
 def nilai_tugas(request, pengumpulan_id):
     pengumpulan = get_object_or_404(PengumpulanTugas, id=pengumpulan_id)

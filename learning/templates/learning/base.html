@@ -3,88 +3,169 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{% block title %}E-Learning SMKN 2 Baleendah{% endblock %}</title>
 
-    {# Generate timestamp untuk cache-busting CSS #}
     {% now "U" as timestamp %}
 
-    <!-- CSS STYLE -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={{ timestamp }}">
+    <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CUSTOM CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={{ timestamp }}">
 
     <style>
         html, body {
             height: 100%;
-            margin: 0;
         }
 
         body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            /* 🔵 BLUE GRADIENT BACKGROUND */
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.18), transparent 40%),
+                radial-gradient(circle at bottom right, rgba(37,99,235,0.15), transparent 45%),
+                linear-gradient(180deg, #f7faff, #eef4ff);
+
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background: #f0f3ff;
         }
 
         main {
-            flex: 1;  
-            padding: 20px 20px 40px 20px;
+            flex: 1;
+            padding: 1.5rem 0 2rem;
+        }
+
+        /* GLOBAL CARD POLISH */
+        .card {
+            border-radius: 14px;
+            border: none;
+        }
+
+        /* MOBILE NAV FIX */
+        @media (max-width: 768px) {
+            .navbar-brand span {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-dark bg-dark navbar-expand-md py-2">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="#">
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-dark navbar-expand-md shadow-sm sticky-top"
+     style="background: linear-gradient(90deg, #1e40af, #2563eb);">
+    <div class="container-fluid px-3">
+
+        <!-- LOGO -->
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
             <img src="{% static 'image/Logo smk.jpg' %}"
                  alt="Logo SMK"
-                 style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 10px;">
-            <span class="h6 mb-0">WEB E-LEARNING SMKN 2 BALEENDAH</span>
+                 width="40" height="40"
+                 class="rounded me-2">
+
+            <!-- Desktop -->
+            <span class="fw-semibold d-none d-sm-inline">
+                WEB E-LEARNING SMKN 2 BALEENDAH
+            </span>
+
+            <!-- Mobile -->
+            <span class="fw-semibold d-inline d-sm-none">
+                E-Learning SMKN 2
+            </span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <!-- TOGGLER -->
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- MENU -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto gap-2">
+
                 <li class="nav-item">
-                    <a class="nav-link text-white fw-semibold" href="{% url 'home' %}">Home</a>
+                    <a class="nav-link fw-semibold text-white" href="{% url 'home' %}">
+                        Home
+                    </a>
                 </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-semibold text-white"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown">
+                        Akun
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                👤 Profil
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">
+                                    🚪 Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
                 <li class="nav-item">
-                    <a class="nav-link text-white fw-semibold" href="{% url 'login' %}">Masuk</a>
+                    <a class="nav-link fw-semibold text-white" href="{% url 'login' %}">
+                        Masuk
+                    </a>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- MAIN CONTENT -->
-<main>
-    <div class="container-fluid px-3">
-        {% block content %}{% endblock %}
+<!-- ================= FLASH MESSAGES ================= -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert
+        {% if message.tags == 'error' %}alert-danger
+        {% elif message.tags == 'success' %}alert-success
+        {% elif message.tags == 'warning' %}alert-warning
+        {% elif message.tags == 'info' %}alert-info
+        {% else %}alert-secondary{% endif %}
+        alert-dismissible fade show shadow-sm">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ================= MAIN ================= -->
+<main class="container">
+    {% block content %}{% endblock %}
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-dark text-white py-3 mt-auto">
-    <div class="container-fluid text-center">
-        <p class="mb-1 fw-semibold">
-            © {{ now|date:"Y" }} SMKN 2 Baleendah — E-Learning System
-        </p>
-        <p class="small mb-2">
-            Dibuat untuk mendukung kegiatan pembelajaran digital.
-        </p>
-        <a href="#" class="text-decoration-none text-info small">
-            Kontak Admin
-        </a>
+<!-- ================= FOOTER ================= -->
+<footer class="text-white py-3 mt-auto"
+        style="background: linear-gradient(90deg, #1e3a8a, #1e40af);">
+    <div class="container text-center small">
+        © {{ now|date:"Y" }} SMKN 2 Baleendah — E-Learning System
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

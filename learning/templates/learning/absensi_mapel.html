@@ -13,11 +13,28 @@
     }
 
     .header-grad {
-        background: linear-gradient(90deg, #0d47a1, #2962ff);
-        padding: 20px 25px;
-        color: white;
-        border-radius: 0 0 20px 20px;
-    }
+    background: linear-gradient(90deg, #0d47a1, #2962ff); /* warna tetap */
+    padding: 25px 35px;        /* lebih tebal biar mirip */
+    color: white;
+    border-radius: 20px;       /* bukan 0 0 20px, tapi full rounded */
+    margin-top: -10px;         /* biar nempel ke navbar seperti halaman mapel */
+    margin-bottom: 25px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.header-grad h3 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.header-grad small {
+    font-size: 15px;
+    opacity: 0.95;
+    padding-left: 50px;
+}
+
+    
 
     /* Row tanggal */
     .date-row {
@@ -89,8 +106,8 @@
 
 <!-- HEADER -->
 <div class="header-grad mb-3">
-    <h3 class="m-0">📋 Absensi {{ mapel.nama }}</h3>
-    <small>Pilih tanggal dan catat kehadiran</small>
+    <h3 class="m-0">📋 Absensi {{ mapel.nama  }} {{ mapel.kelas.nama }}</h3>
+    <small>Pilih tanggal dan catat atau lihat kehadiran</small>
 </div>
 
 
