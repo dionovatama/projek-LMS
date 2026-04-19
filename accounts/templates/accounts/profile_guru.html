@@ -1,0 +1,37 @@
+{% extends 'learning/base.html' %}
+{% block title %}Profil Guru{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3">Profil Guru</h4>
+            <p><strong>Nama:</strong>
+                {{ guru.user.first_name|default:"-" }} {{ guru.user.last_name|default:"" }}
+            </p>
+            <p><strong>Username:</strong> {{ guru.user.username }}</p>
+            <p><strong>Email:</strong> {{ guru.user.email|default:"-" }}</p>
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Mata Pelajaran yang Diajar</h5>
+            {% if mapel_list %}
+                <ul class="list-group">
+                    {% for mapel in mapel_list %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            {{ mapel.nama }}
+                            <span class="badge bg-primary">{{ mapel.kelas.nama }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Belum ada mapel yang diajar.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
