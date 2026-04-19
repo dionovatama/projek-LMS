@@ -1,0 +1,105 @@
+{% extends 'learning/base.html' %}
+
+{% block title %}Profil Siswa{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- PROFIL -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3">Profil Siswa</h4>
+
+            <p>
+                <strong>Nama:</strong>
+                {{ siswa.user.first_name|default:"-" }} {{ siswa.user.last_name|default:"" }}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                {{ siswa.user.username|default:"-" }}
+            </p>
+
+            <p>
+                <strong>Kelas:</strong>
+                {{ siswa.kelas.nama|default:"-" }}
+            </p>
+        </div>
+    </div>
+
+    <!-- STATISTIK -->
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h5 class="fw-bold mb-4">Statistik Absensi</h5>
+
+            <div class="row align-items-center">
+                
+                <!-- CHART -->
+                <div class="col-md-6 text-center">
+                    <canvas id="absensiChart" style="max-height:300px;"></canvas>
+                </div>
+
+                <!-- DATA -->
+                <div class="col-md-6">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between text-success">
+                            Hadir <span>{{ hadir }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between text-info">
+                            Izin <span>{{ izin }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between text-warning">
+                            Sakit <span>{{ sakit }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between text-danger">
+                            Alpa <span>{{ alpa }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const dataValues = [
+    {{ hadir|default:0 }},
+    {{ izin|default:0 }},
+    {{ sakit|default:0 }},
+    {{ alpa|default:0 }}
+];
+
+// handle kalau semua 0 biar chart tetap muncul
+const total = dataValues.reduce((a, b) => a + b, 0);
+const safeData = total === 0 ? [1,1,1,1] : dataValues;
+
+new Chart(document.getElementById('absensiChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Hadir', 'Izin', 'Sakit', 'Alpa'],
+        datasets: [{
+            data: safeData,
+            backgroundColor: [
+                '#22c55e',
+                '#0ea5e9',
+                '#facc15',
+                '#ef4444'
+            ]
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

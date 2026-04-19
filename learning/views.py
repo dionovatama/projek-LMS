@@ -3,13 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
-from .models import Tugas, PengumpulanTugas, Absensi
-from .forms import  MapelForm, PengumpulanTugasForm
-from django import forms
 from django.utils import timezone
-from datetime import datetime
-from .forms import TugasForm
-
 
 from .models import (
     CustomUser, GuruProfile, SiswaProfile,
@@ -17,16 +11,25 @@ from .models import (
     Absensi
 )
 
-# ========================
-# HALAMAN UTAMA
-# ========================
+
+# =========================
+# UTIL / GUARD
+# =========================
+def is_guru(user):
+    return hasattr(user, 'role') and user.role == 'guru'
+
+
+def is_siswa(user):
+    return hasattr(user, 'role') and user.role == 'siswa'
+
+
+# =========================
+# HOME & AUTH
+# =========================
 def home(request):
     return render(request, 'learning/home.html')
 
 
-# ========================
-# LOGIN & akun 
-# ========================
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -35,161 +38,83 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            if hasattr(user, 'role'):
-                if user.role == 'guru':
-                    return redirect('dashboard_guru')
-                elif user.role == 'siswa':
-                    return redirect('dashboard_siswa')
-            return redirect('home')
-        else:
-            messages.error(request, 'Username atau password salah.')
+            return redirect('dashboard_guru' if is_guru(user) else 'dashboard_siswa')
+
+        messages.error(request, 'Username atau password salah.')
 
     return render(request, 'learning/login.html')
 
+
+# =========================
+# PROFILE (SISWA)
+# =========================
 @login_required
 def profile(request):
-    return render(request, 'accounts/profile.html')
+    if not is_siswa(request.user):
+        return render(request, 'accounts/profile.html')
 
+    siswa = get_object_or_404(SiswaProfile, user=request.user)
 
-
-
-
-# ========================
-# DASHBOARD GURU
-# ========================
-from .models import GuruProfile, Mapel
-
-def guru_dashboard(request):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    mapel_list = Mapel.objects.filter(guru=guru_profile)
-
-    if request.method == "POST":
-        nama = request.POST.get('nama')
-        deskripsi = request.POST.get('deskripsi')
-        gambar = request.FILES.get('gambar')
-    
-        Mapel.objects.create(
-            nama=nama,
-            deskripsi=deskripsi,
-            gambar=gambar,
-            guru=guru_profile,
-            kelas=guru_profile.kelas.first()  # ambil kelas pertama (kalau banyak)
-        )
-
-    return render(request, 'learning/guru_dashboard.html', {'mapel_list': mapel_list})
-
-
-@login_required
-def tambah_mapel(request):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    kelas_list = Kelas.objects.all()  # semua kelas tampil
-    if request.method == 'POST':
-        nama = request.POST.get('nama')
-        deskripsi = request.POST.get('deskripsi')
-        kelas_id = request.POST.get('kelas')
-        gambar = request.FILES.get('gambar')
-
-        kelas = get_object_or_404(Kelas, id=kelas_id)
-        Mapel.objects.create(
-            nama=nama,
-            deskripsi=deskripsi,
-            kelas=kelas,
-            guru=guru_profile,
-            gambar=gambar
-        )
-
-        messages.success(request, "Mapel berhasil ditambahkan.")
-        return redirect('dashboard_guru')
-    
-
-    return render(request, 'learning/tambah_mapel.html', {'kelas_list': kelas_list})
-
-
-@login_required
-def edit_mapel(request, mapel_id):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    mapel = get_object_or_404(Mapel, id=mapel_id, guru=guru_profile)
-    kelas_list = Kelas.objects.all()
-
-    if request.method == 'POST':
-        mapel.nama = request.POST.get('nama')
-        mapel.deskripsi = request.POST.get('deskripsi')
-        kelas_id = request.POST.get('kelas')
-        if kelas_id:
-            mapel.kelas = get_object_or_404(Kelas, id=kelas_id)
-
-        if 'gambar' in request.FILES:
-            mapel.gambar = request.FILES['gambar']
-
-        mapel.save()
-        messages.info(request, "Mapel berhasil diperbarui.")
-        return redirect('dashboard_guru')
-
-    return render(request, 'learning/edit_mapel.html', {
-        'mapel': mapel,
-        'kelas_list': kelas_list
-    })
-
-@login_required
-def hapus_mapel(request, id):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-
-    # hanya guru pemilik mapel yang boleh hapus
-    mapel = get_object_or_404(Mapel, id=id, guru=guru_profile)
-
-    if request.method == "POST":
-        mapel.delete()
-        messages.success(request, "Mapel berhasil dihapus.")
-        return redirect('dashboard_guru')
-
-    # GET → tampilkan halaman konfirmasi
-    return render(
-        request,
-        'learning/guru/konfirmasi_hapus_mapel.html',
-        {'mapel': mapel}
-    )
-
-
-def hapus_bab(request, pk):
-    bab = get_object_or_404(Bab, id=pk)
-    mapel_id = bab.mapel.id
-    bab.delete()
-    messages.error(request, "Bab berhasil dihapus.")
-    return redirect('detail_mapel_guru', mapel_id)
-
-def hapus_tugas(request, id):
-    tugas = get_object_or_404(Tugas, id=id)
-    bab = tugas.bab
-    tugas.delete()
-    messages.error(request, "Tugas berhasil dihapus.")
-    return redirect('detail_bab', bab.id)
-
-
-
-@login_required
-def daftar_tugas_guru(request):
-    # ambil guru yang login sekarang
-    guru_profile = GuruProfile.objects.get(user=request.user)
-
-    # ambil semua mapel yang diampu guru ini
-    mapel_list = Mapel.objects.filter(guru=guru_profile)
-
-    context = {
-        'mapel_list': mapel_list,
+    stats = {
+        'hadir': Absensi.objects.filter(siswa=siswa, status='hadir').count(),
+        'izin': Absensi.objects.filter(siswa=siswa, status='izin').count(),
+        'sakit': Absensi.objects.filter(siswa=siswa, status='sakit').count(),
+        'alpa': Absensi.objects.filter(siswa=siswa, status='alpa').count(),
     }
 
-    return render(request, 'learning/daftar_tugas_guru.html', context)
+    return render(request, 'accounts/profile_siswa.html', {
+        'siswa': siswa,
+        **stats
+    })
 
 
+# =========================
+# DASHBOARD
+# =========================
+@login_required
+def guru_dashboard(request):
+    if not is_guru(request.user):
+        return redirect('dashboard_siswa')
 
-# ========================
-# DETAIL MAPEL → DAFTAR BAB
-# ========================
+    guru = get_object_or_404(GuruProfile, user=request.user)
+    mapel_list = Mapel.objects.filter(guru=guru)
+
+    return render(request, 'learning/guru_dashboard.html', {
+        'mapel_list': mapel_list
+    })
+
+
+@login_required
+def siswa_dashboard(request):
+    if not is_siswa(request.user):
+        return redirect('dashboard_guru')
+
+    siswa = get_object_or_404(SiswaProfile, user=request.user)
+    mapel_list = Mapel.objects.filter(kelas=siswa.kelas)
+
+    return render(request, 'learning/siswa_dashboard.html', {
+        'siswa': siswa,
+        'mapel_list': mapel_list
+    })
+
+
+# =========================
+# GURU - MAPEL & BAB
+# =========================
+@login_required
+def daftar_tugas_guru(request):
+    guru = get_object_or_404(GuruProfile, user=request.user)
+    mapel_list = Mapel.objects.filter(guru=guru)
+
+    return render(request, 'learning/daftar_tugas_guru.html', {
+        'mapel_list': mapel_list
+    })
+
+
 @login_required
 def detail_mapel_guru(request, mapel_id):
-    """Tampilan daftar Bab dan Tugas dalam 1 Mapel"""
     mapel = get_object_or_404(Mapel, id=mapel_id, guru__user=request.user)
-    bab_list = Bab.objects.filter(mapel=mapel).prefetch_related('tugas')
+    bab_list = mapel.bab_list.all()
 
     return render(request, 'learning/detail_mapel_guru.html', {
         'mapel': mapel,
@@ -197,400 +122,263 @@ def detail_mapel_guru(request, mapel_id):
     })
 
 
-# ========================
-# DETAIL BAB → DAFTAR TUGAS + PENGUMPULAN
-# ========================
 @login_required
 def detail_bab_guru(request, bab_id):
-    bab = get_object_or_404(Bab, id=bab_id, mapel__guru__user=request.user)
-    tugas_list = Tugas.objects.filter(bab=bab).prefetch_related('pengumpulan_tugas')
-
-    # total nilai rata-rata per siswa (optional)
-    pengumpulan = PengumpulanTugas.objects.filter(tugas__bab=bab)
-    avg_nilai = pengumpulan.aggregate(rata_rata=Avg('nilai'))['rata_rata']
+    bab = get_object_or_404(Bab, id=bab_id)
+    tugas_list = bab.tugas.all()
 
     return render(request, 'learning/detail_bab_guru.html', {
         'bab': bab,
-        'tugas_list': tugas_list,
-        'avg_nilai': avg_nilai,
+        'tugas_list': tugas_list
     })
 
 
-# ===============================
-# 1️⃣ Halaman Pengumpulan Tugas
-# ===============================
-from django.shortcuts import render, get_object_or_404
-from .models import Tugas, PengumpulanTugas
+# =========================
+# TAMBAH / EDIT / HAPUS
+# =========================
+@login_required
+def tambah_mapel(request):
+    guru = get_object_or_404(GuruProfile, user=request.user)
+    kelas_list = Kelas.objects.all()
+
+    if request.method == 'POST':
+        Mapel.objects.create(
+            nama=request.POST.get('nama'),
+            deskripsi=request.POST.get('deskripsi'),
+            kelas=get_object_or_404(Kelas, id=request.POST.get('kelas')),
+            guru=guru,
+            gambar=request.FILES.get('gambar')
+        )
+        return redirect('dashboard_guru')
+
+    return render(request, 'learning/tambah_mapel.html', {'kelas_list': kelas_list})
+
 
 @login_required
-def pengumpulan_tugas_view(request, tugas_id):
-    tugas = get_object_or_404(Tugas, id=tugas_id)
-    pengumpulan_list = PengumpulanTugas.objects.filter(tugas=tugas).select_related('siswa')
+def edit_mapel(request, mapel_id):
+    mapel = get_object_or_404(Mapel, id=mapel_id)
 
-    context = {
-        'tugas': tugas,
-        'pengumpulan_list': pengumpulan_list,
-    }
-    return render(request, 'learning/pengumpulan_per_tugas.html', context)
+    if request.method == 'POST':
+        mapel.nama = request.POST.get('nama')
+        mapel.deskripsi = request.POST.get('deskripsi')
+        if request.FILES.get('gambar'):
+            mapel.gambar = request.FILES.get('gambar')
+        mapel.save()
+        return redirect('dashboard_guru')
+
+    return render(request, 'learning/edit_mapel.html', {'mapel': mapel})
 
 
-# ===============================
-# 2️⃣ Halaman Rekap Nilai per Bab
-# ===============================
-def rekap_nilai_view(request, bab_id):
-    bab = get_object_or_404(Bab, id=bab_id)
-    
-    rekap = (
-        PengumpulanTugas.objects.filter(tugas__bab=bab)
-        .values('siswa__username')
-        .annotate(
-            jumlah_tugas=Count('tugas', distinct=True),
-            rata_rata=Avg('nilai')
+@login_required
+def hapus_mapel(request, id):
+    mapel = get_object_or_404(Mapel, id=id)
+    mapel.delete()
+    return redirect('dashboard_guru')
+
+
+@login_required
+def tambah_bab(request, mapel_id):
+    mapel = get_object_or_404(Mapel, id=mapel_id)
+
+    if request.method == 'POST':
+        Bab.objects.create(
+            mapel=mapel,
+            judul=request.POST.get('judul'),
+            deskripsi=request.POST.get('deskripsi')
         )
-        .order_by('siswa__username')
-    )
+        return redirect('detail_mapel_guru', mapel_id=mapel.id)
 
-    context = {
-        'bab': bab,
-        'rekap': rekap,
-    }
-    return render(request, 'learning/rekap_nilai.html', context)
+    return render(request, 'learning/tambah_bab.html', {'mapel': mapel})
+
+
+@login_required
+def hapus_bab(request, pk):
+    bab = get_object_or_404(Bab, id=pk)
+    mapel_id = bab.mapel.id
+    bab.delete()
+    return redirect('detail_mapel_guru', mapel_id=mapel_id)
 
 
 @login_required
 def tambah_tugas(request):
-    if request.user.role != 'guru':
-        messages.error(request, 'Hanya guru yang bisa menambah tugas.')
-        return redirect('dashboard_siswa')
-
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    bab_list = Bab.objects.filter(mapel__guru=guru_profile)
-
-    bab_id_default = request.GET.get('bab')  # ambil dari query param
-    bab_obj = None
-    if bab_id_default:
-        bab_obj = get_object_or_404(Bab, id=bab_id_default)
-
     if request.method == 'POST':
-        form = TugasForm(request.POST, request.FILES)  # <-- tambahkan FILES
-        if form.is_valid():
-            tugas = form.save(commit=False)
-            bab_id = request.POST.get('bab') or bab_id_default
-            bab = get_object_or_404(Bab, id=bab_id)
-            tugas.bab = bab
-            tugas.save()
-            messages.success(request, 'Tugas berhasil ditambahkan!')
-            return redirect('detail_bab_guru', bab_id=bab.id)
-        else:
-            messages.error(request, 'Terjadi kesalahan, periksa kembali inputan Anda.')
-    else:
-        form = TugasForm()
-    
-    return render(request, 'learning/tambah_tugas.html', {
-        'form': form,
-        'bab_list': bab_list,
-        'bab': bab_obj
-    })
+        bab = get_object_or_404(Bab, id=request.POST.get('bab'))
 
-
-# ========================
-# FORM TAMBAH BAB
-# ========================
-@login_required
-def tambah_bab(request, mapel_id):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-
-    mapel = get_object_or_404(
-        Mapel,
-        id=mapel_id,
-        guru=guru_profile
-    )
-
-    if request.method == "POST":
-        judul = request.POST.get("judul")
-        deskripsi = request.POST.get("deskripsi")
-
-        Bab.objects.create(
-            mapel=mapel,
-            judul=judul,
-            deskripsi=deskripsi
+        Tugas.objects.create(
+            bab=bab,
+            judul=request.POST.get('judul'),
+            deskripsi=request.POST.get('deskripsi'),
+            file_tugas=request.FILES.get('file'),
+            deadline=request.POST.get('deadline')
         )
 
-        messages.success(request, "Bab berhasil ditambahkan.")
-        return redirect("detail_mapel_guru", mapel.id)
+        return redirect('detail_bab_guru', bab_id=bab.id)
 
-    return render(request, "learning/tambah_bab.html", {
-        "mapel": mapel
+    bab_list = Bab.objects.all()
+    return render(request, 'learning/tambah_tugas.html', {'bab_list': bab_list})
+
+
+@login_required
+def hapus_tugas(request, id):
+    tugas = get_object_or_404(Tugas, id=id)
+    bab_id = tugas.bab.id
+    tugas.delete()
+    return redirect('detail_bab_guru', bab_id=bab_id)
+
+
+# =========================
+# PENILAIAN
+# =========================
+@login_required
+def pengumpulan_tugas_view(request, tugas_id):
+    tugas = get_object_or_404(Tugas, id=tugas_id)
+    pengumpulan = tugas.pengumpulan_tugas.all()
+
+    return render(request, 'learning/pengumpulan_per_tugas.html', {
+        'tugas': tugas,
+        'pengumpulan_list': pengumpulan
     })
 
 
-
-
-
-# ========================
-# NILAIKAN TUGAS SISWA
-# ========================
-# === Form Penilaian ===
-class PenilaianForm(forms.ModelForm):
-    class Meta:
-        model = PengumpulanTugas
-        fields = ['nilai', 'komentar_guru']
-        widgets = {
-            'nilai': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'komentar_guru': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        }
-        
 @login_required
 def nilai_tugas(request, pengumpulan_id):
     pengumpulan = get_object_or_404(PengumpulanTugas, id=pengumpulan_id)
 
     if request.method == 'POST':
-        form = PenilaianForm(request.POST, instance=pengumpulan)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Nilai dan komentar berhasil disimpan!')
-            return redirect('pengumpulan_tugas', tugas_id=pengumpulan.tugas.id)
-    else:
-        form = PenilaianForm(instance=pengumpulan)
+        pengumpulan.nilai = request.POST.get('nilai')
+        pengumpulan.komentar_guru = request.POST.get('komentar')
+        pengumpulan.save()
+        return redirect(request.META.get('HTTP_REFERER', 'dashboard_guru'))
 
     return render(request, 'learning/nilai_tugas.html', {
-        'form': form,
         'pengumpulan': pengumpulan
     })
 
-# ========================
-# KIRIM TUGAS SISWA
-# ========================
-@login_required
-def kirim_tugas(request, tugas_id):
-    tugas = get_object_or_404(Tugas, id=tugas_id)
-
-    if request.method == 'POST':
-        form = PengumpulanTugasForm(request.POST, request.FILES)
-        if form.is_valid():
-            pengumpulan = form.save(commit=False)
-            pengumpulan.tugas = tugas
-            pengumpulan.siswa = request.user  # pastikan user siswa
-            pengumpulan.save()
-            return redirect('daftar_tugas')  # arahkan ke halaman daftar tugas
-    else:
-        form = PengumpulanTugasForm()
-
-    context = {
-        'tugas': tugas,
-        'form': form,
-    }
-    return render(request, 'tugas/kirim_tugas.html', context)
-
-
 
 @login_required
-def daftar_tugas_per_mapel(request, mapel_id):
-    if request.user.role != 'siswa':
-        return redirect('dashboard_guru')
+def rekap_nilai_view(request, bab_id):
+    bab = get_object_or_404(Bab, id=bab_id)
 
-    siswa_profile = SiswaProfile.objects.get(user=request.user)
-    mapel = get_object_or_404(Mapel, id=mapel_id, kelas=siswa_profile.kelas)
-    tugas_list = Tugas.objects.filter(bab__mapel=mapel).select_related('bab')
-
-    context = {
-        'mapel': mapel,
-        'tugas_list': tugas_list
-    }
-    return render(request, 'learning/daftar_tugas_per_mapel.html', context)
-
-@login_required
-def kumpul_tugas(request, tugas_id):
-    if request.user.role != 'siswa':
-        return redirect('dashboard_guru')
-
-    siswa_profile = SiswaProfile.objects.get(user=request.user)
-    tugas = get_object_or_404(Tugas, id=tugas_id)
-
-    if request.method == 'POST':
-        file = request.FILES.get('file')
-        if not file:
-            messages.error(request, 'Silakan pilih file sebelum mengirim.')
-            return redirect(request.path)
-
-        PengumpulanTugas.objects.create(
-            tugas=tugas,
-            siswa=siswa_profile.user,
-            file=file
+    rekap = (
+        PengumpulanTugas.objects.filter(tugas__bab=bab)
+        .values('siswa__username')
+        .annotate(
+            rata_rata=Avg('nilai'),
+            jumlah=Count('id')
         )
-        messages.success(request, 'Tugas berhasil dikumpulkan!')
-        return redirect('daftar_tugas_per_mapel', mapel_id=tugas.bab.mapel.id)
+    )
 
-    return render(request, 'learning/kumpul_tugas.html', {'tugas': tugas})
+    return render(request, 'learning/rekap_nilai.html', {
+        'bab': bab,
+        'rekap': rekap
+    })
 
 
-# ========================
+# =========================
 # ABSENSI
-# ========================
+# =========================
 @login_required
 def absensi_view(request, mapel_id):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    mapel = get_object_or_404(Mapel, id=mapel_id, guru=guru_profile)
-
-    tanggal_str = request.GET.get('tanggal')
-
-    # parsing tanggal fleksibel
-    if tanggal_str:
-        try:
-            tanggal = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
-        except ValueError:
-            try:
-                tanggal = datetime.strptime(tanggal_str, '%b. %d, %Y').date()
-            except ValueError:
-                try:
-                    tanggal = datetime.strptime(tanggal_str, '%b %d, %Y').date()
-                except ValueError:
-                    tanggal = timezone.now().date()
-    else:
-        tanggal = timezone.now().date()
+    guru = get_object_or_404(GuruProfile, user=request.user)
+    mapel = get_object_or_404(Mapel, id=mapel_id, guru=guru)
 
     siswa_list = SiswaProfile.objects.filter(kelas=mapel.kelas)
+    tanggal = timezone.now().date()
 
     if request.method == 'POST':
         for siswa in siswa_list:
             status = request.POST.get(f'status_{siswa.id}')
             if status:
                 Absensi.objects.update_or_create(
-                    guru=guru_profile,
-                    mapel=mapel,
                     siswa=siswa,
+                    mapel=mapel,
                     tanggal=tanggal,
-                    defaults={'status': status}
+                    defaults={'status': status, 'guru': guru}
                 )
-        messages.success(request, f'Absensi tanggal {tanggal} berhasil disimpan!')
-        return redirect(f"{request.path}?tanggal={tanggal}")
 
-    absensi_tercatat = Absensi.objects.filter(mapel=mapel, tanggal=tanggal)
-    absensi_dict = {a.siswa.id: a.status for a in absensi_tercatat}
-    sudah_ada = absensi_tercatat.exists()
+        return redirect(request.path)
 
-    # 🧩 tambahkan status_absen ke tiap siswa
-    for siswa in siswa_list:
-        siswa.status_absen = absensi_dict.get(siswa.id, '')
-
-    context = {
+    return render(request, 'learning/absensi_mapel.html', {
         'mapel': mapel,
         'siswa_list': siswa_list,
-        'tanggal': tanggal,
-        'sudah_ada': sudah_ada
-    }
-    return render(request, 'learning/absensi_mapel.html', context)
-
+        'tanggal': tanggal
+    })
 
 
 @login_required
 def ubah_absensi_view(request, mapel_id, tanggal):
-    guru_profile = GuruProfile.objects.get(user=request.user)
-    mapel = get_object_or_404(Mapel, id=mapel_id, guru=guru_profile)
-    tanggal = datetime.strptime(tanggal, "%Y-%m-%d").date()
+    mapel = get_object_or_404(Mapel, id=mapel_id)
+    siswa_list = SiswaProfile.objects.filter(kelas=mapel.kelas)
 
-    absensi_list = Absensi.objects.filter(mapel=mapel, tanggal=tanggal).select_related('siswa__user')
-
-    if request.method == 'POST':
-        for absensi in absensi_list:
-            status = request.POST.get(f'status_{absensi.siswa.id}')
-            if status:
-                absensi.status = status
-                absensi.save()
-        messages.success(request, f'Absensi tanggal {tanggal} berhasil diubah!')
-        return redirect('absensi_view', mapel_id=mapel.id)
-
-    context = {
+    return render(request, 'learning/ubah_absensi.html', {
         'mapel': mapel,
-        'tanggal': tanggal,
-        'absensi_list': absensi_list
-    }
+        'siswa_list': siswa_list,
+        'tanggal': tanggal
+    })
 
 
-
-
-# ========================
-# DASHBOARD SISWA
-# ========================
-@login_required
-def siswa_dashboard(request):
-    if not hasattr(request.user, 'siswaprofile'):
-        return redirect('dashboard_guru')  # antisipasi kalau bukan siswa
-
-    siswa_profile = SiswaProfile.objects.get(user=request.user)
-    mapel_list = Mapel.objects.filter(kelas=siswa_profile.kelas)
-
-    context = {
-        'siswa': siswa_profile,
-        'mapel_list': mapel_list
-    }
-    return render(request, 'learning/siswa_dashboard.html', context)
-    return render(request, 'learning/ubah_absensi.html', context)
-
-# ========================
-# DETAIL MAPEL SISWA & BAB & tugas
-# ========================
-@login_required
+# =========================
+# SISWA
+# =========================
 @login_required
 def detail_mapel_siswa(request, mapel_id):
-    mapel = get_object_or_404(Mapel, id=mapel_id)
-    bab_list = Bab.objects.filter(mapel=mapel).order_by('id')
+    siswa = get_object_or_404(SiswaProfile, user=request.user)
+    mapel = get_object_or_404(Mapel, id=mapel_id, kelas=siswa.kelas)
 
-    context = {
+    return render(request, 'learning/detail_mapel_siswa.html', {
         'mapel': mapel,
-        'bab_list': bab_list,
-    }
-    return render(request, 'learning/detail_mapel_siswa.html', context)
+        'bab_list': mapel.bab_list.all()
+    })
 
 
 @login_required
 def detail_bab_siswa(request, bab_id):
     bab = get_object_or_404(Bab, id=bab_id)
-    tugas_list = Tugas.objects.filter(bab=bab)
 
-
-    context = {
+    return render(request, 'learning/detail_bab_siswa.html', {
         'bab': bab,
-        'tugas_list': tugas_list,
-    }
-    return render(request, 'learning/detail_bab_siswa.html', context)
+        'tugas_list': bab.tugas.all()
+    })
+
 
 @login_required
 def detail_tugas_siswa(request, tugas_id):
-    siswa_profile = SiswaProfile.objects.get(user=request.user)
     tugas = get_object_or_404(Tugas, id=tugas_id)
 
-    # Cek apakah siswa sudah mengumpulkan
-    pengumpulan = PengumpulanTugas.objects.filter(
-        tugas=tugas, siswa=request.user
-    ).first()
+    return render(request, 'learning/detail_tugas_siswa.html', {
+        'tugas': tugas
+    })
+
+
+@login_required
+def kirim_tugas(request, tugas_id):
+    tugas = get_object_or_404(Tugas, id=tugas_id)
 
     if request.method == 'POST':
-        jawaban_teks = request.POST.get('jawaban_teks')
-        jawaban_file = request.FILES.get('jawaban_file')  # ✅ sesuai dengan model
+        PengumpulanTugas.objects.create(
+            tugas=tugas,
+            siswa=request.user,
+            jawaban_teks=request.POST.get('jawaban'),
+            jawaban_file=request.FILES.get('file')
+        )
+        return redirect('dashboard_siswa')
 
-        if pengumpulan:
-            # Update pengumpulan lama
-            if jawaban_teks:
-                pengumpulan.jawaban_teks = jawaban_teks
-            if jawaban_file:
-                pengumpulan.jawaban_file = jawaban_file
-            pengumpulan.save()
-        else:
-            # Buat pengumpulan baru
-            PengumpulanTugas.objects.create(
-                tugas=tugas,
-                siswa=request.user,
-                jawaban_teks=jawaban_teks,
-                jawaban_file=jawaban_file
-            )
+    return render(request, 'learning/kirim_tugas.html', {'tugas': tugas})
 
-        messages.success(request, "Jawaban berhasil dikumpulkan!")
-        return redirect('detail_tugas_siswa', tugas_id=tugas.id)
 
-    context = {
-        'tugas': tugas,
-        'pengumpulan': pengumpulan,
-    }
-    return render(request, 'learning/detail_tugas_siswa.html', context)
+@login_required
+def kumpul_tugas(request, tugas_id):
+    return kirim_tugas(request, tugas_id)
 
+
+@login_required
+def daftar_tugas_per_mapel(request, mapel_id):
+    siswa = get_object_or_404(SiswaProfile, user=request.user)
+    mapel = get_object_or_404(Mapel, id=mapel_id, kelas=siswa.kelas)
+
+    tugas_list = Tugas.objects.filter(bab__mapel=mapel)
+
+    return render(request, 'learning/daftar_tugas_siswa.html', {
+        'mapel': mapel,
+        'tugas_list': tugas_list
+    })
