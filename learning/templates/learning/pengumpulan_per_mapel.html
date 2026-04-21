@@ -1,39 +1,50 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<h2>Pengumpulan Tugas: {{ tugas.judul }}</h2>
 
-{% if pengumpulan_list %}
-    <ul>
-    {% for pengumpulan in pengumpulan_list %}
-        <li>
-            <strong>{{ pengumpulan.siswa.username }}</strong><br>
-            <small>Waktu: {{ pengumpulan.waktu_dikumpulkan|date:"d M Y, H:i" }}</small><br><br>
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">📋 Pengumpulan Tugas: {{ tugas.judul }}</h2>
+    <hr>
 
-            {% if pengumpulan.jawaban_teks %}
-                <p><strong>Jawaban Teks:</strong></p>
-                <p>{{ pengumpulan.jawaban_teks }}</p>
-            {% endif %}
+    {% if pengumpulan_list %}
+        {% for pengumpulan in pengumpulan_list %}
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
 
-            {% if pengumpulan.jawaban_file %}
-                <p><a href="{{ pengumpulan.jawaban_file.url }}" target="_blank">📄 Lihat File Jawaban</a></p>
-            {% endif %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0">{{ pengumpulan.siswa.username }}</h6>
+                    <small class="text-muted">
+                        {{ pengumpulan.waktu_dikumpulkan|date:"d M Y, H:i" }}
+                    </small>
+                </div>
 
-            {% if pengumpulan.nilai %}
-                <p><strong>Nilai:</strong> {{ pengumpulan.nilai }}</p>
-            {% else %}
-                <p><em>Belum dinilai</em></p>
-            {% endif %}
+                {% if pengumpulan.jawaban_teks %}
+                    <p class="mb-1"><strong>Jawaban:</strong></p>
+                    <p class="bg-light rounded p-2 small">{{ pengumpulan.jawaban_teks }}</p>
+                {% endif %}
 
-            {% if pengumpulan.komentar_guru %}
-                <p><strong>Komentar Guru:</strong> {{ pengumpulan.komentar_guru }}</p>
-            {% endif %}
-        </li>
-        <hr>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Belum ada siswa yang mengumpulkan tugas ini.</p>
-{% endif %}
+                {% if pengumpulan.jawaban_file %}
+                    <a href="{{ pengumpulan.jawaban_file.url }}" target="_blank"
+                       class="btn btn-sm btn-outline-primary mb-2">
+                        📄 Lihat File
+                    </a>
+                {% endif %}
 
-<a href="{% url 'dashboard_guru' %}">⬅️ Kembali ke Dashboard Guru</a>
+                {% if pengumpulan.nilai %}
+                    <span class="badge bg-success">Nilai: {{ pengumpulan.nilai }}</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Belum dinilai</span>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">Belum ada siswa yang mengumpulkan tugas ini.</div>
+    {% endif %}
+
+    <a href="{% url 'dashboard_guru' %}" class="btn btn-outline-secondary mt-2">
+        ⬅️ Kembali ke Dashboard
+    </a>
+</div>
+
 {% endblock %}

@@ -3,216 +3,214 @@
 {% block content %}
 
 <style>
-    /* ===== HEADER ===== */
-    .header-dashboard {
-        background: linear-gradient(135deg, #0d6efd, #2563eb);
-        padding: 25px;
-        border-radius: 18px;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.20);
-        margin-bottom: 20px;
+    .mapel-page { background: #f4f6fb; min-height: 100vh; padding-bottom: 40px; }
+
+    .mapel-header {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        padding: 28px 40px; color: white; margin-bottom: 28px;
+    }
+    .mapel-header h3 { font-size: 24px; font-weight: 800; margin: 0 0 4px; }
+    .mapel-header p  { margin: 0; opacity: 0.85; font-size: 14px; }
+    .mapel-header .meta { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .mapel-header .meta span {
+        background: rgba(255,255,255,0.2); padding: 4px 12px;
+        border-radius: 20px; font-size: 12px; font-weight: 600;
     }
 
-    .mapel-title {
-        font-size: 28px;
-        font-weight: 800;
-        margin: 0;
-    }
+    .content-area { padding: 0 40px; }
 
-    .header-info {
-        font-size: 14px;
-        opacity: 0.9;
-        margin-top: 3px;
+    /* TOOLBAR */
+    .toolbar {
+        display: flex; justify-content: space-between;
+        align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
     }
+    .toolbar h5 { font-weight: 700; color: #1e3a8a; margin: 0; font-size: 17px; }
 
-    /* ===== BUTTONS ===== */
-    .btn-absen {
-        background: #0d6efd;
-        color: white;
-        padding: 8px 14px;
-        border-radius: 10px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-block;
-        margin-bottom: 18px;
-    }
+    .btn-group-tools { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .btn-absen:hover {
-        background: #0b5ed7;
+    .btn-absensi {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: white; color: #1e40af;
+        border: 2px solid #bfdbfe; padding: 9px 18px;
+        border-radius: 11px; font-weight: 700; font-size: 13px;
+        text-decoration: none; transition: all 0.15s;
     }
+    .btn-absensi:hover { background: #eff6ff; color: #1e40af; border-color: #93c5fd; }
 
     .btn-tambah-bab {
-        background: #198754;
-        color: white;
-        padding: 7px 14px;
-        border-radius: 10px;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 14px;
+        display: inline-flex; align-items: center; gap: 7px;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white; padding: 9px 18px; border-radius: 11px;
+        font-weight: 700; font-size: 13px; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
     }
-
     .btn-tambah-bab:hover {
-        background: #146c43;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 14px rgba(22,163,74,0.35); color: white;
     }
 
-    /* ===== CARD BAB ===== */
+    /* BAB GRID */
     .bab-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
     }
 
     .bab-card {
-        background: white;
-        padding: 12px;
-        border-radius: 12px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-        transition: 0.2s;
-        border-left: 4px solid #0d6efd;
+        background: white; border-radius: 16px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        border-left: 5px solid #3b82f6;
+        padding: 20px; transition: transform 0.2s, box-shadow 0.2s;
+        display: flex; flex-direction: column; gap: 8px;
     }
-
     .bab-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.13);
     }
 
-    .bab-icon {
-        font-size: 22px;
-        color: #0d6efd;
-        margin-bottom: 6px;
-    }
+    .bab-icon { font-size: 24px; }
 
-    .bab-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 0;
-        color: #111;
-    }
+    .bab-title { font-size: 16px; font-weight: 700; color: #111827; margin: 0; }
 
     .bab-desc {
-        font-size: 12px;
-        color: #666;
-        margin-top: 3px;
-        min-height: 28px;
-        line-height: 1.2;
+        font-size: 13px; color: #6b7280; line-height: 1.5;
+        flex: 1;
     }
 
-    .btn-lihat {
-        margin-top: 8px;
-        display: inline-block;
-        font-weight: 600;
-        font-size: 13px;
-        color: #0d6efd;
-        text-decoration: none;
+    .bab-actions {
+        display: flex; gap: 8px; margin-top: 4px;
     }
 
-    .btn-lihat:hover {
-        text-decoration: underline;
+    .btn-lihat-bab {
+        flex: 1; display: flex; align-items: center; justify-content: center;
+        gap: 5px; background: #eff6ff; color: #1d4ed8;
+        border-radius: 10px; padding: 8px 12px; font-size: 13px;
+        font-weight: 700; text-decoration: none; transition: background 0.15s;
     }
+    .btn-lihat-bab:hover { background: #dbeafe; color: #1d4ed8; }
 
-    /* NO UNDERLINE DELETE BUTTON */
-    .btn-link { text-decoration: none !important; }
-    .btn-link:hover { text-decoration: none !important; }
+    .btn-hapus-bab {
+        display: flex; align-items: center; justify-content: center;
+        gap: 5px; background: #fef2f2; color: #dc2626;
+        border: none; border-radius: 10px; padding: 8px 14px;
+        font-size: 13px; font-weight: 700; cursor: pointer;
+        transition: background 0.15s;
+    }
+    .btn-hapus-bab:hover { background: #fee2e2; }
+
+    /* EMPTY */
+    .empty-state {
+        text-align: center; padding: 50px 20px; background: white;
+        border-radius: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 10px; }
+    .empty-state p { color: #9ca3af; font-size: 14px; margin: 0; }
+
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        color: #6b7280; font-weight: 600; font-size: 14px;
+        text-decoration: none; margin-top: 24px;
+    }
+    .btn-back:hover { color: #111827; }
+
+    @media (max-width: 640px) {
+        .mapel-header { padding: 20px 16px; }
+        .content-area { padding: 0 16px; }
+        .bab-grid { grid-template-columns: 1fr; }
+    }
 </style>
 
+<div class="mapel-page">
 
-<div class="container mt-3">
-
-    <!-- ===== HEADER MAPEL ===== -->
-    <div class="header-dashboard">
-        <h1 class="mapel-title">{{ mapel.nama }} — {{ mapel.kelas.nama }}</h1>
-        <div class="header-info" id="greeting"></div>
-        <div class="header-info" id="tanggal"></div>
+    <!-- HEADER -->
+    <div class="mapel-header">
+        <h3>{{ mapel.nama }}</h3>
+        <p>{{ mapel.kelas.nama }}</p>
+        <div class="meta" id="greeting-meta">
+            <span id="greeting-text"></span>
+            <span id="tanggal-text"></span>
+        </div>
     </div>
 
-    <!-- ===== BUTTON ABSENSI ===== -->
-    <a href="{% url 'absensi_mapel' mapel.id %}" class="btn-absen">📋 Lihat / Tambah Absensi</a>
+    <div class="content-area">
 
-    <!-- ===== TOMBOL TAMBAH BAB ===== -->
-    <div class="mb-4">
-        <a href="{% url 'tambah_bab' mapel.id %}"class="btn btn-primary">➕ Tambah Bab</a>
-    </div>
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <h5>📘 Daftar Bab</h5>
+            <div class="btn-group-tools">
+                <a href="{% url 'absensi_mapel' mapel.id %}" class="btn-absensi">
+                    📋 Absensi
+                </a>
+                <a href="{% url 'tambah_bab' mapel.id %}" class="btn-tambah-bab">
+                    ➕ Tambah Bab
+                </a>
+            </div>
+        </div>
 
-    <!-- ===== LIST BAB ===== -->
-    {% if bab_list %}
+        <!-- BAB GRID -->
+        {% if bab_list %}
         <div class="bab-grid">
             {% for bab in bab_list %}
-                <div class="bab-card">
-                    <div class="bab-icon">📘</div>
+            <div class="bab-card">
+                <div class="bab-icon">📘</div>
+                <p class="bab-title">{{ bab.judul }}</p>
+                <p class="bab-desc">{{ bab.deskripsi|default:"Tidak ada deskripsi" }}</p>
 
-                    <div class="bab-title">{{ bab.judul }}</div>
-                    <div class="bab-desc">{{ bab.deskripsi|default:"(Tidak ada deskripsi)" }}</div>
-
-                    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn-lihat">
+                <div class="bab-actions">
+                    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn-lihat-bab">
                         ➜ Lihat Tugas
                     </a>
-
-                    <!-- === TOMBOL HAPUS BAB (TANPA GARIS BAWAH) === -->
-                    <button class="btn btn-link text-danger p-0 mt-1"
+                    <button class="btn-hapus-bab"
                             data-bs-toggle="modal"
                             data-bs-target="#modalHapusBab{{ bab.id }}">
-                        🗑️ Hapus
+                        🗑️
                     </button>
                 </div>
+            </div>
 
-                <!-- === MODAL KONFIRMASI HAPUS BAB === -->
-                <div class="modal fade" id="modalHapusBab{{ bab.id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content" style="border-radius: 15px;">
-
-                            <div class="modal-header bg-danger text-white"
-                                 style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                                <h5 class="modal-title">Konfirmasi Hapus</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <p>
-                                    Yakin ingin menghapus bab <strong>"{{ bab.judul }}"</strong>?<br>
-                                    Semua materi & tugas yang terkait akan ikut terhapus.
-                                </p>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-
-                                <a href="{% url 'hapus_bab' bab.id %}" class="btn btn-danger">
-                                    Ya, Hapus
-                                </a>
-                            </div>
-
+            <!-- MODAL HAPUS -->
+            <div class="modal fade" id="modalHapusBab{{ bab.id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow rounded-4">
+                        <div class="modal-header bg-danger text-white rounded-top-4">
+                            <h5 class="modal-title">Hapus Bab</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body py-4">
+                            Yakin hapus bab <strong>"{{ bab.judul }}"</strong>?
+                            <br><small class="text-danger">Semua tugas di bab ini akan ikut terhapus.</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <a href="{% url 'hapus_bab' bab.id %}" class="btn btn-danger">Ya, Hapus</a>
                         </div>
                     </div>
                 </div>
-
+            </div>
             {% endfor %}
         </div>
-    {% else %}
-        <p>Belum ada Bab di mapel ini.</p>
-    {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+            <div class="emoji">📭</div>
+            <p>Belum ada bab. Klik "Tambah Bab" untuk mulai.</p>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'dashboard_guru' %}" class="btn-back">← Kembali ke Dashboard</a>
+
+    </div>
 </div>
 
-
-<!-- ===== SCRIPT GREETING ===== -->
 <script>
-    const hours = new Date().getHours();
-    let greet = "";
-
-    if (hours >= 4 && hours < 11) greet = "Selamat Pagi";
-    else if (hours >= 11 && hours < 15) greet = "Selamat Siang";
-    else if (hours >= 15 && hours < 18) greet = "Selamat Sore";
-    else greet = "Selamat Malam";
-
-    document.getElementById("greeting").textContent =
-        greet + " • {{ user.first_name }} {{ user.last_name }}";
-
-    document.getElementById("tanggal").textContent =
-        new Date().toLocaleDateString('id-ID', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+    const h = new Date().getHours();
+    let greet = "Selamat Malam";
+    if (h >= 4 && h < 11)  greet = "Selamat Pagi";
+    else if (h >= 11 && h < 15) greet = "Selamat Siang";
+    else if (h >= 15 && h < 18) greet = "Selamat Sore";
+    document.getElementById("greeting-text").textContent = "👋 " + greet;
+    document.getElementById("tanggal-text").textContent =
+        new Date().toLocaleDateString("id-ID", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 </script>
 
 {% endblock %}

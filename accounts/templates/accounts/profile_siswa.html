@@ -1,103 +1,211 @@
 {% extends 'learning/base.html' %}
-
 {% block title %}Profil Siswa{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
 
-    <!-- PROFIL -->
-    <div class="card shadow-lg border-0 mb-4">
-        <div class="card-body">
-            <h4 class="fw-bold mb-3">Profil Siswa</h4>
+<style>
+    .profile-page { background: #f4f6fb; min-height: 100vh; padding-bottom: 40px; }
 
-            <p>
-                <strong>Nama:</strong>
-                {{ siswa.user.first_name|default:"-" }} {{ siswa.user.last_name|default:"" }}
-            </p>
+    .profile-header {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        padding: 28px 40px; color: white; margin-bottom: 28px;
+    }
+    .profile-header h3 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+    .profile-header p  { margin: 0; opacity: 0.85; font-size: 14px; }
 
-            <p>
-                <strong>Email:</strong>
-                {{ siswa.user.username|default:"-" }}
-            </p>
+    .content-area {
+        padding: 0 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
 
-            <p>
-                <strong>Kelas:</strong>
-                {{ siswa.kelas.nama|default:"-" }}
-            </p>
-        </div>
+    .info-card {
+        background: white; border-radius: 16px;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.07); overflow: hidden;
+    }
+
+    .info-card-header {
+        padding: 14px 20px; border-bottom: 2px solid #f3f4f6;
+        font-weight: 700; font-size: 14px; color: #374151;
+        display: flex; align-items: center; gap: 8px;
+    }
+
+    .info-card-body { padding: 20px; }
+
+    /* PROFIL */
+    .profile-avatar {
+        width: 64px; height: 64px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; font-size: 26px; font-weight: 800;
+        color: white; margin-bottom: 14px;
+    }
+
+    .profile-field { margin-bottom: 12px; }
+    .profile-field .lbl { font-size: 11px; color: #9ca3af; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .profile-field .val { font-size: 15px; font-weight: 600; color: #111827; }
+
+    /* ABSENSI */
+    .absensi-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+    }
+
+    .absensi-item {
+        border-radius: 12px; padding: 12px 14px; text-align: center;
+    }
+    .absensi-item .num { font-size: 24px; font-weight: 800; line-height: 1; }
+    .absensi-item .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 3px; }
+
+    .absensi-item.hadir { background: #dcfce7; color: #16a34a; }
+    .absensi-item.izin  { background: #dbeafe; color: #2563eb; }
+    .absensi-item.sakit { background: #fef9c3; color: #ca8a04; }
+    .absensi-item.alpa  { background: #fee2e2; color: #dc2626; }
+
+    /* TUGAS STATS */
+    .tugas-stat-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .tugas-stat {
+        flex: 1; border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .tugas-stat .num { font-size: 22px; font-weight: 800; line-height: 1; }
+    .tugas-stat .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 3px; }
+    .tugas-stat.total  { background: #eff6ff; color: #1d4ed8; }
+    .tugas-stat.selesai{ background: #dcfce7; color: #16a34a; }
+    .tugas-stat.belum  { background: #fee2e2; color: #dc2626; }
+
+    /* CHART */
+    .chart-wrap { position: relative; max-height: 200px; }
+
+    /* FULL WIDTH CARD */
+    .full-col { grid-column: 1 / -1; }
+
+    @media (max-width: 768px) {
+        .profile-header { padding: 20px 16px; }
+        .content-area { padding: 0 16px; grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="profile-page">
+
+    <!-- HEADER -->
+    <div class="profile-header">
+        <h3>👤 Profil Siswa</h3>
+        <p>{{ siswa.kelas.nama }} — {{ siswa.user.username }}</p>
     </div>
 
-    <!-- STATISTIK -->
-    <div class="card shadow-lg border-0">
-        <div class="card-body">
-            <h5 class="fw-bold mb-4">Statistik Absensi</h5>
+    <div class="content-area">
 
-            <div class="row align-items-center">
-                
-                <!-- CHART -->
-                <div class="col-md-6 text-center">
-                    <canvas id="absensiChart" style="max-height:300px;"></canvas>
+        <!-- PROFIL INFO -->
+        <div class="info-card">
+            <div class="info-card-header">🪪 Informasi Pribadi</div>
+            <div class="info-card-body">
+                <div class="profile-avatar">
+                    {{ siswa.user.first_name|default:siswa.user.username|first|upper }}
                 </div>
-
-                <!-- DATA -->
-                <div class="col-md-6">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between text-success">
-                            Hadir <span>{{ hadir }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between text-info">
-                            Izin <span>{{ izin }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between text-warning">
-                            Sakit <span>{{ sakit }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between text-danger">
-                            Alpa <span>{{ alpa }}</span>
-                        </li>
-                    </ul>
+                <div class="profile-field">
+                    <div class="lbl">Nama Lengkap</div>
+                    <div class="val">
+                        {{ siswa.user.first_name|default:"-" }} {{ siswa.user.last_name|default:"" }}
+                    </div>
                 </div>
-
+                <div class="profile-field">
+                    <div class="lbl">Username</div>
+                    <div class="val">{{ siswa.user.username }}</div>
+                </div>
+                <div class="profile-field">
+                    <div class="lbl">Email</div>
+                    <div class="val">{{ siswa.user.email|default:"-" }}</div>
+                </div>
+                <div class="profile-field">
+                    <div class="lbl">Kelas</div>
+                    <div class="val">{{ siswa.kelas.nama }}</div>
+                </div>
             </div>
-
         </div>
-    </div>
 
+        <!-- ABSENSI -->
+        <div class="info-card">
+            <div class="info-card-header">📅 Statistik Absensi</div>
+            <div class="info-card-body">
+                <div class="absensi-grid">
+                    <div class="absensi-item hadir">
+                        <div class="num">{{ hadir }}</div>
+                        <div class="lbl">Hadir</div>
+                    </div>
+                    <div class="absensi-item izin">
+                        <div class="num">{{ izin }}</div>
+                        <div class="lbl">Izin</div>
+                    </div>
+                    <div class="absensi-item sakit">
+                        <div class="num">{{ sakit }}</div>
+                        <div class="lbl">Sakit</div>
+                    </div>
+                    <div class="absensi-item alpa">
+                        <div class="num">{{ alpa }}</div>
+                        <div class="lbl">Alpa</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="absensiChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATISTIK TUGAS -->
+        <div class="info-card full-col">
+            <div class="info-card-header">📝 Statistik Tugas</div>
+            <div class="info-card-body">
+                <div class="tugas-stat-row">
+                    <div class="tugas-stat total">
+                        <div class="num">{{ total_tugas|default:0 }}</div>
+                        <div class="lbl">Total Tugas</div>
+                    </div>
+                    <div class="tugas-stat selesai">
+                        <div class="num">{{ tugas_selesai|default:0 }}</div>
+                        <div class="lbl">Dikumpulkan</div>
+                    </div>
+                    <div class="tugas-stat belum">
+                        <div class="num">{{ tugas_belum|default:0 }}</div>
+                        <div class="lbl">Belum Kumpul</div>
+                    </div>
+                </div>
+
+                {% if rata_nilai %}
+                <div style="background:#f0fdf4;border-radius:12px;padding:14px 18px;
+                            display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-weight:700;color:#374151;font-size:14px;">
+                        📊 Rata-rata Nilai Keseluruhan
+                    </span>
+                    <span style="font-size:22px;font-weight:800;color:#16a34a;">
+                        {{ rata_nilai|floatformat:1 }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<!-- CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const dataValues = [
-    {{ hadir|default:0 }},
-    {{ izin|default:0 }},
-    {{ sakit|default:0 }},
-    {{ alpa|default:0 }}
-];
-
-// handle kalau semua 0 biar chart tetap muncul
+const dataValues = [{{ hadir|default:0 }}, {{ izin|default:0 }}, {{ sakit|default:0 }}, {{ alpa|default:0 }}];
 const total = dataValues.reduce((a, b) => a + b, 0);
 const safeData = total === 0 ? [1,1,1,1] : dataValues;
 
 new Chart(document.getElementById('absensiChart'), {
-    type: 'pie',
+    type: 'doughnut',
     data: {
         labels: ['Hadir', 'Izin', 'Sakit', 'Alpa'],
         datasets: [{
             data: safeData,
-            backgroundColor: [
-                '#22c55e',
-                '#0ea5e9',
-                '#facc15',
-                '#ef4444'
-            ]
+            backgroundColor: ['#22c55e', '#3b82f6', '#facc15', '#ef4444'],
+            borderWidth: 0,
         }]
     },
     options: {
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } },
+        cutout: '65%',
     }
 });
 </script>

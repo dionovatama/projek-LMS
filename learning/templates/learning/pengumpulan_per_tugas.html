@@ -1,40 +1,331 @@
 {% extends 'learning/base.html' %}
 {% block content %}
 
-<h2>Pengumpulan Tugas: {{ tugas.judul }}</h2>
-<hr>
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 20px;
+        padding: 26px 30px;
+        color: white;
+        margin-bottom: 24px;
+        box-shadow: 0 6px 20px rgba(30, 64, 175, 0.25);
+    }
 
-{% if pengumpulan_list %}
-    <ul>
-        {% for p in pengumpulan_list %}
-            <li>
-                <strong>Nama Siswa:</strong> {{ p.siswa.username }}<br>
-                <small>Waktu: {{ p.waktu_dikumpulkan|date:"d M Y, H:i" }}</small><br><br>
+    .page-header h3 {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 4px;
+    }
 
-                {% if p.jawaban_teks %}
-                    <p><strong>Jawaban Teks:</strong><br>{{ p.jawaban_teks }}</p>
-                {% endif %}
+    .page-header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
 
-                {% if p.jawaban_file %}
-                    <p><a href="{{ p.jawaban_file.url }}" target="_blank">📄 Lihat File Jawaban</a></p>
-                {% endif %}
+    .stat-row {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
 
+    .stat-box {
+        background: white;
+        border-radius: 14px;
+        padding: 16px 22px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .stat-box .num {
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .stat-box .lbl {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .stat-box.blue .num { color: #2563eb; }
+    .stat-box.green .num { color: #16a34a; }
+    .stat-box.orange .num { color: #d97706; }
+
+    /* SUBMISSION CARD */
+    .sub-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.07);
+        margin-bottom: 16px;
+        overflow: hidden;
+        border-left: 5px solid #3b82f6;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .sub-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .sub-card.graded {
+        border-left-color: #16a34a;
+    }
+
+    .sub-card-header {
+        padding: 16px 20px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-bottom: 1.5px solid #f3f4f6;
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .avatar {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .student-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: #111827;
+    }
+
+    .student-time {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+
+    .badge-nilai {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .badge-nilai.graded {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .badge-nilai.pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .sub-card-body {
+        padding: 14px 20px 16px;
+    }
+
+    .answer-box {
+        background: #f8faff;
+        border: 1.5px solid #e8eeff;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 12px;
+        line-height: 1.6;
+    }
+
+    .file-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1.5px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+        margin-bottom: 12px;
+    }
+
+    .file-link:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .btn-nilai {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        padding: 8px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-nilai:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+
+    .empty-state .emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h5 {
+        color: #374151;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+</style>
+
+<div class="container mt-4" style="max-width: 780px;">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <h3>📥 Pengumpulan Tugas</h3>
+        <p>{{ tugas.judul }}</p>
+    </div>
+
+    {% if pengumpulan_list %}
+
+    <!-- STATS -->
+    <div class="stat-row">
+        <div class="stat-box blue">
+            <div class="num">{{ pengumpulan_list|length }}</div>
+            <div class="lbl">Total Kumpul</div>
+        </div>
+        <div class="stat-box green">
+            <div class="num">
+                {% with graded=pengumpulan_list|length %}
+                    {{ pengumpulan_list|length }}
+                {% endwith %}
+            </div>
+            <div class="lbl">Sudah Dinilai</div>
+        </div>
+        <div class="stat-box orange">
+            <div class="num">
+                {% for p in pengumpulan_list %}{% if not p.nilai %}1{% endif %}{% endfor %}
+            </div>
+            <div class="lbl">Belum Dinilai</div>
+        </div>
+    </div>
+
+    <!-- LIST -->
+    {% for p in pengumpulan_list %}
+    <div class="sub-card {% if p.nilai %}graded{% endif %}">
+
+        <!-- HEADER CARD -->
+        <div class="sub-card-header">
+            <div class="student-info">
+                <div class="avatar">
+                    {{ p.siswa.username|first|upper }}
+                </div>
+                <div>
+                    <div class="student-name">{{ p.siswa.username }}</div>
+                    <div class="student-time">
+                        ⏱ {{ p.waktu_dikumpulkan|date:"d M Y, H:i" }}
+                    </div>
+                </div>
+            </div>
+
+            <span class="badge-nilai {% if p.nilai %}graded{% else %}pending{% endif %}">
                 {% if p.nilai %}
-                    <p><strong>Nilai:</strong> {{ p.nilai }}</p>
+                    ✅ Nilai: {{ p.nilai }}
                 {% else %}
-                    <p><em>Belum dinilai</em></p>
+                    ⏳ Belum Dinilai
                 {% endif %}
+            </span>
+        </div>
 
-                <a href="{% url 'nilai_tugas' p.id %}">✏️ Beri Nilai</a>
-            </li>
-            <hr>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>Belum ada siswa yang mengumpulkan tugas ini.</p>
-{% endif %}
+        <!-- BODY CARD -->
+        <div class="sub-card-body">
 
-<hr>
-<a href="{% url 'dashboard_guru' %}">⬅️ Kembali ke Dashboard Guru</a>
+            {% if p.jawaban_teks %}
+            <div class="answer-box">
+                <strong style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;">
+                    Jawaban Teks
+                </strong><br>
+                {{ p.jawaban_teks }}
+            </div>
+            {% endif %}
+
+            {% if p.jawaban_file %}
+            <a href="{{ p.jawaban_file.url }}" target="_blank" class="file-link">
+                📄 Lihat File Jawaban
+            </a>
+            {% endif %}
+
+            {% if p.komentar_guru %}
+            <div class="answer-box" style="border-color:#bbf7d0;background:#f0fdf4;">
+                <strong style="font-size:12px;color:#16a34a;text-transform:uppercase;letter-spacing:.5px;">
+                    Komentar Guru
+                </strong><br>
+                {{ p.komentar_guru }}
+            </div>
+            {% endif %}
+
+            <a href="{% url 'nilai_tugas' p.id %}" class="btn-nilai">
+                ✏️ {% if p.nilai %}Edit Nilai{% else %}Beri Nilai{% endif %}
+            </a>
+
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="emoji">📭</div>
+        <h5>Belum Ada Pengumpulan</h5>
+        <p>Siswa belum mengumpulkan tugas ini.</p>
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'dashboard_guru' %}"
+           style="color:#1d4ed8;font-weight:600;text-decoration:none;">
+            ← Kembali ke Dashboard
+        </a>
+    </div>
+
+</div>
 
 {% endblock %}

@@ -2,82 +2,168 @@
 {% load static %}
 
 {% block title %}Dashboard Siswa{% endblock %}
+{% block page_title %}Dashboard Siswa{% endblock %}
 
 {% block content %}
-<div class="container py-4">
 
-    <!-- JUDUL -->
-    <div class="mb-4">
-        <h2 class="fw-bold">📚 Daftar Mata Pelajaran</h2>
-        <p class="text-muted mb-0">
-            Mata pelajaran yang tersedia untuk kelas kamu
-        </p>
+<style>
+    /* SECTION HEADER */
+    .sec-header {
+        background: var(--sec-header-bg);
+        border-bottom: 1px solid var(--sb-border);
+        padding: 20px 28px;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 10px;
+    }
+    .sec-header-left h4 { margin: 0 0 2px; font-size: 20px; font-weight: 800; color: var(--sec-header-text); }
+    .sec-header-left p  { margin: 0; font-size: 13px; color: var(--sec-header-sub); }
+
+    .btn-profil {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: var(--sb-active-bg); color: white;
+        padding: 8px 18px; border-radius: 10px;
+        font-size: 13px; font-weight: 700; text-decoration: none;
+        transition: opacity .2s;
+    }
+    .btn-profil:hover { opacity: .85; color: white; }
+
+    /* MAPEL GRID */
+    .mapel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 0;
+    }
+
+    .mapel-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px; overflow: hidden;
+        transition: transform .2s, box-shadow .2s;
+        display: flex; flex-direction: column;
+    }
+    .mapel-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    }
+
+    .mapel-img-wrap { position: relative; height: 165px; overflow: hidden; }
+    .mapel-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .mapel-img-placeholder {
+        width: 100%; height: 165px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        display: flex; align-items: center; justify-content: center; font-size: 48px;
+    }
+
+    .mapel-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+
+    .mapel-name { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px; }
+    .mapel-kelas { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+
+    .progress-label {
+        display: flex; justify-content: space-between;
+        font-size: 12px; margin-bottom: 5px;
+        color: var(--text-secondary);
+    }
+    .progress-label span:last-child { font-weight: 700; color: #22c55e; }
+    .progress-bar-wrap {
+        background: var(--sb-icon-bg);
+        border-radius: 99px; height: 7px; margin-bottom: 14px;
+    }
+    .progress-bar-fill {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
+        height: 100%; border-radius: 99px;
+        transition: width .4s;
+    }
+
+    .mapel-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: var(--sb-icon-bg); color: var(--text-secondary);
+        border: 1px solid var(--card-border);
+        font-size: 11px; font-weight: 700;
+        padding: 3px 10px; border-radius: 20px; margin-bottom: 14px;
+    }
+
+    .btn-buka {
+        display: block; width: 100%; text-align: center;
+        background: #1d4ed8; color: white;
+        padding: 10px; border-radius: 10px;
+        font-weight: 700; font-size: 14px; text-decoration: none;
+        transition: background .15s;
+        margin-top: auto;
+    }
+    .btn-buka:hover { background: #1e40af; color: white; }
+
+    /* EMPTY */
+    .empty-state {
+        grid-column: 1 / -1; text-align: center; padding: 60px 20px;
+        background: var(--card-bg); border: 1px solid var(--card-border);
+        border-radius: 16px;
+    }
+    .empty-state .emoji { font-size: 56px; margin-bottom: 12px; }
+    .empty-state h5 { color: var(--text-secondary); font-weight: 700; }
+    .empty-state p  { color: var(--text-muted); font-size: 13px; margin: 0; }
+</style>
+
+<!-- SECTION HEADER -->
+<div class="sec-header">
+    <div class="sec-header-left">
+        <h4>📚 Mata Pelajaran</h4>
+        <p>Halo, <strong>{{ siswa.user.first_name|default:siswa.user.username }}</strong>! Kelas {{ siswa.kelas.nama }}</p>
     </div>
+    <a href="{% url 'accounts:profile' %}" class="btn-profil">👤 Lihat Profil</a>
+</div>
 
-    {% if mapel_list %}
-    <div class="row g-4">
+<!-- MAPEL GRID -->
+<div style="padding: 24px;">
+<div class="mapel-grid">
+    {% for mapel in mapel_list %}
+    <div class="mapel-card">
 
-        {% for mapel in mapel_list %}
-        <div class="col-12 col-sm-6 col-lg-4">
+        <div class="mapel-img-wrap">
+            {% if mapel.gambar %}
+                <img src="{{ mapel.gambar.url }}" alt="{{ mapel.nama }}">
+            {% else %}
+                <div class="mapel-img-placeholder">📘</div>
+            {% endif %}
+        </div>
 
-            <div class="card shadow-sm h-100 border-0 rounded-4">
+        <div class="mapel-body">
+            <div class="mapel-name">{{ mapel.nama }}</div>
+            <div class="mapel-kelas">Kelas {{ mapel.kelas.nama }}</div>
 
-                <!-- GAMBAR -->
-                {% if mapel.gambar %}
-                <img src="{{ mapel.gambar.url }}"
-                     class="card-img-top rounded-top-4"
-                     style="height:180px; object-fit:cover;"
-                     alt="{{ mapel.nama }}">
-                {% else %}
-                <img src="{% static 'image/default-mapel.jpg' %}"
-                     class="card-img-top rounded-top-4"
-                     style="height:180px; object-fit:cover;"
-                     alt="Mapel">
-                {% endif %}
-
-                <!-- BODY -->
-                <div class="card-body d-flex flex-column">
-
-                    <h5 class="fw-bold mb-1">
-                        {{ mapel.nama }}
-                    </h5>
-
-                    <p class="text-muted small mb-3">
-                        Kelas {{ mapel.kelas.nama }}
-                    </p>
-
-                    <!-- PROGRESS -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between small mb-1">
-                            <span>Progress</span>
-                            <span>38%</span>
-                        </div>
-                        <div class="progress" style="height:8px;">
-                            <div class="progress-bar bg-success"
-                                 style="width:38%">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BUTTON -->
-                    <a href="{% url 'detail_mapel_siswa' mapel.id %}"
-                       class="btn btn-primary mt-auto w-100">
-                        📖 Lihat Materi
-                    </a>
-
+            <!-- Progress -->
+            {% with bab_count=mapel.bab_list.count %}
+            <div class="progress-label">
+                <span>Progress</span>
+                <span>{% if bab_count > 0 %}{{ bab_count }} Bab{% else %}Belum ada bab{% endif %}</span>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill"
+                     style="width:{% if bab_count > 0 %}100{% else %}0{% endif %}%">
                 </div>
             </div>
 
+            <!-- Chip -->
+            <span class="mapel-chip">
+                📝 {{ bab_count }} Bab
+            </span>
+            {% endwith %}
+
+            <a href="{% url 'detail_mapel_siswa' mapel.id %}" class="btn-buka">
+                📖 Buka Materi
+            </a>
         </div>
-        {% endfor %}
-
     </div>
 
-    {% else %}
-    <div class="alert alert-info shadow-sm">
-        Belum ada mata pelajaran untuk kelas ini.
+    {% empty %}
+    <div class="empty-state">
+        <div class="emoji">📭</div>
+        <h5>Belum Ada Mata Pelajaran</h5>
+        <p>Hubungi guru atau admin untuk menambahkan mapel.</p>
     </div>
-    {% endif %}
-
+    {% endfor %}
 </div>
+</div>
+
 {% endblock %}

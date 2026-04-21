@@ -1,36 +1,323 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<h2>Nilai Tugas: {{ pengumpulan.tugas.judul }}</h2>
 
-<p><strong>Siswa:</strong> {{ pengumpulan.siswa.username }}</p>
+<style>
+    .nilai-wrapper {
+        max-width: 720px;
+        margin: 0 auto;
+    }
 
-{% if pengumpulan.jawaban_teks %}
-    <p><strong>Jawaban Teks:</strong><br>{{ pengumpulan.jawaban_teks }}</p>
-{% endif %}
+    /* INFO CARD */
+    .info-card {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
 
-{% if pengumpulan.jawaban_file %}
-    <p><strong>File Jawaban:</strong>
-        <a href="{{ pengumpulan.jawaban_file.url }}" target="_blank">📄 Lihat File</a>
-    </p>
-{% endif %}
+    .info-card-header {
+        padding: 16px 22px;
+        border-bottom: 2px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-<hr>
+    .info-card-header .icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
 
-<form method="post">
-    {% csrf_token %}
-    <div>
-        <label for="id_nilai">Nilai:</label>
-        {{ form.nilai }}
+    .info-card-header h6 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 14px;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-card-body {
+        padding: 18px 22px;
+    }
+
+    /* STUDENT BANNER */
+    .student-banner {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 18px;
+        padding: 22px 26px;
+        color: white;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 6px 20px rgba(30, 64, 175, 0.3);
+    }
+
+    .student-avatar {
+        width: 52px;
+        height: 52px;
+        background: rgba(255,255,255,0.25);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        flex-shrink: 0;
+        border: 2.5px solid rgba(255,255,255,0.5);
+    }
+
+    .student-banner h5 {
+        margin: 0 0 3px;
+        font-weight: 800;
+        font-size: 18px;
+    }
+
+    .student-banner p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 13px;
+    }
+
+    /* ANSWER BOX */
+    .answer-text {
+        background: #f8faff;
+        border: 1.5px solid #e0e9ff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #374151;
+        white-space: pre-wrap;
+    }
+
+    .file-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1.5px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .file-link:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    /* FORM PENILAIAN */
+    .grade-card {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .grade-card-header {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        padding: 18px 22px;
+        color: white;
+    }
+
+    .grade-card-header h5 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 17px;
+    }
+
+    .grade-card-body {
+        padding: 26px;
+    }
+
+    .field-group {
+        margin-bottom: 20px;
+    }
+
+    .field-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .score-input-wrap {
+        position: relative;
+        max-width: 200px;
+    }
+
+    .score-input-wrap input {
+        width: 100%;
+        padding: 14px 44px 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 24px;
+        font-weight: 800;
+        color: #16a34a;
+        background: #f0fdf4;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        text-align: center;
+    }
+
+    .score-input-wrap input:focus {
+        outline: none;
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+        background: white;
+    }
+
+    .score-hint {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 6px;
+    }
+
+    .field-group textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        min-height: 110px;
+        resize: vertical;
+        background: #f9fafb;
+        font-family: inherit;
+        color: #374151;
+        transition: border-color 0.2s;
+    }
+
+    .field-group textarea:focus {
+        outline: none;
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        background: white;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white;
+        border: none;
+        padding: 13px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-back {
+        background: #f3f4f6;
+        color: #374151;
+        text-decoration: none;
+        padding: 13px 22px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: background 0.2s;
+        display: inline-block;
+    }
+
+    .btn-back:hover {
+        background: #e5e7eb;
+        color: #111;
+    }
+</style>
+
+<div class="container mt-4 nilai-wrapper">
+
+    <!-- STUDENT BANNER -->
+    <div class="student-banner">
+        <div class="student-avatar">
+            {{ pengumpulan.siswa.username|first|upper }}
+        </div>
+        <div>
+            <h5>{{ pengumpulan.siswa.username }}</h5>
+            <p>📘 {{ pengumpulan.tugas.judul }}</p>
+        </div>
     </div>
-    <br>
-    <div>
-        <label for="id_komentar_guru">Komentar guru:</label><br>
-        {{ form.komentar_guru }}
-    </div>
-    <br>
-    <button type="submit">💾 Simpan Nilai</button>
-</form>
 
-<hr>
-<a href="{% url 'pengumpulan_tugas' pengumpulan.tugas.id %}">⬅️ Kembali ke Daftar Pengumpulan</a>
+    <!-- JAWABAN TEKS -->
+    {% if pengumpulan.jawaban_teks %}
+    <div class="info-card">
+        <div class="info-card-header">
+            <div class="icon" style="background:#eff6ff;">✍️</div>
+            <h6>Jawaban Teks</h6>
+        </div>
+        <div class="info-card-body">
+            <div class="answer-text">{{ pengumpulan.jawaban_teks }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FILE JAWABAN -->
+    {% if pengumpulan.jawaban_file %}
+    <div class="info-card">
+        <div class="info-card-header">
+            <div class="icon" style="background:#eff6ff;">📎</div>
+            <h6>File Jawaban</h6>
+        </div>
+        <div class="info-card-body">
+            <a href="{{ pengumpulan.jawaban_file.url }}" target="_blank" class="file-link">
+                📄 Buka File Jawaban
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FORM PENILAIAN -->
+    <div class="grade-card">
+        <div class="grade-card-header">
+            <h5>✅ Beri Penilaian</h5>
+        </div>
+        <div class="grade-card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label>🎯 Nilai (0 – 100)</label>
+                    <div class="score-input-wrap">
+                        {{ form.nilai }}
+                    </div>
+                    <p class="score-hint">Masukkan angka antara 0 sampai 100</p>
+                </div>
+
+                <div class="field-group">
+                    <label>💬 Komentar untuk Siswa</label>
+                    {{ form.komentar_guru }}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <a href="{% url 'pengumpulan_tugas' pengumpulan.tugas.id %}" class="btn-back">
+                        ← Kembali
+                    </a>
+                    <button type="submit" class="btn-save">💾 Simpan Nilai</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

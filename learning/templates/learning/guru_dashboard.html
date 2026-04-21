@@ -3,189 +3,296 @@
 {% block content %}
 
 <style>
+    .guru-page {
+        background: #f4f6fb;
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
+
     /* ===== HEADER ===== */
     .header-box {
-        background: linear-gradient(90deg, #34078dff, #1e09a5ff, #250cc9ff);
-        padding: 35px 30px;
+        background: linear-gradient(120deg, #1e3a8a, #2563eb, #1d4ed8);
+        padding: 36px 40px;
         color: white;
-        border-radius: 18px;
-        margin-bottom: 30px;
+        margin-bottom: 32px;
         position: relative;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+        overflow: hidden;
+    }
+
+    .header-box::after {
+        content: '📚';
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 80px;
+        opacity: 0.12;
     }
 
     .header-title {
-        font-size: 32px;
+        font-size: 30px;
         font-weight: 800;
-        margin: 0;
+        margin: 0 0 4px;
     }
 
     .header-sub {
-        font-size: 18px;
-        opacity: 0.9;
+        font-size: 15px;
+        opacity: 0.88;
+        margin: 0;
     }
 
-    /* ===== GRID MAPEL ===== */
+    .header-date {
+        font-size: 13px;
+        opacity: 0.7;
+        margin-top: 6px;
+    }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 0 40px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .toolbar h5 {
+        font-weight: 700;
+        color: #1e3a8a;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .btn-tambah {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #6a11cb, #8b5cf6);
+        color: white;
+        padding: 10px 22px;
+        font-weight: 700;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: transform 0.15s, box-shadow 0.15s;
+        border: none;
+    }
+
+    .btn-tambah:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(107, 17, 203, 0.35);
+        color: white;
+    }
+
+    /* ===== GRID ===== */
     .mapel-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 22px;
+        padding: 0 40px;
     }
 
+    /* ===== CARD ===== */
     .mapel-card {
         background: white;
         border-radius: 18px;
-        padding: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: 0.2s;
-        border-top: 5px solid #6a11cb;
+        overflow: hidden;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
     }
 
     .mapel-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.14);
     }
 
     .mapel-img {
         width: 100%;
-        height: 130px;
-        border-radius: 12px;
+        height: 150px;
         object-fit: cover;
-        margin-bottom: 10px;
+    }
+
+    .mapel-img-placeholder {
+        width: 100%;
+        height: 150px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+    }
+
+    .mapel-body {
+        padding: 16px 18px 18px;
     }
 
     .mapel-name {
-        font-size: 20px;
-        font-weight: bold;
-        color: #111;
+        font-size: 17px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 4px;
     }
 
     .mapel-kelas {
-        font-size: 14px;
-        color: gray;
-        margin-bottom: 10px;
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 14px;
     }
 
-    .btn-tambah {
-        display: inline-block;
-        margin-bottom: 20px;
-        background: #6a11cb;
-        color: white;
-        padding: 10px 20px;
-        font-weight: bold;
-        border-radius: 12px;
-        transition: 0.2s;
-        text-decoration: none !important;
+    /* ===== ACTION BUTTONS ===== */
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
-    .btn-tambah:hover {
-        background: #5210b0;
+    .btn-action {
+        flex: 1;
+        min-width: 70px;
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.15s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .btn-action:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    .btn-lihat  { background: #eff6ff; color: #1d4ed8; }
+    .btn-edit   { background: #fefce8; color: #b45309; }
+    .btn-hapus  { background: #fef2f2; color: #dc2626; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        grid-column: 1 / -1;
+    }
+
+    .empty-state .emoji { font-size: 56px; margin-bottom: 12px; }
+    .empty-state h5 { color: #374151; font-weight: 700; }
+    .empty-state p  { color: #9ca3af; font-size: 14px; }
+
+    @media (max-width: 640px) {
+        .header-box { padding: 24px 20px; }
+        .toolbar    { padding: 0 16px; }
+        .mapel-grid { padding: 0 16px; gap: 16px; }
+        .header-title { font-size: 22px; }
     }
 </style>
 
-<div class="container mt-4">
+<div class="guru-page">
 
     <!-- ===== HEADER ===== -->
     <div class="header-box">
-        <h1 class="header-title" id="greeting"></h1>
+        <h1 class="header-title" id="greeting">Selamat Datang 👋</h1>
         <p class="header-sub">
-            {{ request.user.first_name }} {{ request.user.last_name }} • Guru SMK
+            {{ request.user.first_name|default:request.user.username }}
+            {{ request.user.last_name }} • Guru SMK
         </p>
-        <div class="header-sub" style="margin-top:5px;">
-            <span id="tanggal"></span>
-        </div>
+        <p class="header-date" id="tanggal"></p>
     </div>
 
-    <!-- TAMBAH MAPEL -->
-    <a href="{% url 'tambah_mapel' %}" class="btn-tambah">
-        + Tambah Mapel Baru
-    </a>
+    <!-- ===== TOOLBAR ===== -->
+    <div class="toolbar">
+        <h5>🗂 Daftar Mata Pelajaran</h5>
+        <a href="{% url 'tambah_mapel' %}" class="btn-tambah">
+            ＋ Tambah Mapel
+        </a>
+    </div>
 
-    <!-- ===== DAFTAR MAPEL ===== -->
+    <!-- ===== GRID MAPEL ===== -->
     <div class="mapel-grid">
         {% for mapel in mapel_list %}
         <div class="mapel-card">
 
             {% if mapel.gambar %}
-                <img src="{{ mapel.gambar.url }}" class="mapel-img">
+                <img src="{{ mapel.gambar.url }}" class="mapel-img" alt="{{ mapel.nama }}">
             {% else %}
-                <img src="{% static 'image/default-mapel.jpg' %}" class="mapel-img">
+                <div class="mapel-img-placeholder">📘</div>
             {% endif %}
 
-            <div class="mapel-name">{{ mapel.nama }}</div>
-            <div class="mapel-kelas">Kelas: {{ mapel.kelas.nama }}</div>
+            <div class="mapel-body">
+                <div class="mapel-name">{{ mapel.nama }}</div>
+                <div class="mapel-kelas">Kelas: {{ mapel.kelas.nama }}</div>
 
-            <div class="mt-2">
-                <a href="{% url 'detail_mapel_guru' mapel.id %}" class="btn btn-sm btn-outline-primary">📘 Lihat</a>
-                <a href="{% url 'edit_mapel' mapel.id %}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
-
-                <button class="btn btn-sm btn-outline-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#hapusMapelModal{{ mapel.id }}">
-                    🗑️ Hapus
-                </button>
-            </div>
-        </div>
-
-        <!-- ===== MODAL HAPUS MAPEL ===== -->
-        <div class="modal fade" id="hapusMapelModal{{ mapel.id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">Konfirmasi Hapus</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        Yakin ingin menghapus mapel
-                        <strong>"{{ mapel.nama }}"</strong>?
-                        <br>
-                        <small class="text-danger">
-                            Semua bab & tugas akan ikut terhapus.
-                        </small>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">
-                            Batal
-                        </button>
-
-                        <form method="POST" action="{% url 'hapus_mapel' mapel.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">
-                                Ya, Hapus
-                            </button>
-                        </form>
-                    </div>
-
+                <div class="card-actions">
+                    <a href="{% url 'detail_mapel_guru' mapel.id %}" class="btn-action btn-lihat">
+                        📘 Lihat
+                    </a>
+                    <a href="{% url 'edit_mapel' mapel.id %}" class="btn-action btn-edit">
+                        ✏️ Edit
+                    </a>
+                    <button class="btn-action btn-hapus"
+                            data-bs-toggle="modal"
+                            data-bs-target="#hapusMapelModal{{ mapel.id }}">
+                        🗑️ Hapus
+                    </button>
                 </div>
             </div>
         </div>
-        <!-- ============================= -->
+
+        <!-- MODAL HAPUS -->
+        <div class="modal fade" id="hapusMapelModal{{ mapel.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-header bg-danger text-white rounded-top-4">
+                        <h5 class="modal-title">Konfirmasi Hapus</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body py-4">
+                        Yakin ingin menghapus mapel <strong>"{{ mapel.nama }}"</strong>?
+                        <br><small class="text-danger">Semua bab & tugas akan ikut terhapus.</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <form method="POST" action="{% url 'hapus_mapel' mapel.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {% empty %}
-        <p>Belum ada mapel.</p>
+        <div class="empty-state">
+            <div class="emoji">📭</div>
+            <h5>Belum Ada Mapel</h5>
+            <p>Klik tombol "Tambah Mapel" untuk mulai membuat mata pelajaran.</p>
+        </div>
         {% endfor %}
     </div>
 
 </div>
 
-<!-- ===== SCRIPT GREETING ===== -->
+<!-- SCRIPT GREETING -->
 <script>
     const h = new Date().getHours();
     let greet = "Selamat Malam 👋";
-    if (h >= 4 && h < 11) greet = "Selamat Pagi 👋";
+    if (h >= 4 && h < 11)  greet = "Selamat Pagi 👋";
     else if (h >= 11 && h < 15) greet = "Selamat Siang 👋";
     else if (h >= 15 && h < 18) greet = "Selamat Sore 👋";
 
     document.getElementById("greeting").textContent = greet;
     document.getElementById("tanggal").textContent =
         new Date().toLocaleDateString("id-ID", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
+            weekday: "long", year: "numeric",
+            month: "long", day: "numeric"
         });
 </script>
 

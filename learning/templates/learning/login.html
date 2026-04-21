@@ -4,171 +4,203 @@
 
 <style>
     .login-wrapper {
-        min-height: 100vh;
+        min-height: calc(100vh - 56px);
         display: flex;
         justify-content: center;
         align-items: center;
         background: url("{% static 'image/bg-blur-green.jpg' %}") center/cover no-repeat;
-        padding: 20px;
+        padding: 24px 16px;
     }
 
     .login-card {
         width: 100%;
-        max-width: 900px;
-        background: rgba(255, 255, 255, 0.15);
+        max-width: 880px;
+        background: rgba(255,255,255,0.12);
         backdrop-filter: blur(18px);
-        border-radius: 18px;
+        border-radius: 22px;
         overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.3);
         display: flex;
-        flex-direction: row;
     }
 
+    /* KIRI — GAMBAR */
     .login-left {
-        width: 50%;
+        width: 48%;
         background: url("{% static 'image/logo smk.jpg' %}") center/cover no-repeat;
-    }
-
-    .login-right {
-        width: 50%;
-        padding: 40px 35px;
-        background: rgba(255,255,255,0.35);
-        backdrop-filter: blur(20px);
-    }
-
-    .input-group {
         position: relative;
-        margin-top: 12px;
+        min-height: 480px;
     }
 
-    /* Ikon kiri (username & lock) */
-    .icon-left {
-        position: absolute;
-        top: 50%;
-        left: 12px;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #1e3a8a;
+    .login-left-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(30,64,175,0.55), rgba(37,99,235,0.35));
+        display: flex; flex-direction: column;
+        justify-content: flex-end; padding: 28px;
     }
 
-    /* Show/Hide Password */
-    .toggle-password {
-        position: absolute;
-        top: 50%;
-        right: 14px;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #1e3a8a;
-        cursor: pointer;
+    .login-left-overlay h2 {
+        color: white; font-weight: 800; font-size: 22px; margin: 0 0 6px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-    .login-right input {
-        background: #ffffff;
-        border: 1px solid #d1d1d1;
-        padding: 12px 38px 12px 40px;
-        border-radius: 10px;
-        width: 100%;
-        font-size: 15px;
-        transition: 0.2s;
+    .login-left-overlay p {
+        color: rgba(255,255,255,0.85); font-size: 13px; margin: 0;
     }
 
-    .login-right input:focus {
-        background: #ffffff;
-        border: 1px solid #1e40af;
-        box-shadow: 0 0 8px rgba(30, 64, 175, 0.35);
-        outline: none;
-    }
-
-    .login-btn {
-        background: #1e3a8a;
-        border: none;
-        padding: 12px 0;
-        border-radius: 10px;
-        width: 100%;
-        color: white;
-        font-weight: bold;
-        margin-top: 20px;
-        transition: 0.2s;
-    }
-
-    .login-btn:hover {
-        background: #162d71;
-    }
-
-    @media (max-width: 768px) {
-    .login-card {
-        flex-direction: column;
-    }
-    .login-left {
-        width: 100%;
-        height: 220px;
-
-        
-        background-size: contain !important;
-        background-repeat: no-repeat !important;
-        background-position: center !important;
-        background-color: #ffffff; /* biar ga transparan */ 
-    }
+    /* KANAN — FORM */
     .login-right {
-        width: 100%;
+        width: 52%;
+        padding: 44px 36px;
+        background: rgba(255,255,255,0.88);
+        backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
-}
 
-        
-    
+    .login-right h2 {
+        font-weight: 800; color: #1e3a8a;
+        font-size: 26px; margin-bottom: 4px; text-align: center;
+    }
+
+    .login-right .subtitle {
+        text-align: center; color: #6b7280;
+        font-size: 14px; margin-bottom: 28px;
+    }
+
+    .field-group { margin-bottom: 18px; }
+    .field-group label {
+        display: block; font-weight: 700; font-size: 13px;
+        color: #374151; margin-bottom: 6px;
+    }
+
+    .input-wrap { position: relative; }
+    .input-wrap .icon {
+        position: absolute; left: 13px; top: 50%;
+        transform: translateY(-50%); color: #1e3a8a; font-size: 15px;
+    }
+    .input-wrap .toggle {
+        position: absolute; right: 13px; top: 50%;
+        transform: translateY(-50%); color: #1e3a8a;
+        font-size: 15px; cursor: pointer;
+    }
+
+    .input-wrap input {
+        width: 100%; padding: 12px 40px;
+        border: 2px solid #e5e7eb; border-radius: 12px;
+        font-size: 15px; background: white; color: #111827;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrap input:focus {
+        outline: none; border-color: #1e40af;
+        box-shadow: 0 0 0 4px rgba(30,64,175,0.12);
+    }
+
+    .btn-login {
+        width: 100%; background: #1e3a8a; color: white;
+        border: none; padding: 13px; border-radius: 12px;
+        font-weight: 700; font-size: 16px; cursor: pointer;
+        transition: background 0.2s, transform 0.15s;
+        margin-top: 8px;
+    }
+    .btn-login:hover { background: #1e40af; transform: translateY(-1px); }
+
+    /* MOBILE */
+    @media (max-width: 640px) {
+        .login-wrapper { padding: 16px; align-items: flex-start; padding-top: 30px; }
+
+        .login-card { flex-direction: column; max-width: 420px; margin: 0 auto; }
+
+        /* Di mobile tampilkan gambar sebagai banner atas kecil */
+        .login-left {
+            width: 100%;
+            min-height: 160px;
+        }
+
+        .login-left-overlay { padding: 16px 20px; }
+        .login-left-overlay h2 { font-size: 17px; }
+        .login-left-overlay p  { font-size: 12px; }
+
+        .login-right {
+            width: 100%;
+            padding: 28px 24px;
+        }
+
+        .login-right h2 { font-size: 22px; }
+    }
+
+    @media (max-width: 400px) {
+        .login-left { min-height: 130px; }
+        .login-right { padding: 22px 18px; }
+    }
 </style>
-
-<div class="login-wrapper">
-
-    <div class="login-card">
-
-        <div class="login-left"></div>
-
-        <div class="login-right">
-
-            <h2 class="fw-bold text-center mb-1" style="color:#1e3a8a;">Welcome!</h2>
-            <p class="text-center text-muted mb-4">Silahkan login menggunakan akun anda</p>
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <label class="fw-semibold mt-2">E-mail</label>
-                <div class="input-group">
-                    <i class="fas fa-user icon-left"></i>
-                    <input type="text" name="username" required>
-                </div>
-
-                <label class="fw-semibold mt-3">Password</label>
-                <div class="input-group">
-                    <i class="fas fa-lock icon-left"></i>
-                    <input id="password" type="password" name="password" required>
-                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
-                </div>
-
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-danger mt-3">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-
-                <button class="login-btn" type="submit">LOGIN</button>
-            </form>
-
-        </div>
-    </div>
-</div>
 
 <!-- FONT AWESOME -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <!-- KIRI -->
+        <div class="login-left">
+            <div class="login-left-overlay">
+                <h2>WEB E-LEARNING<br>SMKN 2 BALEENDAH</h2>
+                <p>Platform pembelajaran digital modern</p>
+            </div>
+        </div>
+
+        <!-- KANAN -->
+        <div class="login-right">
+            <h2>Selamat Datang! 👋</h2>
+            <p class="subtitle">Masuk menggunakan akun yang telah terdaftar</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label>Username</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon"></i>
+                        <input type="text" name="username"
+                               placeholder="Masukkan username" required>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock icon"></i>
+                        <input id="password" type="password"
+                               name="password"
+                               placeholder="Masukkan password" required>
+                        <i class="fas fa-eye toggle" id="togglePassword"></i>
+                    </div>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger py-2 px-3 rounded-3 mb-3"
+                         style="font-size:13px;">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <button type="submit" class="btn-login">
+                    🚀 LOGIN
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
 <script>
     const toggle = document.getElementById("togglePassword");
-    const passwordInput = document.getElementById("password");
-
+    const pwd    = document.getElementById("password");
     toggle.addEventListener("click", () => {
-        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-        passwordInput.setAttribute("type", type);
-
+        const isText = pwd.getAttribute("type") === "text";
+        pwd.setAttribute("type", isText ? "password" : "text");
         toggle.classList.toggle("fa-eye");
         toggle.classList.toggle("fa-eye-slash");
     });

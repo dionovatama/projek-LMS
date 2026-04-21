@@ -1,41 +1,173 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3>📈 Rekap Nilai Siswa - {{ bab.judul }}</h3>
-    <p><strong>Mapel:</strong> {{ bab.mapel.nama }}</p>
-    <hr>
 
-    {% if rekap %}
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-success">
-            <tr>
-                <th>No</th>
-                <th>Nama Siswa</th>
-                <th>Jumlah Tugas Dikerjakan</th>
-                <th>Rata-rata Nilai</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in rekap %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ data.siswa__username }}</td>
-                <td>{{ data.jumlah_tugas }}</td>
-                <td>
-                    {% if data.rata_rata %}
-                        {{ data.rata_rata|floatformat:2 }}
-                    {% else %}
-                        <span class="text-muted">Belum Dinilai</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-        <p class="text-muted">Belum ada nilai untuk bab ini.</p>
-    {% endif %}
+<style>
+    .rekap-page { background: #f4f6fb; min-height: 100vh; padding-bottom: 40px; }
 
-    <a href="{% url 'detail_bab_guru' bab.id %}" class="btn btn-secondary mt-3">⬅ Kembali ke Bab</a>
+    .rekap-header {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        padding: 28px 40px; color: white; margin-bottom: 28px;
+    }
+    .rekap-header h3 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+    .rekap-header p  { margin: 0; opacity: 0.85; font-size: 14px; }
+
+    .content-area { padding: 0 40px; }
+
+    .stat-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-box {
+        background: white; border-radius: 14px;
+        padding: 16px 22px; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        flex: 1; min-width: 130px; text-align: center;
+    }
+    .stat-box .num { font-size: 26px; font-weight: 800; line-height: 1; }
+    .stat-box .lbl { font-size: 11px; color: #6b7280; margin-top: 4px; font-weight: 600; text-transform: uppercase; }
+    .stat-box.green  .num { color: #16a34a; }
+    .stat-box.blue   .num { color: #2563eb; }
+    .stat-box.orange .num { color: #d97706; }
+
+    .table-card { background: white; border-radius: 16px; box-shadow: 0 3px 14px rgba(0,0,0,0.07); overflow: hidden; }
+    .table-card-header {
+        padding: 16px 22px; border-bottom: 2px solid #f3f4f6;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .table-card-header h6 { margin: 0; font-weight: 700; font-size: 15px; color: #111827; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+        background: #f8faff; padding: 12px 18px;
+        font-size: 12px; font-weight: 700; color: #6b7280;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        border-bottom: 2px solid #e8eeff; text-align: left;
+    }
+    tbody td { padding: 14px 18px; font-size: 14px; color: #374151; border-bottom: 1px solid #f3f4f6; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8faff; }
+
+    .student-cell { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+        width: 36px; height: 36px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; color: white; font-weight: 800; font-size: 14px; flex-shrink: 0;
+    }
+
+    .nilai-badge {
+        display: inline-block; padding: 5px 14px;
+        border-radius: 20px; font-weight: 700; font-size: 13px; text-align: center; min-width: 60px;
+    }
+    .nilai-badge.tinggi { background: #dcfce7; color: #16a34a; }
+    .nilai-badge.sedang { background: #fef9c3; color: #ca8a04; }
+    .nilai-badge.rendah { background: #fee2e2; color: #dc2626; }
+    .nilai-badge.kosong { background: #f3f4f6; color: #9ca3af; }
+
+    .rank-badge {
+        width: 28px; height: 28px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 12px;
+    }
+    .rank-1 { background: #fef9c3; color: #ca8a04; }
+    .rank-2 { background: #f1f5f9; color: #475569; }
+    .rank-3 { background: #fef3c7; color: #b45309; }
+    .rank-n { background: #f3f4f6; color: #9ca3af; }
+
+    .empty-state { text-align: center; padding: 50px 20px; }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 10px; }
+    .empty-state p { color: #9ca3af; font-size: 14px; }
+
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        color: #6b7280; font-weight: 600; font-size: 14px;
+        text-decoration: none; margin-top: 20px;
+    }
+    .btn-back:hover { color: #111827; }
+
+    @media (max-width: 640px) {
+        .rekap-header { padding: 20px 16px; }
+        .content-area { padding: 0 16px; }
+    }
+</style>
+
+<div class="rekap-page">
+    <div class="rekap-header">
+        <h3>📊 Rekap Nilai — {{ bab.judul }}</h3>
+        <p>{{ bab.mapel.nama }} • {{ bab.mapel.kelas.nama }}</p>
+    </div>
+
+    <div class="content-area">
+        {% if rekap %}
+        <div class="stat-row">
+            <div class="stat-box blue">
+                <div class="num">{{ rekap|length }}</div>
+                <div class="lbl">Total Siswa</div>
+            </div>
+            <div class="stat-box green">
+                <div class="num">{% for r in rekap %}{% if r.rata_rata %}1{% endif %}{% endfor %}</div>
+                <div class="lbl">Sudah Dinilai</div>
+            </div>
+            <div class="stat-box orange">
+                <div class="num">{% for r in rekap %}{% if not r.rata_rata %}1{% endif %}{% endfor %}</div>
+                <div class="lbl">Belum Dinilai</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-card-header">
+                <h6>📋 Daftar Nilai Siswa</h6>
+                <span style="font-size:12px;color:#9ca3af;">{{ rekap|length }} siswa</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:50px;">No</th>
+                        <th>Nama Siswa</th>
+                        <th>Tugas Dikerjakan</th>
+                        <th style="text-align:center;">Rata-rata Nilai</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in rekap %}
+                    <tr>
+                        <td>
+                            <span class="rank-badge {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}rank-n{% endif %}">
+                                {{ forloop.counter }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="student-cell">
+                                <div class="avatar">{{ data.siswa__username|first|upper }}</div>
+                                <span class="fw-semibold">{{ data.siswa__username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+                                {{ data.jumlah_tugas }} tugas
+                            </span>
+                        </td>
+                        <td style="text-align:center;">
+                            {% if data.rata_rata %}
+                                <span class="nilai-badge {% if data.rata_rata >= 80 %}tinggi{% elif data.rata_rata >= 60 %}sedang{% else %}rendah{% endif %}">
+                                    {{ data.rata_rata|floatformat:1 }}
+                                </span>
+                            {% else %}
+                                <span class="nilai-badge kosong">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-card">
+            <div class="empty-state">
+                <div class="emoji">📭</div>
+                <p>Belum ada nilai untuk bab ini.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'detail_bab_guru' bab.id %}" class="btn-back">← Kembali ke Bab</a>
+    </div>
 </div>
+
 {% endblock %}

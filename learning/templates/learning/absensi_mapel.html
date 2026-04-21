@@ -2,198 +2,251 @@
 {% block content %}
 
 <style>
-    body {
-        background: #f0f3ff;
+    .absensi-page { background: #f4f6fb; min-height: 100vh; padding-bottom: 40px; }
+
+    .absensi-header {
+        background: linear-gradient(90deg, #0d47a1, #2962ff);
+        padding: 26px 40px; color: white; margin-bottom: 28px;
     }
+    .absensi-header h3 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+    .absensi-header p  { margin: 0; opacity: 0.85; font-size: 14px; }
 
-    .page-wrapper {
-        width: 95%;
-        margin: auto;
-        padding: 0 5px;
+    .content-area { padding: 0 40px; }
+
+    /* DATE FILTER */
+    .date-filter {
+        background: white; border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        padding: 16px 20px; margin-bottom: 20px;
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
-
-    .header-grad {
-    background: linear-gradient(90deg, #0d47a1, #2962ff); /* warna tetap */
-    padding: 25px 35px;        /* lebih tebal biar mirip */
-    color: white;
-    border-radius: 20px;       /* bukan 0 0 20px, tapi full rounded */
-    margin-top: -10px;         /* biar nempel ke navbar seperti halaman mapel */
-    margin-bottom: 25px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-}
-
-.header-grad h3 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 800;
-}
-
-.header-grad small {
-    font-size: 15px;
-    opacity: 0.95;
-    padding-left: 50px;
-}
-
-    
-
-    /* Row tanggal */
-    .date-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 20px 0;
+    .date-filter label { font-weight: 700; font-size: 14px; color: #374151; white-space: nowrap; }
+    .date-filter input[type="date"] {
+        padding: 9px 14px; border: 2px solid #e5e7eb;
+        border-radius: 10px; font-size: 14px; background: #f9fafb;
+        color: #111827; transition: border-color 0.2s;
     }
-
-    .date-row label {
-        font-weight: bold;
-        margin-right: 5px;
+    .date-filter input[type="date"]:focus {
+        outline: none; border-color: #3b82f6; background: white;
     }
-
-    /* Table style */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
+    .btn-filter {
+        background: #1e40af; color: white; border: none;
+        padding: 9px 20px; border-radius: 10px; font-weight: 700;
+        font-size: 14px; cursor: pointer; transition: background 0.2s;
     }
+    .btn-filter:hover { background: #1e3a8a; }
+
+    /* TABLE CARD */
+    .table-card {
+        background: white; border-radius: 16px;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 20px;
+    }
+    .table-card-header {
+        padding: 16px 22px; border-bottom: 2px solid #f3f4f6;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .table-card-header h6 { margin: 0; font-weight: 700; font-size: 15px; color: #111827; }
+    .table-card-header small { color: #9ca3af; font-size: 12px; }
+
+    /* ABSENSI TABLE */
+    table { width: 100%; border-collapse: collapse; }
 
     thead th {
-        background: #0d6efd;
-        color: white;
-        padding: 14px;
-        text-align: center;
-        font-size: 15px;
-        font-weight: bold;
+        background: #f8faff; padding: 12px 16px;
+        font-size: 12px; font-weight: 700; color: #6b7280;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        border-bottom: 2px solid #e8eeff; text-align: center;
     }
+    thead th:first-child { text-align: left; }
 
     tbody td {
-        background: white;
-        padding: 12px;
-        text-align: center;
+        padding: 12px 16px; border-bottom: 1px solid #f3f4f6; text-align: center;
+    }
+    tbody td:first-child { text-align: left; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f8faff; }
+
+    /* STUDENT NAME */
+    .student-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+        width: 34px; height: 34px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; color: white; font-weight: 800;
+        font-size: 13px; flex-shrink: 0;
+    }
+    .student-name { font-weight: 600; font-size: 14px; color: #111827; }
+
+    /* RADIO BUTTONS */
+    .radio-group { display: flex; justify-content: center; }
+
+    input[type="radio"] { display: none; }
+
+    .status-label {
+        width: 44px; height: 36px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 13px; cursor: pointer;
+        border: 2px solid #e5e7eb; background: #f9fafb; color: #9ca3af;
+        transition: all 0.15s; user-select: none;
     }
 
-    tbody tr:nth-child(even) td {
-        background: #f4f6ff;
+    .status-label:hover { border-color: #94a3b8; color: #374151; }
+
+    /* Hadir */
+    input[value="hadir"]:checked + .status-label {
+        background: #dcfce7; border-color: #16a34a; color: #16a34a;
+    }
+    /* Sakit */
+    input[value="sakit"]:checked + .status-label {
+        background: #fef9c3; border-color: #ca8a04; color: #ca8a04;
+    }
+    /* Izin */
+    input[value="izin"]:checked + .status-label {
+        background: #dbeafe; border-color: #2563eb; color: #2563eb;
+    }
+    /* Alpa */
+    input[value="alpa"]:checked + .status-label {
+        background: #fee2e2; border-color: #dc2626; color: #dc2626;
     }
 
-    .text-start {
-        text-align: left !important;
+    /* SUBMIT BUTTON */
+    .btn-simpan {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white; border: none; padding: 13px 28px;
+        border-radius: 12px; font-weight: 700; font-size: 15px;
+        cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-simpan:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(22,163,74,0.35);
     }
 
-    .status-box {
-        width: 75px;
-        height: 35px;
-        border-radius: 12px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: white;
-        border: 2px solid #d0d4ff;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    input[type="radio"] {
-        display: none;
-    }
-
-    input[type="radio"]:checked + .status-box {
-        background: #0f5ceb;
-        border-color: #0f5ceb;
-        color: white;
+    @media (max-width: 640px) {
+        .absensi-header { padding: 20px 16px; }
+        .content-area   { padding: 0 12px; }
+        .date-filter    { padding: 14px 16px; }
+        .status-label   { width: 38px; height: 34px; font-size: 12px; }
+        thead th, tbody td { padding: 10px 8px; }
     }
 </style>
 
+<div class="absensi-page">
 
-<!-- HEADER -->
-<div class="header-grad mb-3">
-    <h3 class="m-0">📋 Absensi {{ mapel.nama  }} {{ mapel.kelas.nama }}</h3>
-    <small>Pilih tanggal dan catat atau lihat kehadiran</small>
-</div>
+    <!-- HEADER -->
+    <div class="absensi-header">
+        <h3>📋 Absensi {{ mapel.nama }}</h3>
+        <p>{{ mapel.kelas.nama }} — Pilih tanggal dan catat kehadiran</p>
+    </div>
 
+    <div class="content-area">
 
-<div class="page-wrapper">
+        <!-- DATE FILTER -->
+        <form method="get" class="date-filter">
+            <label for="tanggal">📅 Tanggal:</label>
+            <input type="date" id="tanggal" name="tanggal"
+                   value="{{ tanggal|date:'Y-m-d' }}">
+            <button type="submit" class="btn-filter">Tampilkan</button>
+            <span style="font-size:13px;color:#6b7280;margin-left:4px;">
+                Menampilkan: <strong>{{ tanggal|date:"d M Y" }}</strong>
+            </span>
+        </form>
 
-    <!-- FILTER TANGGAL (sejajar kiri) -->
-    <form method="get" class="date-row">
-        <label for="tanggal">Tanggal:</label>
-        <input type="date" id="tanggal" name="tanggal" class="form-control" style="width: 200px;"
-               value="{{ tanggal|date:'Y-m-d' }}">
-        <button class="btn btn-primary">Tampilkan</button>
-    </form>
+        <!-- TABLE -->
+        <form method="post">
+            {% csrf_token %}
 
-    <h5 class="fw-bold mb-3">🗓 Absensi Tanggal: {{ tanggal|date:"d M Y" }}</h5>
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h6>👥 Daftar Siswa</h6>
+                    <small>{{ siswa_list|length }} siswa</small>
+                </div>
 
-    <!-- TABLE -->
-    <form method="post">
-        {% csrf_token %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama Siswa</th>
+                            <th>H</th>
+                            <th>S</th>
+                            <th>I</th>
+                            <th>A</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for siswa in siswa_list %}
+                        <tr>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar">
+                                        {% if siswa.user.first_name %}
+                                            {{ siswa.user.first_name|first|upper }}
+                                        {% else %}
+                                            {{ siswa.user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <span class="student-name">
+                                        {% if siswa.user.first_name %}
+                                            {{ siswa.user.first_name }} {{ siswa.user.last_name }}
+                                        {% else %}
+                                            {{ siswa.user.username }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </td>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="text-start" style="width: 250px;">Nama Siswa</th>
-                    <th style="width: 100px;">Hadir</th>
-                    <th style="width: 100px;">Sakit</th>
-                    <th style="width: 100px;">Izin</th>
-                    <th style="width: 100px;">Alpa</th>
-                </tr>
-            </thead>
+                            <!-- Hadir -->
+                            <td>
+                                <div class="radio-group">
+                                    <input type="radio" id="hadir_{{ siswa.id }}"
+                                           name="status_{{ siswa.id }}" value="hadir"
+                                           {% if siswa.status_absen == "hadir" %}checked{% endif %}>
+                                    <label for="hadir_{{ siswa.id }}" class="status-label">H</label>
+                                </div>
+                            </td>
 
-            <tbody>
-                {% for siswa in siswa_list %}
-                <tr>
-                    <!-- Nama -->
-                    <td class="text-start">
-                        {% if siswa.user.first_name %}
-                            {{ siswa.user.first_name }} {{ siswa.user.last_name }}
-                        {% else %}
-                            {{ siswa.user.username }}
-                        {% endif %}
-                    </td>
+                            <!-- Sakit -->
+                            <td>
+                                <div class="radio-group">
+                                    <input type="radio" id="sakit_{{ siswa.id }}"
+                                           name="status_{{ siswa.id }}" value="sakit"
+                                           {% if siswa.status_absen == "sakit" %}checked{% endif %}>
+                                    <label for="sakit_{{ siswa.id }}" class="status-label">S</label>
+                                </div>
+                            </td>
 
-                    <!-- Hadir -->
-                    <td>
-                        <label>
-                            <input type="radio" name="status_{{ siswa.id }}" value="hadir"
-                            {% if siswa.status_absen == "hadir" %}checked{% endif %}>
-                            <div class="status-box">H</div>
-                        </label>
-                    </td>
+                            <!-- Izin -->
+                            <td>
+                                <div class="radio-group">
+                                    <input type="radio" id="izin_{{ siswa.id }}"
+                                           name="status_{{ siswa.id }}" value="izin"
+                                           {% if siswa.status_absen == "izin" %}checked{% endif %}>
+                                    <label for="izin_{{ siswa.id }}" class="status-label">I</label>
+                                </div>
+                            </td>
 
-                    <!-- Sakit -->
-                    <td>
-                        <label>
-                            <input type="radio" name="status_{{ siswa.id }}" value="sakit"
-                            {% if siswa.status_absen == "sakit" %}checked{% endif %}>
-                            <div class="status-box">S</div>
-                        </label>
-                    </td>
+                            <!-- Alpa -->
+                            <td>
+                                <div class="radio-group">
+                                    <input type="radio" id="alpa_{{ siswa.id }}"
+                                           name="status_{{ siswa.id }}" value="alpa"
+                                           {% if siswa.status_absen == "alpa" %}checked{% endif %}>
+                                    <label for="alpa_{{ siswa.id }}" class="status-label">A</label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-                    <!-- Izin -->
-                    <td>
-                        <label>
-                            <input type="radio" name="status_{{ siswa.id }}" value="izin"
-                            {% if siswa.status_absen == "izin" %}checked{% endif %}>
-                            <div class="status-box">I</div>
-                        </label>
-                    </td>
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                    H = Hadir &nbsp;|&nbsp; S = Sakit &nbsp;|&nbsp; I = Izin &nbsp;|&nbsp; A = Alpa
+                </small>
+                <button type="submit" class="btn-simpan">💾 Simpan Absensi</button>
+            </div>
+        </form>
 
-                    <!-- Alpa -->
-                    <td>
-                        <label>
-                            <input type="radio" name="status_{{ siswa.id }}" value="alpa"
-                            {% if siswa.status_absen == "alpa" %}checked{% endif %}>
-                            <div class="status-box">A</div>
-                        </label>
-                    </td>
-
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <button class="btn btn-success mt-3">💾 Simpan Absensi</button>
-    </form>
-
+    </div>
 </div>
 
 {% endblock %}

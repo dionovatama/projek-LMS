@@ -1,91 +1,156 @@
 {% extends 'learning/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="max-width: 720px;">
 
     <!-- Header Tugas -->
     <div class="card shadow-lg border-0 mb-4"
-         style="background: linear-gradient(135deg, #f6c23e, #e74a3b);">
-        <div class="card-body text-white">
-            <h4 class="fw-bold mb-1">📘 Detail Tugas</h4>
-            <p class="mb-0 opacity-75">
-                Silakan cek status dan kumpulkan jawaban tugas
+         style="background: linear-gradient(135deg, #f6c23e, #e74a3b); border-radius: 18px;">
+        <div class="card-body text-white p-4">
+            <h4 class="fw-bold mb-1">📘 {{ tugas.judul }}</h4>
+            <p class="mb-0 opacity-75 small">
+                {{ tugas.deskripsi|default:"Tidak ada deskripsi tugas" }}
             </p>
+            {% if tugas.deadline %}
+            <div class="mt-2">
+                <span style="background:rgba(255,255,255,0.2);
+                             padding: 4px 12px;
+                             border-radius: 20px;
+                             font-size: 13px;">
+                    ⏰ Deadline: {{ tugas.deadline|date:"d M Y, H:i" }}
+                </span>
+            </div>
+            {% endif %}
         </div>
     </div>
 
+    <!-- FILE TUGAS DARI GURU -->
+    {% if tugas.file_tugas %}
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-header text-white fw-bold"
+             style="background: linear-gradient(135deg, #1e40af, #3b82f6);
+                    border-radius: 16px 16px 0 0;">
+            📎 File Tugas dari Guru
+        </div>
+        <div class="card-body p-3">
+            <a href="{{ tugas.file_tugas.url }}"
+               target="_blank"
+               class="d-inline-flex align-items-center gap-2 px-4 py-2 fw-bold text-white text-decoration-none rounded-3"
+               style="background: linear-gradient(135deg, #1e40af, #3b82f6);
+                      font-size: 14px;
+                      transition: opacity 0.2s;"
+               onmouseover="this.style.opacity='.85'"
+               onmouseout="this.style.opacity='1'">
+                ⬇️ Download File Tugas
+            </a>
+            <p class="text-muted small mt-2 mb-0">
+                Klik tombol di atas untuk membuka atau mengunduh file tugas.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Status Pengumpulan -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-primary text-white">
-            <h6 class="mb-0">📌 Status Pengumpulan</h6>
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-header bg-primary text-white fw-bold"
+             style="border-radius: 16px 16px 0 0;">
+            📌 Status Pengumpulan
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-4">
             {% if pengumpulan %}
-                <span class="badge bg-success mb-2">Sudah dikumpulkan</span>
+                <span class="badge bg-success mb-3 px-3 py-2" style="font-size:13px;">
+                    ✅ Sudah Dikumpulkan
+                </span>
 
-                <p class="mb-1">
+                <p class="mb-2">
                     <strong>Nilai:</strong>
                     {% if pengumpulan.nilai %}
-                        <span class="text-success fw-bold">{{ pengumpulan.nilai }}</span>
+                        <span class="text-success fw-bold fs-5">{{ pengumpulan.nilai }}</span>
                     {% else %}
                         <span class="text-muted">Belum dinilai</span>
                     {% endif %}
                 </p>
 
-                {% if pengumpulan.file %}
-                    <p class="mb-1">
-                        <strong>File:</strong>
-                        <a href="{{ pengumpulan.file.url }}" class="btn btn-sm btn-outline-primary">
-                            ⬇ Download
-                        </a>
-                    </p>
+                {% if pengumpulan.jawaban_teks %}
+                <div class="mb-3">
+                    <strong>Jawaban Teks:</strong>
+                    <div class="bg-light rounded p-3 mt-1 small"
+                         style="border-left: 4px solid #3b82f6;">
+                        {{ pengumpulan.jawaban_teks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if pengumpulan.jawaban_file %}
+                <p class="mb-2">
+                    <strong>File Jawaban:</strong>
+                    <a href="{{ pengumpulan.jawaban_file.url }}"
+                       class="btn btn-sm btn-outline-primary ms-2">
+                        ⬇ Download
+                    </a>
+                </p>
                 {% endif %}
 
                 {% if pengumpulan.komentar_guru %}
-                    <div class="alert alert-info mt-3">
-                        <strong>Komentar Guru:</strong><br>
-                        {{ pengumpulan.komentar_guru }}
-                    </div>
+                <div class="alert alert-info mt-3 mb-0" style="border-radius: 12px;">
+                    <strong>💬 Komentar Guru:</strong><br>
+                    {{ pengumpulan.komentar_guru }}
+                </div>
                 {% endif %}
+
             {% else %}
-                <span class="badge bg-danger">Belum dikumpulkan</span>
+                <span class="badge bg-danger mb-3 px-3 py-2" style="font-size:13px;">
+                    ❌ Belum Dikumpulkan
+                </span>
             {% endif %}
         </div>
     </div>
 
-    <!-- Form Pengumpulan -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-success text-white">
-            <h6 class="mb-0">📝 Kumpulkan Jawaban</h6>
+    <!-- Form Pengumpulan — hanya tampil kalau belum kumpul -->
+    {% if not pengumpulan %}
+    <div class="card shadow-sm border-0" style="border-radius: 16px;">
+        <div class="card-header bg-success text-white fw-bold"
+             style="border-radius: 16px 16px 0 0;">
+            📝 Kumpulkan Jawaban
         </div>
 
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data"
+                  action="{% url 'kirim_tugas' tugas.id %}">
                 {% csrf_token %}
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
-                        Upload File (opsional)
+                        📎 Upload File <span class="text-muted fw-normal">(opsional)</span>
                     </label>
-                    <input type="file" name="jawaban_file" class="form-control">
+                    <input type="file" name="file" class="form-control">
+                    <small class="text-muted">Format: PDF, DOC, DOCX, JPG, PNG, ZIP</small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
-                        Tulis Jawaban (opsional)
+                        ✍️ Tulis Jawaban <span class="text-muted fw-normal">(opsional)</span>
                     </label>
-                    <textarea name="jawaban_teks"
+                    <textarea name="jawaban"
                               class="form-control"
                               rows="4"
                               placeholder="Tulis jawaban kamu di sini..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-success fw-bold px-4">
                     🚀 Kirim Jawaban
                 </button>
             </form>
         </div>
+    </div>
+    {% endif %}
+
+    <!-- Tombol Kembali -->
+    <div class="mt-4">
+        <a href="javascript:history.back()" class="text-muted text-decoration-none">
+            ← Kembali
+        </a>
     </div>
 
 </div>

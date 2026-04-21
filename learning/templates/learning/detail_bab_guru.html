@@ -1,60 +1,329 @@
 {% extends 'learning/base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h3 class="fw-bold text-success">📘 {{ bab.judul }}</h3>
-    <p class="text-muted">{{ bab.deskripsi }}</p>
-    <hr>
 
-    <a href="{% url 'tambah_tugas' %}?bab={{ bab.id }}" class="btn btn-primary mb-4">Tambah Tugas</a>
+<style>
+    .bab-page {
+        background: #f4f6fb;
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
 
-    {% if tugas_list %}
-        {% for tugas in tugas_list %}
-            <div class="card mb-3 shadow-sm border-0" style="background-color: #f8f9fa;">
-                <div class="card-body">
-                    <h5 class="card-title fw-semibold text-dark">{{ tugas.judul }}</h5>
-                    <p class="card-text">{{ tugas.deskripsi }}</p>
-                    <p class="mb-2"><strong>Deadline:</strong> {{ tugas.deadline|date:"M d, Y, H:i a" }}</p>
+    .bab-header {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        padding: 28px 40px;
+        color: white;
+        margin-bottom: 28px;
+    }
 
-                    <a href="{% url 'pengumpulan_tugas' tugas.id %}" class="btn btn-outline-primary btn-sm">
-                        📥 Lihat Pengumpulan
-                    </a>
+    .bab-header h3 {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0 0 4px;
+    }
 
-                    <!-- Tombol Hapus -->
-                    <a href="#" class="text-danger text-decoration-none ms-3" 
-                       data-bs-toggle="modal" 
-                       data-bs-target="#hapusTugasModal{{ tugas.id }}">
-                        <i class="bi bi-trash"></i> Hapus
-                    </a>
+    .bab-header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
+
+    .content-area {
+        padding: 0 40px;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-tambah-tugas {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-tambah-tugas:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30,64,175,0.3);
+        color: white;
+    }
+
+    .btn-rekap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-rekap:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(22,163,74,0.3);
+        color: white;
+    }
+
+    /* TUGAS CARD */
+    .tugas-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        margin-bottom: 14px;
+        overflow: hidden;
+        border-left: 5px solid #3b82f6;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .tugas-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+    }
+
+    .tugas-card-body {
+        padding: 18px 20px;
+    }
+
+    .tugas-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .tugas-desc {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .tugas-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .tugas-meta span {
+        font-size: 12px;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .tugas-meta .deadline {
+        background: #fef3c7;
+        color: #d97706;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .tugas-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-pengumpulan {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1.5px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-pengumpulan:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .btn-hapus-tugas {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1.5px solid #fecaca;
+        border-radius: 10px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s;
+        border: 1.5px solid #fecaca;
+    }
+
+    .btn-hapus-tugas:hover {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+
+    .empty-state .emoji { font-size: 48px; margin-bottom: 10px; }
+    .empty-state p { color: #9ca3af; font-size: 14px; margin: 0; }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+
+    .btn-back:hover { color: #111827; }
+
+    @media (max-width: 640px) {
+        .bab-header { padding: 20px 16px; }
+        .content-area { padding: 0 16px; }
+    }
+</style>
+
+<div class="bab-page">
+
+    <!-- HEADER -->
+    <div class="bab-header">
+        <h3>📘 {{ bab.judul }}</h3>
+        <p>{{ bab.deskripsi|default:"Tidak ada deskripsi" }}</p>
+    </div>
+
+    <div class="content-area">
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <a href="{% url 'tambah_tugas' %}?bab={{ bab.id }}" class="btn-tambah-tugas">
+                ➕ Tambah Tugas
+            </a>
+            <a href="{% url 'rekap_nilai' bab.id %}" class="btn-rekap">
+                📊 Rekap Nilai
+            </a>
+        </div>
+
+        <!-- LIST TUGAS -->
+        {% if tugas_list %}
+            {% for tugas in tugas_list %}
+            <div class="tugas-card">
+                <div class="tugas-card-body">
+
+                    <div class="tugas-title">{{ tugas.judul }}</div>
+                    <div class="tugas-desc">
+                        {{ tugas.deskripsi|default:"Tidak ada deskripsi" }}
+                    </div>
+
+                    <div class="tugas-meta">
+                        {% if tugas.deadline %}
+                        <span class="deadline">
+                            ⏰ {{ tugas.deadline|date:"d M Y, H:i" }}
+                        </span>
+                        {% endif %}
+                        {% if tugas.file_tugas %}
+                        <span>
+                            📎 <a href="{{ tugas.file_tugas.url }}" target="_blank"
+                                  style="color:#3b82f6;font-weight:600;">
+                                File Terlampir
+                            </a>
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="tugas-actions">
+                        <a href="{% url 'pengumpulan_tugas' tugas.id %}" class="btn-pengumpulan">
+                            📥 Lihat Pengumpulan
+                        </a>
+                        <button class="btn-hapus-tugas"
+                                data-bs-toggle="modal"
+                                data-bs-target="#hapusTugasModal{{ tugas.id }}">
+                            🗑️ Hapus
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Modal Konfirmasi Hapus -->
-            <div class="modal fade" id="hapusTugasModal{{ tugas.id }}" tabindex="-1" aria-labelledby="hapusTugasLabel{{ tugas.id }}" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-3">
-                  <div class="modal-header bg-danger text-white rounded-top">
-                    <h5 class="modal-title" id="hapusTugasLabel{{ tugas.id }}">Konfirmasi Hapus Tugas</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                  </div>
-
-                  <div class="modal-body">
-                    Apakah kamu yakin ingin menghapus tugas <strong>"{{ tugas.judul }}"</strong>?
-                  </div>
-
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="{% url 'hapus_tugas' tugas.id %}" class="btn btn-danger">Hapus</a>
-                  </div>
+            <!-- MODAL HAPUS TUGAS -->
+            <div class="modal fade" id="hapusTugasModal{{ tugas.id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow rounded-4">
+                        <div class="modal-header bg-danger text-white rounded-top-4">
+                            <h5 class="modal-title">Hapus Tugas</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body py-4">
+                            Yakin hapus tugas <strong>"{{ tugas.judul }}"</strong>?
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <a href="{% url 'hapus_tugas' tugas.id %}" class="btn btn-danger">Ya, Hapus</a>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
 
-        {% endfor %}
-    {% else %}
-        <p class="text-muted fst-italic">Belum ada tugas di bab ini.</p>
-    {% endif %}
+            {% endfor %}
+
+        {% else %}
+        <div class="empty-state">
+            <div class="emoji">📝</div>
+            <p>Belum ada tugas di bab ini.</p>
+        </div>
+        {% endif %}
+
+        <!-- BOTTOM -->
+        <div class="bottom-bar">
+            <a href="{% url 'detail_mapel_guru' bab.mapel.id %}" class="btn-back">
+                ← Kembali ke {{ bab.mapel.nama }}
+            </a>
+        </div>
+
+    </div>
 </div>
-
-<a href="{% url 'rekap_nilai' bab.id %}" class="btn btn-success mt-2">📊 Rekap Nilai</a>
 
 {% endblock %}
