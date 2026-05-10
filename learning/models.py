@@ -170,19 +170,7 @@ class PengumpulanTugas(models.Model):
 
 
 # ==========================
-# 8. Nilai
-# ==========================
-class Nilai(models.Model):
-    tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE, related_name='nilai_tugas')
-    siswa = models.ForeignKey(SiswaProfile, on_delete=models.CASCADE)
-    nilai = models.FloatField(default=0)
-
-    def __str__(self):
-        return f"{self.siswa.user.username} - {self.tugas.judul}: {self.nilai}"
-
-
-# ==========================
-# 9. Absensi
+# 8. Absensi
 # ==========================
 class Absensi(models.Model):
     guru = models.ForeignKey(GuruProfile, on_delete=models.CASCADE)

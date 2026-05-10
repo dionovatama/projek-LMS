@@ -2,12 +2,15 @@ from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.signals import user_login_failed
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from datetime import date
 import os
+
+from axes.decorators import axes_dispatch
 
 from .forms import PenilaianForm
 from .models import (
@@ -104,6 +107,7 @@ def home(request):
     return render(request, 'learning/home.html')
 
 
+@axes_dispatch
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -114,35 +118,14 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard_guru' if is_guru(user) else 'dashboard_siswa')
 
+        user_login_failed.send(
+            sender=__name__,
+            credentials={'username': username},
+            request=request,
+        )
         messages.error(request, 'Username atau password salah.')
 
     return render(request, 'learning/login.html')
-
-
-# =============================================================
-# PROFILE
-# =============================================================
-
-@login_required
-def profile(request):
-    user = request.user
-
-    if is_siswa(user):
-        siswa = get_object_or_404(SiswaProfile, user=user)
-        context = {
-            'siswa': siswa,
-            'hadir': Absensi.objects.filter(siswa=siswa, status='hadir').count(),
-            'izin':  Absensi.objects.filter(siswa=siswa, status='izin').count(),
-            'sakit': Absensi.objects.filter(siswa=siswa, status='sakit').count(),
-            'alpa':  Absensi.objects.filter(siswa=siswa, status='alpa').count(),
-        }
-        return render(request, 'accounts/profile_siswa.html', context)
-
-    guru = get_object_or_404(GuruProfile, user=user)
-    return render(request, 'accounts/profile_guru.html', {
-        'guru': guru,
-        'mapel_list': Mapel.objects.filter(guru=guru).select_related('kelas'),
-    })
 
 
 # =============================================================
@@ -411,7 +394,11 @@ def pengumpulan_tugas_view(request, tugas_id):
     tugas = get_object_or_404(Tugas, id=tugas_id)
     get_object_or_404(Mapel, id=tugas.bab.mapel.id, guru__user=request.user)
 
-    pengumpulan_list = tugas.pengumpulan_tugas.all().select_related('siswa')
+    pengumpulan_list = (
+        tugas.pengumpulan_tugas
+        .select_related('siswa')
+        .order_by('-waktu_dikumpulkan')
+    )
 
     # FIX: hitung statistik di view, bukan di template
     sudah_dinilai = pengumpulan_list.filter(nilai__isnull=False).count()
@@ -626,6 +613,10 @@ def detail_tugas_siswa(request, tugas_id):
 
 @siswa_required
 def kirim_tugas(request, tugas_id):
+    if not is_siswa(request.user):
+        messages.error(request, 'Akses ditolak.')
+        return redirect('dashboard_guru')
+
     siswa = get_object_or_404(SiswaProfile, user=request.user)
     tugas = get_object_or_404(Tugas, id=tugas_id, bab__mapel__kelas=siswa.kelas)
 
