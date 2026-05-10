@@ -45,14 +45,29 @@ class PenilaianForm(forms.ModelForm):
             'nilai': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'step': '0.01',
-                'placeholder': 'Masukkan nilai tugas'
+                # FIX: tambah atribut min/max agar browser juga memvalidasi
+                'min': '0',
+                'max': '100',
+                'placeholder': 'Masukkan nilai (0 – 100)',
             }),
             'komentar_guru': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Berikan komentar'
+                'placeholder': 'Berikan komentar',
             }),
         }
+
+    # FIX: validasi eksplisit di sisi server — tidak cukup mengandalkan
+    # atribut min/max HTML karena dapat di-bypass lewat DevTools atau curl.
+    def clean_nilai(self):
+        nilai = self.cleaned_data.get('nilai')
+        if nilai is None:
+            return nilai
+        if nilai < 0 or nilai > 100:
+            raise forms.ValidationError(
+                'Nilai harus berada di antara 0 dan 100.'
+            )
+        return nilai
 
 
 # -----------------------------
@@ -66,9 +81,9 @@ class PengumpulanTugasForm(forms.ModelForm):
             'jawaban_teks': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Tulis jawaban di sini'
+                'placeholder': 'Tulis jawaban di sini',
             }),
             'jawaban_file': forms.ClearableFileInput(attrs={
-                'class': 'form-control'
+                'class': 'form-control',
             }),
         }

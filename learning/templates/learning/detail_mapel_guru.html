@@ -84,12 +84,12 @@
     }
     .btn-lihat-bab:hover { background: #dbeafe; color: #1d4ed8; }
 
+    /* FIX: tombol hapus adalah <button> di dalam <form>, bukan <a href> */
     .btn-hapus-bab {
         display: flex; align-items: center; justify-content: center;
-        gap: 5px; background: #fef2f2; color: #dc2626;
-        border: none; border-radius: 10px; padding: 8px 14px;
-        font-size: 13px; font-weight: 700; cursor: pointer;
-        transition: background 0.15s;
+        gap: 5px; background: #fef2f2; color: #dc2626; border: none;
+        border-radius: 10px; padding: 8px 14px; font-size: 13px;
+        font-weight: 700; cursor: pointer; transition: background 0.15s;
     }
     .btn-hapus-bab:hover { background: #fee2e2; }
 
@@ -165,21 +165,34 @@
                 </div>
             </div>
 
-            <!-- MODAL HAPUS -->
+            <!-- MODAL HAPUS — FIX: gunakan form POST + CSRF token, bukan <a href> GET -->
             <div class="modal fade" id="modalHapusBab{{ bab.id }}" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-content border-0 shadow rounded-4"
+                         style="background:var(--card-bg);color:var(--text-primary);">
                         <div class="modal-header bg-danger text-white rounded-top-4">
                             <h5 class="modal-title">Hapus Bab</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body py-4">
                             Yakin hapus bab <strong>"{{ bab.judul }}"</strong>?
-                            <br><small class="text-danger">Semua tugas di bab ini akan ikut terhapus.</small>
+                            <br><small class="text-danger">
+                                Semua tugas di bab ini akan ikut terhapus.
+                            </small>
                         </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <a href="{% url 'hapus_bab' bab.id %}" class="btn btn-danger">Ya, Hapus</a>
+                        <div class="modal-footer" style="border-color:var(--card-border);">
+                            <button class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Batal</button>
+                            <!-- FIX: form POST menggantikan <a href> yang menggunakan GET -->
+                            <form method="POST"
+                                  action="{% url 'hapus_bab' bab.id %}"
+                                  style="margin:0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    Ya, Hapus
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -207,7 +220,10 @@
     else if (h >= 15 && h < 18) greet = "Selamat Sore";
     document.getElementById("greeting-text").textContent = "👋 " + greet;
     document.getElementById("tanggal-text").textContent =
-        new Date().toLocaleDateString("id-ID", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+        new Date().toLocaleDateString("id-ID", {
+            weekday: "long", year: "numeric",
+            month: "long", day: "numeric"
+        });
 </script>
 
 {% endblock %}

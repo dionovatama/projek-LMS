@@ -1,0 +1,1 @@
+[2026-05-10 10:43:07,796] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883

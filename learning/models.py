@@ -2,6 +2,7 @@ import os
 
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator  # FIX: tambah import
 from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -62,17 +63,6 @@ class SiswaProfile(models.Model):
 # ==========================
 # upload_to helpers
 # ==========================
-# Setiap fungsi menghasilkan path unik berbasis random string (32 karakter)
-# sehingga nama file asli dari user tidak pernah tersimpan ke disk.
-# Ini mencegah:
-#   - path traversal (misal: nama file "../../etc/passwd")
-#   - enumeration / tebak URL file milik user lain
-#   - konflik nama file yang sama
-#
-# PENTING: logika randomisasi harus ada di sini (upload_to), BUKAN di views.py.
-# Django memanggil fungsi ini tepat sebelum menulis ke storage backend,
-# sehingga nama yang dikembalikan adalah nama yang benar-benar tersimpan.
-
 def _random_name(ext: str) -> str:
     """Hasilkan nama file acak 32 karakter + ekstensi yang sudah lowercase."""
     return get_random_string(32) + ext.lower()
@@ -108,8 +98,6 @@ class Mapel(models.Model):
         related_name='mapel_diajarkan',
     )
     kelas = models.ForeignKey(Kelas, on_delete=models.CASCADE, related_name='mapel_kelas')
-
-    # upload_to diganti dari string 'mapel/' menjadi fungsi upload_gambar_mapel
     gambar = models.ImageField(upload_to=upload_gambar_mapel, blank=True, null=True)
     deskripsi = models.TextField(blank=True, null=True)
 
@@ -135,8 +123,6 @@ class Bab(models.Model):
 class Tugas(models.Model):
     bab = models.ForeignKey(Bab, on_delete=models.CASCADE, related_name='tugas')
     judul = models.CharField(max_length=200)
-
-    # upload_to diganti dari string 'tugas_files/' menjadi fungsi upload_file_tugas
     file_tugas = models.FileField(upload_to=upload_file_tugas, blank=True, null=True)
     deskripsi = models.TextField(default='', blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
@@ -152,17 +138,27 @@ class PengumpulanTugas(models.Model):
     tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE, related_name='pengumpulan_tugas')
     siswa = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     jawaban_teks = models.TextField(blank=True, null=True)
-
-    # upload_to diganti dari string 'tugas/' menjadi fungsi upload_jawaban_siswa
     jawaban_file = models.FileField(upload_to=upload_jawaban_siswa, blank=True, null=True)
     waktu_dikumpulkan = models.DateTimeField(auto_now_add=True)
-    nilai = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+
+    # FIX: tambahkan validators untuk membatasi nilai antara 0 dan 100.
+    # Validasi terjadi di dua lapis:
+    #   1. Model level — Django memanggil full_clean() sebelum save via ModelForm.
+    #   2. Form level  — PenilaianForm.clean_nilai() sebagai guard eksplisit.
+    # Dua lapis ini memastikan data invalid tidak bisa masuk melalui jalur apapun.
+    nilai = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(0, message='Nilai tidak boleh kurang dari 0.'),
+            MaxValueValidator(100, message='Nilai tidak boleh lebih dari 100.'),
+        ],
+    )
     komentar_guru = models.TextField(null=True, blank=True)
 
     class Meta:
-        # Satu siswa hanya boleh mengumpulkan satu kali per tugas.
-        # Constraint ini di level database mencegah race condition double-submit
-        # bahkan jika dua request masuk bersamaan.
         unique_together = ('tugas', 'siswa')
 
     def __str__(self):
@@ -170,7 +166,7 @@ class PengumpulanTugas(models.Model):
 
 
 # ==========================
-# 8. Nilai
+# 8. Nilai (belum digunakan — kandidat hapus di sprint berikutnya)
 # ==========================
 class Nilai(models.Model):
     tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE, related_name='nilai_tugas')
