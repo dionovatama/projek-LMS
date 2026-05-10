@@ -235,15 +235,13 @@
         </div>
         <div class="stat-box green">
             <div class="num">
-                {% with graded=pengumpulan_list|length %}
-                    {{ pengumpulan_list|length }}
-                {% endwith %}
+                {{ sudah_dinilai }}
             </div>
             <div class="lbl">Sudah Dinilai</div>
         </div>
         <div class="stat-box orange">
             <div class="num">
-                {% for p in pengumpulan_list %}{% if not p.nilai %}1{% endif %}{% endfor %}
+                {{ belum_dinilai }}
             </div>
             <div class="lbl">Belum Dinilai</div>
         </div>
