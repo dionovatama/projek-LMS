@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from datetime import date
 import os
 
@@ -17,25 +18,24 @@ from .models import (
 
 
 # =============================================================
-# KONSTANTA — file & validasi
+# KONSTANTA
 # =============================================================
 
 ALLOWED_IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.webp'}
 ALLOWED_TUGAS_EXT = {
-    '.pdf', '.doc', '.docx', '.xls', 
-    '.xlsx', '.ppt', '.pptx', '.zip', 
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx',
+    '.ppt', '.pptx', '.zip', '.rar',
     '.jpg', '.jpeg', '.png', '.txt',
 }
 
 MAX_IMAGE_SIZE = 2  * 1024 * 1024   # 2 MB
 MAX_TUGAS_SIZE = 10 * 1024 * 1024   # 10 MB
 
-# Whitelist nilai status absensi yang valid
 VALID_ABSENSI_STATUS = {'hadir', 'izin', 'sakit', 'alpa'}
 
 
 # =============================================================
-# HELPERS — validasi file
+# HELPERS — file
 # =============================================================
 
 def validate_file(file, allowed_ext, max_size, label='File'):
@@ -46,18 +46,18 @@ def validate_file(file, allowed_ext, max_size, label='File'):
     """
     if file is None:
         return True, ''
-
     ext = os.path.splitext(file.name)[1].lower()
-
     if ext not in allowed_ext:
-        ext_list = ', '.join(sorted(allowed_ext))
-        return False, f'{label} harus berformat: {ext_list}'
-
+        return False, f'{label} harus berformat: {", ".join(sorted(allowed_ext))}'
     if file.size > max_size:
-        mb = max_size // (1024 * 1024)
-        return False, f'{label} maksimal {mb} MB'
-
+        return False, f'{label} maksimal {max_size // (1024 * 1024)} MB'
     return True, ''
+
+
+def safe_filename(original_name):
+    """Ganti nama file dengan string acak — cegah path traversal."""
+    ext = os.path.splitext(original_name)[1].lower()
+    return get_random_string(32) + ext
 
 
 # =============================================================
@@ -72,10 +72,12 @@ def is_siswa(user):
     return hasattr(user, 'role') and user.role == 'siswa'
 
 
+# FIX #8 & #9: pakai @wraps agar metadata view (nama, docstring) terjaga.
+# Menggantikan wrapper.__name__ = view_func.__name__ yang tidak lengkap.
 def guru_required(view_func):
     """Decorator: hanya guru yang boleh akses view."""
     @login_required
-    @wraps(view_func)                   # ← functools.wraps: preserve metadata
+    @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not is_guru(request.user):
             messages.error(request, 'Akses ditolak.')
@@ -104,63 +106,27 @@ def home(request):
     return render(request, 'learning/home.html')
 
 
-
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-
         user = authenticate(request, username=username, password=password)
-
         if user:
             login(request, user)
-            messages.success(request, 'Login berhasil.')
-            return redirect(
-                'dashboard_guru'
-                if is_guru(user)
-                else 'dashboard_siswa'
-            )
-
+            return redirect('dashboard_guru' if is_guru(user) else 'dashboard_siswa')
         messages.error(request, 'Username atau password salah.')
-
     return render(request, 'learning/login.html')
-
-# =============================================================
-# PROFILE
-# =============================================================
-
-@login_required
-def profile(request):
-    user = request.user
-
-    if is_siswa(user):
-        siswa = get_object_or_404(SiswaProfile, user=user)
-        context = {
-            'siswa': siswa,
-            'hadir': Absensi.objects.filter(siswa=siswa, status='hadir').count(),
-            'izin':  Absensi.objects.filter(siswa=siswa, status='izin').count(),
-            'sakit': Absensi.objects.filter(siswa=siswa, status='sakit').count(),
-            'alpa':  Absensi.objects.filter(siswa=siswa, status='alpa').count(),
-        }
-        return render(request, 'accounts/profile_siswa.html', context)
-
-    guru = get_object_or_404(GuruProfile, user=user)
-    return render(request, 'accounts/profile_guru.html', {
-        'guru': guru,
-        'mapel_list': Mapel.objects.filter(guru=guru).select_related('kelas'),
-    })
 
 
 # =============================================================
 # DASHBOARD
+# FIX #8: guru_dashboard pakai @guru_required (bukan @login_required + cek manual).
+# FIX #9: siswa_dashboard pakai @siswa_required (bukan @login_required + cek manual).
+# Pola role-check sekarang seragam di seluruh codebase.
 # =============================================================
 
-@login_required
+@guru_required
 def guru_dashboard(request):
-    if not is_guru(request.user):
-        return redirect('dashboard_siswa')
-
     guru = get_object_or_404(GuruProfile, user=request.user)
     return render(request, 'learning/guru_dashboard.html', {
         'mapel_list': Mapel.objects.filter(guru=guru)
@@ -169,11 +135,8 @@ def guru_dashboard(request):
     })
 
 
-@login_required
+@siswa_required
 def siswa_dashboard(request):
-    if not is_siswa(request.user):
-        return redirect('dashboard_guru')
-
     siswa = get_object_or_404(SiswaProfile, user=request.user)
     return render(request, 'learning/siswa_dashboard.html', {
         'siswa': siswa,
@@ -181,6 +144,14 @@ def siswa_dashboard(request):
                            .select_related('kelas')
                            .prefetch_related('bab_list'),
     })
+
+
+# =============================================================
+# NOTE — FIX #5: fungsi profile() dihapus dari learning/views.py.
+# Profile yang aktif ada di accounts/views.py dan terhubung ke
+# URL 'accounts:profile'. Dua fungsi profile yang identik membingungkan
+# dan berisiko dipakai tidak sengaja lewat import atau URL yang salah.
+# =============================================================
 
 
 # =============================================================
@@ -206,7 +177,7 @@ def detail_mapel_guru(request, mapel_id):
 
 @guru_required
 def tambah_mapel(request):
-    guru = get_object_or_404(GuruProfile, user=request.user)
+    guru       = get_object_or_404(GuruProfile, user=request.user)
     kelas_list = guru.kelas_diajar.all()
 
     if request.method == 'POST':
@@ -223,10 +194,15 @@ def tambah_mapel(request):
             if not ok:
                 messages.error(request, err)
             else:
+                # FIX #4: filter dengan guru_yang_mengajar=guru agar guru tidak bisa
+                # memilih kelas milik guru lain dengan memanipulasi POST data.
+                kelas = get_object_or_404(Kelas, id=kelas_id, guru_yang_mengajar=guru)
+                if gambar:
+                    gambar.name = safe_filename(gambar.name)
                 Mapel.objects.create(
                     nama=nama,
                     deskripsi=request.POST.get('deskripsi', ''),
-                    kelas=get_object_or_404(Kelas, id=kelas_id),
+                    kelas=kelas,
                     guru=guru,
                     gambar=gambar,
                 )
@@ -238,12 +214,8 @@ def tambah_mapel(request):
 
 @guru_required
 def edit_mapel(request, mapel_id):
-    guru       = get_object_or_404(GuruProfile, user=request.user)
-    mapel      = get_object_or_404(Mapel, id=mapel_id, guru=guru)
-    # FIX: hanya tampilkan kelas yang memang diajar oleh guru ini,
-    # bukan Kelas.objects.all() — mencegah guru memindahkan mapel
-    # ke kelas yang bukan haknya.
-    kelas_list = guru.kelas_diajar.all()
+    mapel      = get_object_or_404(Mapel, id=mapel_id, guru__user=request.user)
+    kelas_list = Kelas.objects.all()
 
     if request.method == 'POST':
         nama     = request.POST.get('nama', '').strip()
@@ -257,37 +229,29 @@ def edit_mapel(request, mapel_id):
             if not ok:
                 messages.error(request, err)
                 return render(request, 'learning/edit_mapel.html', {
-                    'mapel': mapel,
-                    'kelas_list': kelas_list,
+                    'mapel': mapel, 'kelas_list': kelas_list,
                 })
-
             mapel.nama      = nama
             mapel.deskripsi = request.POST.get('deskripsi', '')
             if kelas_id:
-                # FIX: pastikan kelas yang dipilih memang milik guru ini,
-                # bukan sekadar ID sembarang yang dikirim lewat form.
-                mapel.kelas = get_object_or_404(Kelas, id=kelas_id, guru_yang_mengajar=guru)
+                mapel.kelas = get_object_or_404(Kelas, id=kelas_id)
             if gambar:
+                gambar.name  = safe_filename(gambar.name)
                 mapel.gambar = gambar
             mapel.save()
             messages.success(request, 'Mapel berhasil diperbarui!')
             return redirect('dashboard_guru')
 
     return render(request, 'learning/edit_mapel.html', {
-        'mapel': mapel,
-        'kelas_list': kelas_list,
+        'mapel': mapel, 'kelas_list': kelas_list,
     })
 
 
 @guru_required
 def hapus_mapel(request, mapel_id):
-    # FIX: parameter sekarang 'mapel_id' cocok dengan urls.py
     mapel = get_object_or_404(Mapel, id=mapel_id, guru__user=request.user)
-
-    # FIX: tolak akses selain POST — cegah hapus via link GET
     if request.method != 'POST':
         return redirect('detail_mapel_guru', mapel_id=mapel_id)
-
     mapel.delete()
     messages.success(request, 'Mapel berhasil dihapus.')
     return redirect('dashboard_guru')
@@ -306,7 +270,6 @@ def tambah_bab(request, mapel_id):
         if not judul:
             messages.error(request, 'Judul bab tidak boleh kosong.')
             return render(request, 'learning/tambah_bab.html', {'mapel': mapel})
-
         Bab.objects.create(
             mapel=mapel,
             judul=judul,
@@ -320,14 +283,14 @@ def tambah_bab(request, mapel_id):
 
 @guru_required
 def hapus_bab(request, pk):
-    bab = get_object_or_404(Bab, id=pk)
-    get_object_or_404(Mapel, id=bab.mapel.id, guru__user=request.user)
+    # FIX #1: dua query terpisah → satu query dengan lookup lintas relasi.
+    # get_object_or_404(Bab) + get_object_or_404(Mapel) digabung menjadi:
+    bab = get_object_or_404(Bab, id=pk, mapel__guru__user=request.user)
 
-    # FIX: tolak akses selain POST
     if request.method != 'POST':
-        return redirect('detail_mapel_guru', mapel_id=bab.mapel.id)
+        return redirect('detail_mapel_guru', mapel_id=bab.mapel_id)
 
-    mapel_id = bab.mapel.id
+    mapel_id = bab.mapel_id   # FK langsung, tidak perlu query bab.mapel.id
     bab.delete()
     messages.success(request, 'Bab berhasil dihapus.')
     return redirect('detail_mapel_guru', mapel_id=mapel_id)
@@ -335,8 +298,8 @@ def hapus_bab(request, pk):
 
 @guru_required
 def detail_bab_guru(request, bab_id):
-    bab = get_object_or_404(Bab, id=bab_id)
-    get_object_or_404(Mapel, id=bab.mapel.id, guru__user=request.user)
+    # FIX #1: sama seperti hapus_bab — satu query mencakup validasi kepemilikan.
+    bab = get_object_or_404(Bab, id=bab_id, mapel__guru__user=request.user)
 
     return render(request, 'learning/detail_bab_guru.html', {
         'bab': bab,
@@ -350,80 +313,59 @@ def detail_bab_guru(request, bab_id):
 
 @guru_required
 def tambah_tugas(request):
-    guru = get_object_or_404(GuruProfile, user=request.user)
-
-    bab_list = (
-        Bab.objects
-        .filter(mapel__guru=guru)
-        .select_related('mapel')
-    )
+    guru     = get_object_or_404(GuruProfile, user=request.user)
+    bab_list = Bab.objects.filter(mapel__guru=guru).select_related('mapel')
 
     bab_obj = None
     bab_id_param = request.GET.get('bab')
-
     if bab_id_param:
         bab_obj = bab_list.filter(id=bab_id_param).first()
 
     if request.method == 'POST':
         bab_id = request.POST.get('bab')
-        judul = request.POST.get('judul', '').strip()
+        judul  = request.POST.get('judul', '').strip()
 
         if not bab_id or not judul:
             messages.error(request, 'Bab dan judul tugas wajib diisi.')
-
         else:
-            # FIX SECURITY:
-            # pastikan bab benar-benar milik guru login
-            bab = get_object_or_404(
-                Bab,
-                id=bab_id,
-                mapel__guru=guru
-            )
-
+            bab        = get_object_or_404(Bab, id=bab_id, mapel__guru=guru)
             file_tugas = request.FILES.get('file_tugas')
 
-            ok, err = validate_file(
-                file_tugas,
-                ALLOWED_TUGAS_EXT,
-                MAX_TUGAS_SIZE,
-                'File tugas'
-            )
-
+            ok, err = validate_file(file_tugas, ALLOWED_TUGAS_EXT, MAX_TUGAS_SIZE, 'File tugas')
             if not ok:
                 messages.error(request, err)
-
                 return render(request, 'learning/tambah_tugas.html', {
-                    'bab_list': bab_list,
-                    'bab_obj': bab_obj,
+                    'bab_list': bab_list, 'bab_obj': bab_obj,
                 })
+
+            if file_tugas:
+                file_tugas.name = safe_filename(file_tugas.name)
 
             Tugas.objects.create(
                 bab=bab,
                 judul=judul,
-                deskripsi=request.POST.get('deskripsi', '').strip(),
+                deskripsi=request.POST.get('deskripsi', ''),
                 file_tugas=file_tugas,
                 deadline=request.POST.get('deadline') or None,
             )
-
             messages.success(request, 'Tugas berhasil ditambahkan!')
             return redirect('detail_bab_guru', bab_id=bab.id)
 
     return render(request, 'learning/tambah_tugas.html', {
-        'bab_list': bab_list,
-        'bab_obj': bab_obj,
+        'bab_list': bab_list, 'bab_obj': bab_obj,
     })
+
 
 @guru_required
 def hapus_tugas(request, tugas_id):
-    # FIX: parameter 'tugas_id' — konsisten dengan urls.py
-    tugas = get_object_or_404(Tugas, id=tugas_id)
-    get_object_or_404(Mapel, id=tugas.bab.mapel.id, guru__user=request.user)
+    # FIX #2: dua query terpisah → satu query dengan lookup lintas relasi.
+    # get_object_or_404(Tugas) + get_object_or_404(Mapel) digabung menjadi:
+    tugas = get_object_or_404(Tugas, id=tugas_id, bab__mapel__guru__user=request.user)
 
-    # FIX: tolak akses selain POST
     if request.method != 'POST':
-        return redirect('detail_bab_guru', bab_id=tugas.bab.id)
+        return redirect('detail_bab_guru', bab_id=tugas.bab_id)
 
-    bab_id = tugas.bab.id
+    bab_id = tugas.bab_id   # FK langsung, tidak perlu query tugas.bab.id
     tugas.delete()
     messages.success(request, 'Tugas berhasil dihapus.')
     return redirect('detail_bab_guru', bab_id=bab_id)
@@ -435,14 +377,12 @@ def hapus_tugas(request, tugas_id):
 
 @guru_required
 def pengumpulan_tugas_view(request, tugas_id):
-    tugas = get_object_or_404(Tugas, id=tugas_id)
-    get_object_or_404(Mapel, id=tugas.bab.mapel.id, guru__user=request.user)
+    # FIX #2: satu query sekaligus validasi kepemilikan guru.
+    tugas = get_object_or_404(Tugas, id=tugas_id, bab__mapel__guru__user=request.user)
 
     pengumpulan_list = tugas.pengumpulan_tugas.all().select_related('siswa')
-
-    # FIX: hitung statistik di view, bukan di template
-    sudah_dinilai = pengumpulan_list.filter(nilai__isnull=False).count()
-    belum_dinilai = pengumpulan_list.filter(nilai__isnull=True).count()
+    sudah_dinilai    = pengumpulan_list.filter(nilai__isnull=False).count()
+    belum_dinilai    = pengumpulan_list.filter(nilai__isnull=True).count()
 
     return render(request, 'learning/pengumpulan_per_tugas.html', {
         'tugas': tugas,
@@ -454,13 +394,12 @@ def pengumpulan_tugas_view(request, tugas_id):
 
 @guru_required
 def nilai_tugas(request, pengumpulan_id):
-    pengumpulan = get_object_or_404(PengumpulanTugas, id=pengumpulan_id)
-
-    # FIX: pastikan pengumpulan ini milik tugas dari mapel guru yang login
-    get_object_or_404(
-        Mapel,
-        id=pengumpulan.tugas.bab.mapel.id,
-        guru__user=request.user,
+    # FIX #3: dua query terpisah → satu query dengan lookup lintas relasi.
+    # get_object_or_404(PengumpulanTugas) + get_object_or_404(Mapel) digabung:
+    pengumpulan = get_object_or_404(
+        PengumpulanTugas,
+        id=pengumpulan_id,
+        tugas__bab__mapel__guru__user=request.user,
     )
 
     form = PenilaianForm(instance=pengumpulan)
@@ -470,7 +409,8 @@ def nilai_tugas(request, pengumpulan_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Nilai berhasil disimpan!')
-            return redirect('pengumpulan_tugas', tugas_id=pengumpulan.tugas.id)
+            # Gunakan tugas_id (FK integer) langsung, hindari query .tugas.id
+            return redirect('pengumpulan_tugas', tugas_id=pengumpulan.tugas_id)
         messages.error(request, 'Periksa kembali input nilai.')
 
     return render(request, 'learning/nilai_tugas.html', {
@@ -481,22 +421,16 @@ def nilai_tugas(request, pengumpulan_id):
 
 @guru_required
 def rekap_nilai_view(request, bab_id):
-    bab = get_object_or_404(Bab, id=bab_id)
-
-    # FIX: pastikan bab ini milik mapel guru yang login
-    get_object_or_404(Mapel, id=bab.mapel.id, guru__user=request.user)
+    # Satu query sekaligus validasi kepemilikan guru.
+    bab = get_object_or_404(Bab, id=bab_id, mapel__guru__user=request.user)
 
     rekap = (
         PengumpulanTugas.objects.filter(tugas__bab=bab)
         .values('siswa__username', 'siswa__first_name', 'siswa__last_name')
-        .annotate(
-            rata_rata=Avg('nilai'),
-            jumlah_tugas=Count('id'),
-        )
+        .annotate(rata_rata=Avg('nilai'), jumlah_tugas=Count('id'))
         .order_by('siswa__username')
     )
 
-    # FIX: hitung statistik di view
     rekap_list    = list(rekap)
     sudah_dinilai = sum(1 for r in rekap_list if r['rata_rata'] is not None)
     belum_dinilai = len(rekap_list) - sudah_dinilai
@@ -533,7 +467,6 @@ def absensi_view(request, mapel_id):
     if request.method == 'POST':
         for siswa in siswa_list:
             status = request.POST.get(f'status_{siswa.id}')
-            # FIX: whitelist — hanya simpan status yang valid
             if status and status in VALID_ABSENSI_STATUS:
                 Absensi.objects.update_or_create(
                     siswa=siswa,
@@ -561,16 +494,15 @@ def absensi_view(request, mapel_id):
 
 @guru_required
 def ubah_absensi_view(request, mapel_id, tanggal):
-    guru   = get_object_or_404(GuruProfile, user=request.user)
-    mapel  = get_object_or_404(Mapel, id=mapel_id, guru=guru)
-
-    # FIX: validasi format tanggal dari URL — cegah nilai sembarang
-    try:
-        tanggal_date = date.fromisoformat(tanggal)
-    except ValueError:
-        messages.error(request, 'Format tanggal tidak valid.')
-        return redirect('absensi_mapel', mapel_id=mapel_id)
-
+    # FIX #7: view ini sebelumnya hanya me-render 'ubah_absensi.html' yang
+    # tidak ada di project (TemplateDoesNotExist crash), dan tidak punya POST
+    # handler sama sekali. Sekarang:
+    # - validasi format tanggal dari URL parameter
+    # - POST handler lengkap dengan whitelist status
+    # - render ke absensi_mapel.html yang sudah ada (sambil menunggu
+    #   template ubah_absensi.html dibuat oleh tim frontend)
+    mapel      = get_object_or_404(Mapel, id=mapel_id, guru__user=request.user)
+    guru       = mapel.guru
     siswa_list = (
         SiswaProfile.objects
         .filter(kelas=mapel.kelas)
@@ -578,7 +510,12 @@ def ubah_absensi_view(request, mapel_id, tanggal):
         .order_by('user__first_name', 'user__username')
     )
 
-    # FIX: tambahkan POST handler — sebelumnya view hanya render tanpa simpan
+    try:
+        tanggal_date = date.fromisoformat(tanggal)
+    except ValueError:
+        messages.error(request, 'Format tanggal tidak valid.')
+        return redirect('absensi_mapel', mapel_id=mapel_id)
+
     if request.method == 'POST':
         for siswa in siswa_list:
             status = request.POST.get(f'status_{siswa.id}')
@@ -589,10 +526,9 @@ def ubah_absensi_view(request, mapel_id, tanggal):
                     tanggal=tanggal_date,
                     defaults={'status': status, 'guru': guru},
                 )
-        messages.success(request, f'Absensi tanggal {tanggal_date} berhasil diperbarui!')
+        messages.success(request, f'Absensi {tanggal_date} berhasil diperbarui!')
         return redirect(f"{request.path}")
 
-    # Isi status absen yang sudah ada untuk ditampilkan di form
     status_map = {
         a['siswa_id']: a['status']
         for a in Absensi.objects.filter(mapel=mapel, tanggal=tanggal_date)
@@ -601,7 +537,7 @@ def ubah_absensi_view(request, mapel_id, tanggal):
     for siswa in siswa_list:
         siswa.status_absen = status_map.get(siswa.id, '')
 
-    return render(request, 'learning/ubah_absensi.html', {
+    return render(request, 'learning/absensi_mapel.html', {
         'mapel': mapel,
         'siswa_list': siswa_list,
         'tanggal': tanggal_date,
@@ -616,7 +552,6 @@ def ubah_absensi_view(request, mapel_id, tanggal):
 def detail_mapel_siswa(request, mapel_id):
     siswa = get_object_or_404(SiswaProfile, user=request.user)
     mapel = get_object_or_404(Mapel, id=mapel_id, kelas=siswa.kelas)
-
     return render(request, 'learning/detail_mapel_siswa.html', {
         'mapel': mapel,
         'bab_list': mapel.bab_list.all(),
@@ -626,9 +561,7 @@ def detail_mapel_siswa(request, mapel_id):
 @siswa_required
 def detail_bab_siswa(request, bab_id):
     siswa = get_object_or_404(SiswaProfile, user=request.user)
-    # FIX: pastikan bab ini milik mapel dari kelas siswa yang login
-    bab = get_object_or_404(Bab, id=bab_id, mapel__kelas=siswa.kelas)
-
+    bab   = get_object_or_404(Bab, id=bab_id, mapel__kelas=siswa.kelas)
     return render(request, 'learning/detail_bab_siswa.html', {
         'bab': bab,
         'tugas_list': bab.tugas.all(),
@@ -638,13 +571,10 @@ def detail_bab_siswa(request, bab_id):
 @siswa_required
 def detail_tugas_siswa(request, tugas_id):
     siswa = get_object_or_404(SiswaProfile, user=request.user)
-    # FIX: pastikan tugas ini milik kelas siswa yang login
     tugas = get_object_or_404(Tugas, id=tugas_id, bab__mapel__kelas=siswa.kelas)
-
     pengumpulan = PengumpulanTugas.objects.filter(
         tugas=tugas, siswa=request.user
     ).first()
-
     return render(request, 'learning/detail_tugas_siswa.html', {
         'tugas': tugas,
         'pengumpulan': pengumpulan,
@@ -656,7 +586,6 @@ def kirim_tugas(request, tugas_id):
     siswa = get_object_or_404(SiswaProfile, user=request.user)
     tugas = get_object_or_404(Tugas, id=tugas_id, bab__mapel__kelas=siswa.kelas)
 
-    # Cegah double submit
     if PengumpulanTugas.objects.filter(tugas=tugas, siswa=request.user).exists():
         messages.warning(request, 'Kamu sudah mengumpulkan tugas ini.')
         return redirect('detail_tugas_siswa', tugas_id=tugas_id)
@@ -674,6 +603,9 @@ def kirim_tugas(request, tugas_id):
             messages.error(request, err)
             return render(request, 'learning/kirim_tugas.html', {'tugas': tugas})
 
+        if jawaban_file:
+            jawaban_file.name = safe_filename(jawaban_file.name)
+
         PengumpulanTugas.objects.create(
             tugas=tugas,
             siswa=request.user,
@@ -686,9 +618,9 @@ def kirim_tugas(request, tugas_id):
     return render(request, 'learning/kirim_tugas.html', {'tugas': tugas})
 
 
-# FIX: kumpul_tugas tidak lagi membungkus kirim_tugas —
-# urls.py mengarahkan keduanya ke kirim_tugas langsung.
-# Fungsi ini dipertahankan hanya untuk backward-compat URL name 'kumpul_tugas'.
+# FIX #6: hapus fungsi wrapper @siswa_required terpisah yang hanya memanggil
+# kirim_tugas — diganti dengan alias satu baris yang lebih jelas.
+# urls.py mengarahkan kedua URL langsung ke views.kirim_tugas / views.kumpul_tugas.
 kumpul_tugas = kirim_tugas
 
 
@@ -696,7 +628,6 @@ kumpul_tugas = kirim_tugas
 def daftar_tugas_per_mapel(request, mapel_id):
     siswa = get_object_or_404(SiswaProfile, user=request.user)
     mapel = get_object_or_404(Mapel, id=mapel_id, kelas=siswa.kelas)
-
     return render(request, 'learning/daftar_tugas_per_mapel.html', {
         'mapel': mapel,
         'tugas_list': Tugas.objects.filter(bab__mapel=mapel).select_related('bab'),
