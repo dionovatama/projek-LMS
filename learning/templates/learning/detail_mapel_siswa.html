@@ -1,61 +1,83 @@
 {% extends 'learning/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="max-width: 700px;">
 
-    <!-- Header Mapel -->
-    <div class="card shadow-lg border-0 mb-4"
-         style="background: linear-gradient(135deg, #4e73df, #1cc88a);">
-        <div class="card-body text-white">
-            <h3 class="mb-1 fw-bold">{{ mapel.nama }}</h3>
-            <p class="mb-0 opacity-75">
-                Kelas {{ mapel.kelas.nama }}
-            </p>
+  <!-- Hero Header -->
+  <div style="background: linear-gradient(135deg, #1e40af, #1d9e75);
+              border-radius: 16px; padding: 24px; color: white;
+              margin-bottom: 24px; display: flex; align-items: center; gap: 16px;">
+    <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.18);
+                border-radius: 12px; display: flex; align-items: center;
+                justify-content: center; font-size: 28px; flex-shrink: 0;">
+      📘
+    </div>
+    <div>
+      <h3 style="margin: 0 0 4px; font-size: 20px; font-weight: 700;">
+        {{ mapel.nama }}
+      </h3>
+      <p style="margin: 0; font-size: 13px; opacity: 0.85;">
+        🏫 Kelas {{ mapel.kelas.nama }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Label -->
+  <p style="font-size: 12px; font-weight: 700; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+    Daftar Bab
+  </p>
+
+  <!-- Bab List -->
+  {% if bab_list %}
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for bab in bab_list %}
+      <a href="{% url 'detail_bab_siswa' bab.id %}"
+         style="background: white; border: 1px solid #e5e7eb; border-radius: 14px;
+                padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+                text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;"
+         onmouseover="this.style.borderColor='#93c5fd'; this.style.boxShadow='0 2px 10px rgba(59,130,246,0.1)'"
+         onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+
+        <!-- Nomor -->
+        <div style="width: 36px; height: 36px; background: #eff6ff; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 13px; font-weight: 700; color: #1d4ed8; flex-shrink: 0;">
+          {{ forloop.counter }}
         </div>
+
+        <!-- Info -->
+        <div style="flex: 1;">
+          <div style="font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 2px;">
+            {{ bab.judul }}
+          </div>
+          <div style="font-size: 12px; color: #6b7280;">
+            {{ bab.deskripsi|default:"Tidak ada deskripsi" }}
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <span style="color: #9ca3af; font-size: 18px;">›</span>
+      </a>
+      {% endfor %}
     </div>
 
-    <!-- Daftar Bab -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">📘 Daftar Bab</h5>
-        </div>
-
-        <div class="card-body p-0">
-            {% if bab_list %}
-                <div class="list-group list-group-flush">
-                    {% for bab in bab_list %}
-                        <a href="{% url 'detail_bab_siswa' bab.id %}"
-                           class="list-group-item list-group-item-action py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1 fw-semibold text-primary">
-                                        {{ bab.judul }}
-                                    </h6>
-                                    <small class="text-muted">
-                                        {{ bab.deskripsi|default:"Tidak ada deskripsi" }}
-                                    </small>
-                                </div>
-                                <span class="badge bg-success rounded-pill">
-                                    Buka
-                                </span>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-warning m-3">
-                    Belum ada bab untuk mapel ini.
-                </div>
-            {% endif %}
-        </div>
+  {% else %}
+    <div style="text-align: center; padding: 48px 20px; background: white;
+                border: 1px solid #e5e7eb; border-radius: 14px;">
+      <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+      <p style="color: #9ca3af; font-size: 14px; margin: 0;">Belum ada bab untuk mapel ini.</p>
     </div>
+  {% endif %}
 
-    <!-- Tombol Kembali -->
-    <div class="mt-4">
-        <a href="{% url 'dashboard_siswa' %}" class="btn btn-outline-primary">
-            ← Kembali ke Dashboard
-        </a>
-    </div>
+  <!-- Kembali -->
+  <div style="margin-top: 20px;">
+    <a href="{% url 'dashboard_siswa' %}"
+       style="color: #6b7280; font-size: 13px; text-decoration: none;
+              display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+      ← Kembali ke Dashboard
+    </a>
+  </div>
 
 </div>
 {% endblock %}

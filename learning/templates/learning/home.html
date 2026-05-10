@@ -17,7 +17,6 @@
         overflow: hidden;
     ">
 
-    <!-- Dekorasi blur bawah kiri -->
     <div style="
         position:absolute;
         bottom:-80px; left:-80px;
@@ -62,7 +61,15 @@
                 </p>
 
                 <div class="d-flex gap-3 flex-wrap">
-                    <a href="{% url 'login' %}"
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'guru' %}
+                            <a href="{% url 'dashboard_guru' %}"
+                        {% else %}
+                            <a href="{% url 'dashboard_siswa' %}"
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}"
+                    {% endif %}
                        class="btn btn-warning fw-bold px-4 py-2 rounded-3"
                        style="font-size:15px;">
                         🚀 Masuk ke Dashboard
@@ -76,7 +83,7 @@
 
             </div>
 
-            <!-- CARD KANAN (info singkat) -->
+            <!-- CARD KANAN -->
             <div class="col-lg-5 mt-5 mt-lg-0 d-none d-lg-block">
                 <div style="
                     background: rgba(255,255,255,0.08);
@@ -89,20 +96,18 @@
                         ✦ TERSEDIA UNTUK
                     </p>
 
-                    {% for item in info_items|default:"" %}{% endfor %}
-
                     <div class="d-flex flex-column gap-3">
 
                         <div class="d-flex align-items-center gap-3">
                             <div style="width:42px;height:42px;background:rgba(250,204,21,0.2);
                                         border-radius:12px;display:flex;align-items:center;
-                                        justify-content:center;font-size:20px;flex-shrink:0;">
-                                👩‍🏫
+                                        justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-person-fill" style="font-size:20px;color:#facc15;"></i>
                             </div>
                             <div>
                                 <div class="fw-bold" style="font-size:14px;">Guru</div>
                                 <div style="font-size:12px;opacity:0.75;">
-                                    Kelola mapel, bab, tugas & absensi
+                                    Kelola mapel, bab, tugas &amp; absensi
                                 </div>
                             </div>
                         </div>
@@ -110,13 +115,13 @@
                         <div class="d-flex align-items-center gap-3">
                             <div style="width:42px;height:42px;background:rgba(59,130,246,0.25);
                                         border-radius:12px;display:flex;align-items:center;
-                                        justify-content:center;font-size:20px;flex-shrink:0;">
-                                🎒
+                                        justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-mortarboard-fill" style="font-size:20px;color:#93c5fd;"></i>
                             </div>
                             <div>
                                 <div class="fw-bold" style="font-size:14px;">Siswa</div>
                                 <div style="font-size:12px;opacity:0.75;">
-                                    Akses materi, kumpul tugas & cek nilai
+                                    Akses materi, kumpul tugas &amp; cek nilai
                                 </div>
                             </div>
                         </div>
@@ -147,14 +152,16 @@
 </section>
 
 <!-- ================= FEATURES ================= -->
-<section class="py-5 bg-white" id="fitur">
+<section class="py-5" id="fitur" style="background:var(--page-bg);">
     <div class="container">
 
         <div class="text-center mb-5">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2"
-                  style="font-size:12px;font-weight:700;">FITUR UNGGULAN</span>
-            <h2 class="fw-bold">Kenapa E-Learning SMKN 2?</h2>
-            <p class="text-muted" style="max-width:500px;margin:0 auto;">
+            <span class="badge px-3 py-2 rounded-pill mb-2"
+                  style="background:rgba(29,78,216,0.12);color:#3b82f6;font-size:12px;font-weight:700;">
+                FITUR UNGGULAN
+            </span>
+            <h2 class="fw-bold" style="color:var(--text-primary);">Kenapa E-Learning SMKN 2?</h2>
+            <p style="max-width:500px;margin:0 auto;color:var(--text-muted);">
                 Dirancang khusus untuk kebutuhan belajar mengajar yang efisien dan modern.
             </p>
         </div>
@@ -162,33 +169,33 @@
         <div class="row g-4">
 
             <div class="col-12 col-md-4">
-                <div class="p-4 rounded-4 h-100 shadow-sm border-0"
-                     style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">
+                <div class="p-4 rounded-4 h-100 shadow-sm"
+                     style="background:var(--card-bg);border:1px solid var(--card-border);">
                     <div style="font-size:36px;margin-bottom:12px;">📚</div>
-                    <h5 class="fw-bold mb-2">Materi Terstruktur</h5>
-                    <p class="text-muted mb-0 small">
+                    <h5 class="fw-bold mb-2" style="color:var(--text-primary);">Materi Terstruktur</h5>
+                    <p style="color:var(--text-muted);margin:0;font-size:14px;">
                         Materi diorganisir per mapel dan bab sehingga mudah dipelajari secara urut.
                     </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-4">
-                <div class="p-4 rounded-4 h-100 shadow-sm border-0"
-                     style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
+                <div class="p-4 rounded-4 h-100 shadow-sm"
+                     style="background:var(--card-bg);border:1px solid var(--card-border);">
                     <div style="font-size:36px;margin-bottom:12px;">📱</div>
-                    <h5 class="fw-bold mb-2">Akses dari Mana Saja</h5>
-                    <p class="text-muted mb-0 small">
+                    <h5 class="fw-bold mb-2" style="color:var(--text-primary);">Akses dari Mana Saja</h5>
+                    <p style="color:var(--text-muted);margin:0;font-size:14px;">
                         Bisa dibuka dari HP, laptop, atau tablet kapan pun dan di mana pun.
                     </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-4">
-                <div class="p-4 rounded-4 h-100 shadow-sm border-0"
-                     style="background:linear-gradient(135deg,#fefce8,#fef9c3);">
+                <div class="p-4 rounded-4 h-100 shadow-sm"
+                     style="background:var(--card-bg);border:1px solid var(--card-border);">
                     <div style="font-size:36px;margin-bottom:12px;">✅</div>
-                    <h5 class="fw-bold mb-2">Penilaian Real-time</h5>
-                    <p class="text-muted mb-0 small">
+                    <h5 class="fw-bold mb-2" style="color:var(--text-primary);">Penilaian Real-time</h5>
+                    <p style="color:var(--text-muted);margin:0;font-size:14px;">
                         Guru dapat memberi nilai dan komentar langsung, siswa bisa langsung melihat hasilnya.
                     </p>
                 </div>
@@ -199,18 +206,18 @@
 </section>
 
 <!-- ================= JURUSAN ================= -->
-<section class="py-5" style="background:#f8faff;">
+<section class="py-5" style="background:var(--sec-header-bg);">
     <div class="container">
 
         <div class="text-center mb-5">
-            <span class="badge bg-warning bg-opacity-20 text-warning px-3 py-2 rounded-pill mb-2"
-                  style="font-size:12px;font-weight:700;">PROGRAM KEAHLIAN</span>
-            <h2 class="fw-bold">Jurusan di SMKN 2 Baleendah</h2>
+            <span class="badge px-3 py-2 rounded-pill mb-2"
+                  style="background:rgba(202,138,4,0.15);color:#ca8a04;font-size:12px;font-weight:700;">
+                PROGRAM KEAHLIAN
+            </span>
+            <h2 class="fw-bold" style="color:var(--text-primary);">Jurusan di SMKN 2 Baleendah</h2>
         </div>
 
         <div class="row g-3 justify-content-center">
-
-            {% for jurusan in jurusan_list|default:"" %}{% endfor %}
 
             <div class="col-6 col-md-4 col-lg-2">
                 <div class="text-center p-3 rounded-4 h-100 fw-bold text-white shadow-sm"
@@ -264,7 +271,15 @@
         <p class="mb-4" style="opacity:0.85;">
             Login sekarang dan akses semua materi pembelajaran digitalmu.
         </p>
-        <a href="{% url 'login' %}"
+        {% if user.is_authenticated %}
+            {% if user.role == 'guru' %}
+                <a href="{% url 'dashboard_guru' %}"
+            {% else %}
+                <a href="{% url 'dashboard_siswa' %}"
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}"
+        {% endif %}
            class="btn btn-warning btn-lg fw-bold px-5 rounded-3">
             Masuk Sekarang
         </a>

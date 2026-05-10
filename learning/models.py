@@ -1,8 +1,11 @@
-from django.db import models
+import os
+
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
+from django.utils.crypto import get_random_string
+
 
 # ==========================
 # 1. Custom User
@@ -31,22 +34,17 @@ class Kelas(models.Model):
 # ==========================
 # 3. Profil Guru & Siswa
 # ==========================
-# models.py
-
 class GuruProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    # ganti "kelas" → "kelas_diajar"
     kelas_diajar = models.ManyToManyField(
         'Kelas',
         related_name='guru_yang_mengajar',
-        blank=True
+        blank=True,
     )
-
     mapel = models.ManyToManyField(
         'Mapel',
         related_name='pengajar_mapel',
-        blank=True
+        blank=True,
     )
 
     def __str__(self):
@@ -56,9 +54,46 @@ class GuruProfile(models.Model):
 class SiswaProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     kelas = models.ForeignKey(Kelas, on_delete=models.CASCADE, related_name='siswa_kelas')
-    
+
     def __str__(self):
         return self.user.username
+
+
+# ==========================
+# upload_to helpers
+# ==========================
+# Setiap fungsi menghasilkan path unik berbasis random string (32 karakter)
+# sehingga nama file asli dari user tidak pernah tersimpan ke disk.
+# Ini mencegah:
+#   - path traversal (misal: nama file "../../etc/passwd")
+#   - enumeration / tebak URL file milik user lain
+#   - konflik nama file yang sama
+#
+# PENTING: logika randomisasi harus ada di sini (upload_to), BUKAN di views.py.
+# Django memanggil fungsi ini tepat sebelum menulis ke storage backend,
+# sehingga nama yang dikembalikan adalah nama yang benar-benar tersimpan.
+
+def _random_name(ext: str) -> str:
+    """Hasilkan nama file acak 32 karakter + ekstensi yang sudah lowercase."""
+    return get_random_string(32) + ext.lower()
+
+
+def upload_gambar_mapel(instance, filename: str) -> str:
+    """Path untuk gambar Mapel → media/mapel/<random>.ext"""
+    ext = os.path.splitext(filename)[1]
+    return f"mapel/{_random_name(ext)}"
+
+
+def upload_file_tugas(instance, filename: str) -> str:
+    """Path untuk file lampiran Tugas dari guru → media/tugas_files/<random>.ext"""
+    ext = os.path.splitext(filename)[1]
+    return f"tugas_files/{_random_name(ext)}"
+
+
+def upload_jawaban_siswa(instance, filename: str) -> str:
+    """Path untuk file jawaban PengumpulanTugas → media/jawaban/<random>.ext"""
+    ext = os.path.splitext(filename)[1]
+    return f"jawaban/{_random_name(ext)}"
 
 
 # ==========================
@@ -66,9 +101,16 @@ class SiswaProfile(models.Model):
 # ==========================
 class Mapel(models.Model):
     nama = models.CharField(max_length=100)
-    guru = models.ForeignKey('GuruProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='mapel_diajarkan')
+    guru = models.ForeignKey(
+        'GuruProfile',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='mapel_diajarkan',
+    )
     kelas = models.ForeignKey(Kelas, on_delete=models.CASCADE, related_name='mapel_kelas')
-    gambar = models.ImageField(upload_to='mapel/', blank=True, null=True)
+
+    # upload_to diganti dari string 'mapel/' menjadi fungsi upload_gambar_mapel
+    gambar = models.ImageField(upload_to=upload_gambar_mapel, blank=True, null=True)
     deskripsi = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -76,7 +118,7 @@ class Mapel(models.Model):
 
 
 # ==========================
-# 5. Bab (Sub-materi dari Mapel)
+# 5. Bab
 # ==========================
 class Bab(models.Model):
     mapel = models.ForeignKey(Mapel, on_delete=models.CASCADE, related_name='bab_list')
@@ -88,12 +130,14 @@ class Bab(models.Model):
 
 
 # ==========================
-# 6. Tugas (Tiap Bab punya banyak Tugas)
+# 6. Tugas
 # ==========================
 class Tugas(models.Model):
     bab = models.ForeignKey(Bab, on_delete=models.CASCADE, related_name='tugas')
     judul = models.CharField(max_length=200)
-    file_tugas = models.FileField(upload_to='tugas_files/', blank=True, null=True)  # ⬅️ ini bagian penting
+
+    # upload_to diganti dari string 'tugas_files/' menjadi fungsi upload_file_tugas
+    file_tugas = models.FileField(upload_to=upload_file_tugas, blank=True, null=True)
     deskripsi = models.TextField(default='', blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
 
@@ -108,14 +152,21 @@ class PengumpulanTugas(models.Model):
     tugas = models.ForeignKey(Tugas, on_delete=models.CASCADE, related_name='pengumpulan_tugas')
     siswa = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     jawaban_teks = models.TextField(blank=True, null=True)
-    jawaban_file = models.FileField(upload_to='tugas/', blank=True, null=True)
+
+    # upload_to diganti dari string 'tugas/' menjadi fungsi upload_jawaban_siswa
+    jawaban_file = models.FileField(upload_to=upload_jawaban_siswa, blank=True, null=True)
     waktu_dikumpulkan = models.DateTimeField(auto_now_add=True)
     nilai = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     komentar_guru = models.TextField(null=True, blank=True)
 
+    class Meta:
+        # Satu siswa hanya boleh mengumpulkan satu kali per tugas.
+        # Constraint ini di level database mencegah race condition double-submit
+        # bahkan jika dua request masuk bersamaan.
+        unique_together = ('tugas', 'siswa')
+
     def __str__(self):
         return f"{self.siswa.username} - {self.tugas.judul}"
-
 
 
 # ==========================
@@ -128,13 +179,11 @@ class Nilai(models.Model):
 
     def __str__(self):
         return f"{self.siswa.user.username} - {self.tugas.judul}: {self.nilai}"
-    
 
 
-
-
-#absesinsi
-
+# ==========================
+# 9. Absensi
+# ==========================
 class Absensi(models.Model):
     guru = models.ForeignKey(GuruProfile, on_delete=models.CASCADE)
     mapel = models.ForeignKey(Mapel, on_delete=models.CASCADE)
@@ -146,8 +195,8 @@ class Absensi(models.Model):
             ('hadir', 'Hadir'),
             ('izin', 'Izin'),
             ('sakit', 'Sakit'),
-            ('alpa', 'Alpa')
-        ]
+            ('alpa', 'Alpa'),
+        ],
     )
 
     class Meta:

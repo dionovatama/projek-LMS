@@ -4,10 +4,11 @@
 {% block content %}
 
 <style>
-    .profile-page { background: #f4f6fb; min-height: 100vh; padding-bottom: 40px; }
+    .profile-page { background: var(--page-bg); min-height: 100vh; padding-bottom: 40px; }
 
+    /* HEADER — warna biru sesuai tema */
     .profile-header {
-        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        background: linear-gradient(135deg, #1e3a8a, #2563eb, #3b82f6);
         padding: 28px 40px; color: white; margin-bottom: 28px;
     }
     .profile-header h3 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
@@ -21,14 +22,17 @@
     }
 
     .info-card {
-        background: white; border-radius: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
         box-shadow: 0 3px 14px rgba(0,0,0,0.07); overflow: hidden;
     }
 
     .info-card-header {
-        padding: 14px 20px; border-bottom: 2px solid #f3f4f6;
-        font-weight: 700; font-size: 14px; color: #374151;
+        padding: 14px 20px; border-bottom: 2px solid var(--card-border);
+        font-weight: 700; font-size: 14px; color: var(--text-primary);
         display: flex; align-items: center; gap: 8px;
+        background: var(--card-bg);
     }
 
     .info-card-body { padding: 20px; }
@@ -43,10 +47,15 @@
     }
 
     .profile-field { margin-bottom: 12px; }
-    .profile-field .lbl { font-size: 11px; color: #9ca3af; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-    .profile-field .val { font-size: 15px; font-weight: 600; color: #111827; }
+    .profile-field .lbl {
+        font-size: 11px; color: var(--text-muted); font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .profile-field .val {
+        font-size: 15px; font-weight: 600; color: var(--text-primary);
+    }
 
-    /* ABSENSI */
+    /* ABSENSI — warna biru sesuai tema */
     .absensi-grid {
         display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
     }
@@ -57,12 +66,13 @@
     .absensi-item .num { font-size: 24px; font-weight: 800; line-height: 1; }
     .absensi-item .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 3px; }
 
-    .absensi-item.hadir { background: #dcfce7; color: #16a34a; }
-    .absensi-item.izin  { background: #dbeafe; color: #2563eb; }
+    /* Tetap berbeda warna per status agar mudah dibaca */
+    .absensi-item.hadir { background: #dbeafe; color: #1d4ed8; }
+    .absensi-item.izin  { background: #e0f2fe; color: #0369a1; }
     .absensi-item.sakit { background: #fef9c3; color: #ca8a04; }
     .absensi-item.alpa  { background: #fee2e2; color: #dc2626; }
 
-    /* TUGAS STATS */
+    /* TUGAS STATS — ganti hijau ke biru */
     .tugas-stat-row { display: flex; gap: 10px; margin-bottom: 16px; }
     .tugas-stat {
         flex: 1; border-radius: 12px; padding: 14px; text-align: center;
@@ -70,7 +80,7 @@
     .tugas-stat .num { font-size: 22px; font-weight: 800; line-height: 1; }
     .tugas-stat .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 3px; }
     .tugas-stat.total  { background: #eff6ff; color: #1d4ed8; }
-    .tugas-stat.selesai{ background: #dcfce7; color: #16a34a; }
+    .tugas-stat.selesai{ background: #dbeafe; color: #1e40af; }
     .tugas-stat.belum  { background: #fee2e2; color: #dc2626; }
 
     /* CHART */
@@ -78,6 +88,15 @@
 
     /* FULL WIDTH CARD */
     .full-col { grid-column: 1 / -1; }
+
+    /* Rata-rata — biru */
+    .rata-box {
+        background: #eff6ff;
+        border-radius: 12px; padding: 14px 18px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .rata-box .label { font-weight: 700; color: var(--text-primary); font-size: 14px; }
+    .rata-box .value { font-size: 22px; font-weight: 800; color: #1d4ed8; }
 
     @media (max-width: 768px) {
         .profile-header { padding: 20px 16px; }
@@ -90,7 +109,7 @@
     <!-- HEADER -->
     <div class="profile-header">
         <h3>👤 Profil Siswa</h3>
-        <p>{{ siswa.kelas.nama }} — {{ siswa.user.username }}</p>
+        <p>{{ siswa.kelas.nama }} — {{ siswa.user.first_name|default:siswa.user.username }}</p>
     </div>
 
     <div class="content-area">
@@ -108,10 +127,7 @@
                         {{ siswa.user.first_name|default:"-" }} {{ siswa.user.last_name|default:"" }}
                     </div>
                 </div>
-                <div class="profile-field">
-                    <div class="lbl">Username</div>
-                    <div class="val">{{ siswa.user.username }}</div>
-                </div>
+                <!-- DIGANTI: username → email -->
                 <div class="profile-field">
                     <div class="lbl">Email</div>
                     <div class="val">{{ siswa.user.email|default:"-" }}</div>
@@ -171,14 +187,9 @@
                 </div>
 
                 {% if rata_nilai %}
-                <div style="background:#f0fdf4;border-radius:12px;padding:14px 18px;
-                            display:flex;align-items:center;justify-content:space-between;">
-                    <span style="font-weight:700;color:#374151;font-size:14px;">
-                        📊 Rata-rata Nilai Keseluruhan
-                    </span>
-                    <span style="font-size:22px;font-weight:800;color:#16a34a;">
-                        {{ rata_nilai|floatformat:1 }}
-                    </span>
+                <div class="rata-box">
+                    <span class="label">📊 Rata-rata Nilai Keseluruhan</span>
+                    <span class="value">{{ rata_nilai|floatformat:1 }}</span>
                 </div>
                 {% endif %}
             </div>
@@ -199,7 +210,7 @@ new Chart(document.getElementById('absensiChart'), {
         labels: ['Hadir', 'Izin', 'Sakit', 'Alpa'],
         datasets: [{
             data: safeData,
-            backgroundColor: ['#22c55e', '#3b82f6', '#facc15', '#ef4444'],
+            backgroundColor: ['#3b82f6', '#0ea5e9', '#facc15', '#ef4444'],
             borderWidth: 0,
         }]
     },

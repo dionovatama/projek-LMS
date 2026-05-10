@@ -26,7 +26,8 @@ urlpatterns = [
 
     # ===== GURU — TUGAS =====
     path('guru/tugas/tambah/', views.tambah_tugas, name='tambah_tugas'),
-    path('guru/tugas/<int:id>/hapus/', views.hapus_tugas, name='hapus_tugas'),
+    # FIX: ganti '<int:id>' → '<int:tugas_id>' agar konsisten dengan views.py
+    path('guru/tugas/<int:tugas_id>/hapus/', views.hapus_tugas, name='hapus_tugas'),
 
     # ===== GURU — PENILAIAN =====
     path('guru/tugas/<int:tugas_id>/pengumpulan/', views.pengumpulan_tugas_view, name='pengumpulan_tugas'),
@@ -46,6 +47,8 @@ urlpatterns = [
     path('siswa/tugas/<int:tugas_id>/', views.detail_tugas_siswa, name='detail_tugas_siswa'),
 
     # ===== SISWA — KUMPUL TUGAS =====
+    # FIX: kedua URL mengarah ke view yang sama (kirim_tugas)
+    # kumpul_tugas di views.py kini hanya alias — tidak ada fungsi wrapper ganda
     path('siswa/tugas/<int:tugas_id>/kirim/', views.kirim_tugas, name='kirim_tugas'),
     path('siswa/tugas/<int:tugas_id>/kumpul/', views.kumpul_tugas, name='kumpul_tugas'),
     path('siswa/mapel/<int:mapel_id>/tugas/', views.daftar_tugas_per_mapel, name='daftar_tugas_per_mapel'),

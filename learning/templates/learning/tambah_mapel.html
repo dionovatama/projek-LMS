@@ -1,60 +1,268 @@
 {% extends 'learning/base.html' %}
 {% block content %}
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+<style>
+    .form-page {
+        background: var(--page-bg);
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
 
-            <!-- CARD -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">➕ Tambah Mapel Baru</h5>
-                </div>
+    .form-header {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        padding: 28px 40px;
+        color: white;
+        margin-bottom: 28px;
+    }
+    .form-header h4 {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 4px;
+    }
+    .form-header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
 
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
+    .form-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
 
-                        <!-- Nama Mapel -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nama Mapel</label>
-                            <input type="text" name="nama" class="form-control" placeholder="Contoh: Matematika kelas:xxx" required>
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .form-card-body { padding: 32px; }
+
+    .field-group { margin-bottom: 22px; }
+
+    .field-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .field-group select,
+    .field-group input[type="text"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        font-size: 14px;
+        background: var(--sb-icon-bg);
+        color: var(--text-primary);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+    }
+
+    .field-group select:focus,
+    .field-group input[type="text"]:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+        background: var(--card-bg);
+    }
+
+    .field-group select option {
+        background: var(--card-bg);
+        color: var(--text-primary);
+    }
+
+    /* FILE UPLOAD */
+    .file-upload-area {
+        border: 2px dashed var(--card-border);
+        border-radius: 12px;
+        background: var(--sb-icon-bg);
+        padding: 22px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        position: relative;
+    }
+
+    .file-upload-area:hover {
+        border-color: #3b82f6;
+        background: rgba(59,130,246,0.08);
+    }
+
+    .file-upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+    .file-upload-icon { font-size: 32px; margin-bottom: 6px; }
+
+    .file-upload-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin: 0 0 3px;
+    }
+
+    .file-upload-hint {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    #preview-wrap {
+        display: none;
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    #preview-img {
+        max-height: 160px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        object-fit: cover;
+    }
+
+    #file-name {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 6px;
+    }
+
+    .divider {
+        border: none;
+        border-top: 2px dashed var(--card-border);
+        margin: 24px 0;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        border: none;
+        padding: 13px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(30,64,175,0.35);
+    }
+
+    .btn-back {
+        background: var(--sb-icon-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--card-border);
+        padding: 13px 22px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.2s;
+    }
+
+    .btn-back:hover {
+        background: var(--sb-hover-bg);
+        color: var(--sb-hover);
+    }
+
+    @media (max-width: 640px) {
+        .form-header { padding: 20px 16px; }
+        .form-card-body { padding: 20px; }
+    }
+</style>
+
+<div class="form-page">
+
+    <div class="form-header">
+        <h4>📚 Tambah Mapel Baru</h4>
+        <p>Isi detail mata pelajaran yang akan kamu ajarkan</p>
+    </div>
+
+    <div class="form-wrapper">
+        <div class="form-card">
+            <div class="form-card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="field-group">
+                        <label>✏️ Nama Mapel</label>
+                        <input type="text"
+                               name="nama"
+                               placeholder="Contoh: Matematika, Fisika, Kimia Industri"
+                               required>
+                    </div>
+
+                    <div class="field-group">
+                        <label>🏫 Kelas yang Anda Ajar</label>
+                        <select name="kelas" required>
+                            <option value="">-- Pilih Kelas --</option>
+                            {% for k in kelas_list %}
+                                <option value="{{ k.id }}">{{ k.nama }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="field-group">
+                        <label>🖼️ Gambar Mapel <span style="color:var(--text-muted);font-weight:400;">(opsional)</span></label>
+                        <div class="file-upload-area">
+                            <input type="file" name="gambar" accept="image/*" id="gambarInput">
+                            <div class="file-upload-icon">🖼️</div>
+                            <p class="file-upload-text">Klik atau drag gambar ke sini</p>
+                            <p class="file-upload-hint">PNG, JPG, WEBP — maks. 5 MB</p>
                         </div>
-
-                        <!-- Kelas -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Kelas yang anda ajar</label>
-                            <select name="kelas" class="form-select" required>
-                                <option value="">-- Pilih Kelas Disini --</option>
-                                {% for k in kelas_list %}
-                                    <option value="{{ k.id }}">{{ k.nama }}</option>
-                                {% endfor %}
-                            </select>
+                        <div id="preview-wrap">
+                            <img id="preview-img" src="" alt="Preview">
+                            <p id="file-name"></p>
                         </div>
+                    </div>
 
-                        <!-- Gambar -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Gambar Mapel</label>
-                            <input type="file" name="gambar" class="form-control">
-                        </div>
+                    <hr class="divider">
 
-                        <!-- BUTTON -->
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'dashboard_guru' %}" class="btn btn-secondary">
-                                ⬅ Kembali
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                💾 Simpan Mapel
-                            </button>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'dashboard_guru' %}" class="btn-back">← Kembali</a>
+                        <button type="submit" class="btn-save">💾 Simpan Mapel</button>
+                    </div>
 
-                    </form>
-                </div>
+                </form>
             </div>
-            <!-- END CARD -->
-
         </div>
     </div>
 </div>
+
+<script>
+    const input = document.getElementById('gambarInput');
+    const previewWrap = document.getElementById('preview-wrap');
+    const previewImg  = document.getElementById('preview-img');
+    const fileName    = document.getElementById('file-name');
+
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            previewImg.src = e.target.result;
+            previewWrap.style.display = 'block';
+            fileName.textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 
 {% endblock %}

@@ -1,3 +1,18 @@
 __pycache__/ 
 *.pyc 
 db.sqlite3 
+__pycache__/
+*.pyc
+db.sqlite3
+
+# Environment variables — JANGAN DI-COMMIT!
+.env
+.env.local
+
+# Virtual environment
+Env/
+venv/
+env/
+
+# Media files
+media/

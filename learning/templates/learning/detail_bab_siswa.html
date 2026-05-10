@@ -1,66 +1,95 @@
 {% extends 'learning/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="max-width: 700px;">
 
-    <!-- Header Bab -->
-    <div class="card shadow-lg border-0 mb-4"
-         style="background: linear-gradient(135deg, #36b9cc, #4e73df);">
-        <div class="card-body text-white">
-            <h3 class="fw-bold mb-1">{{ bab.judul }}</h3>
-            <p class="mb-0 opacity-75">
-                {{ bab.deskripsi|default:"Tidak ada deskripsi bab" }}
-            </p>
+  <!-- Hero -->
+  <div style="background: linear-gradient(135deg, #1e40af, #0f6e56);
+              border-radius: 16px; padding: 24px; color: white;
+              margin-bottom: 24px; display: flex; align-items: center; gap: 16px;">
+    <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.18);
+                border-radius: 12px; display: flex; align-items: center;
+                justify-content: center; font-size: 28px; flex-shrink: 0;">
+      📖
+    </div>
+    <div>
+      <h3 style="margin: 0 0 4px; font-size: 20px; font-weight: 700;">
+        {{ bab.judul }}
+      </h3>
+      <p style="margin: 0; font-size: 13px; opacity: 0.85;">
+        📚 {{ bab.mapel.nama }} &nbsp;·&nbsp; Kelas {{ bab.mapel.kelas.nama }}
+      </p>
+      {% if bab.deskripsi %}
+      <p style="margin: 6px 0 0; font-size: 12px; opacity: 0.75;">
+        {{ bab.deskripsi }}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Label -->
+  <p style="font-size: 12px; font-weight: 700; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+    Daftar Tugas
+  </p>
+
+  <!-- Tugas List -->
+  {% if tugas_list %}
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for tugas in tugas_list %}
+      <a href="{% url 'detail_tugas_siswa' tugas.id %}"
+         style="background: white; border: 1px solid #e5e7eb; border-radius: 14px;
+                padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+                text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;"
+         onmouseover="this.style.borderColor='#6ee7b7'; this.style.boxShadow='0 2px 10px rgba(16,185,129,0.1)'"
+         onmouseout="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'">
+
+        <!-- Icon -->
+        <div style="width: 40px; height: 40px; background: #f0fdf4; border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 18px; flex-shrink: 0;">
+          📝
         </div>
+
+        <!-- Info -->
+        <div style="flex: 1;">
+          <div style="font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 3px;">
+            {{ tugas.judul }}
+          </div>
+          <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">
+            {{ tugas.deskripsi|default:"Tidak ada deskripsi tugas" }}
+          </div>
+          {% if tugas.deadline %}
+          <span style="display: inline-flex; align-items: center; gap: 4px;
+                       font-size: 11px; font-weight: 600;
+                       background: #fef9c3; color: #92400e;
+                       padding: 2px 8px; border-radius: 99px;">
+            ⏰ {{ tugas.deadline|date:"d M Y, H:i" }}
+          </span>
+          {% endif %}
+        </div>
+
+        <span style="color: #9ca3af; font-size: 18px;">›</span>
+      </a>
+      {% endfor %}
     </div>
 
-    <!-- Daftar Tugas -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">📝 Daftar Tugas</h5>
-        </div>
-
-        <div class="card-body p-0">
-            {% if tugas_list %}
-                <div class="list-group list-group-flush">
-                    {% for tugas in tugas_list %}
-                        <a href="{% url 'detail_tugas_siswa' tugas.id %}"
-                           class="list-group-item list-group-item-action py-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="fw-semibold text-success mb-1">
-                                        {{ tugas.judul }}
-                                    </h6>
-                                    <small class="text-muted d-block">
-                                        {{ tugas.deskripsi|default:"Tidak ada deskripsi tugas" }}
-                                    </small>
-                                    <small class="text-danger">
-                                        ⏰ Deadline:
-                                        {{ tugas.deadline|date:"d M Y H:i" }}
-                                    </small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">
-                                    Detail
-                                </span>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-warning m-3">
-                    Belum ada tugas di bab ini.
-                </div>
-            {% endif %}
-        </div>
+  {% else %}
+    <div style="text-align: center; padding: 48px 20px; background: white;
+                border: 1px solid #e5e7eb; border-radius: 14px;">
+      <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+      <p style="color: #9ca3af; font-size: 14px; margin: 0;">Belum ada tugas di bab ini.</p>
     </div>
+  {% endif %}
 
-    <!-- Tombol Kembali -->
-    <div class="mt-4">
-        <a href="{% url 'detail_mapel_siswa' bab.mapel.id %}"
-           class="btn btn-outline-secondary">
-            ← Kembali ke {{ bab.mapel.nama }}
-        </a>
-    </div>
+  <!-- Kembali -->
+  <div style="margin-top: 20px;">
+    <a href="{% url 'detail_mapel_siswa' bab.mapel.id %}"
+       style="color: #6b7280; font-size: 13px; text-decoration: none;
+              display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+      ← Kembali ke {{ bab.mapel.nama }}
+    </a>
+  </div>
 
 </div>
 {% endblock %}

@@ -1,75 +1,195 @@
 {% extends 'learning/base.html' %}
 {% block content %}
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+<style>
+    .form-page {
+        background: var(--page-bg);
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
 
-            <!-- CARD -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        📚 Tambah Bab – {{ mapel.nama }}
-                    </h5>
+    .form-header {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        padding: 28px 40px;
+        color: white;
+        margin-bottom: 28px;
+    }
+    .form-header h4 {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 4px;
+    }
+    .form-header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
+
+    .form-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .form-card-body { padding: 32px; }
+
+    /* MAPEL INFO BADGE */
+    .mapel-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(59,130,246,0.12);
+        border: 1.5px solid rgba(59,130,246,0.3);
+        color: #3b82f6;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    .field-group { margin-bottom: 22px; }
+
+    .field-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .field-group input[type="text"],
+    .field-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        font-size: 14px;
+        background: var(--sb-icon-bg);
+        color: var(--text-primary);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+    }
+
+    .field-group input[type="text"]:focus,
+    .field-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59,130,246,0.12);
+        background: var(--card-bg);
+    }
+
+    .field-group textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+    /* placeholder color */
+    .field-group input::placeholder,
+    .field-group textarea::placeholder {
+        color: var(--text-muted);
+    }
+
+    .divider {
+        border: none;
+        border-top: 2px dashed var(--card-border);
+        margin: 24px 0;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        border: none;
+        padding: 13px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(30,64,175,0.35);
+    }
+
+    .btn-back {
+        background: var(--sb-icon-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--card-border);
+        padding: 13px 22px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.2s;
+    }
+
+    .btn-back:hover {
+        background: var(--sb-hover-bg);
+        color: var(--sb-hover);
+    }
+
+    @media (max-width: 640px) {
+        .form-header { padding: 20px 16px; }
+        .form-card-body { padding: 20px; }
+    }
+</style>
+
+<div class="form-page">
+
+    <div class="form-header">
+        <h4>📘 Tambah Bab Baru</h4>
+        <p>Tambahkan bab untuk mata pelajaran {{ mapel.nama }}</p>
+    </div>
+
+    <div class="form-wrapper">
+        <div class="form-card">
+            <div class="form-card-body">
+
+                <!-- INFO MAPEL -->
+                <div class="mapel-badge">
+                    📚 {{ mapel.nama }}
+                    <span style="opacity:0.6;font-weight:500;">— {{ mapel.kelas.nama }}</span>
                 </div>
 
-                <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
+                <form method="POST">
+                    {% csrf_token %}
 
-                        <!-- INFO MAPEL (READ ONLY) -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                Mata Pelajaran
-                            </label>
-                            <input type="text"
-                                   class="form-control"
-                                   value="{{ mapel.nama }}"
-                                   disabled>
-                        </div>
+                    <div class="field-group">
+                        <label>✏️ Judul Bab</label>
+                        <input type="text"
+                               name="judul"
+                               placeholder="Contoh: Persamaan Linear, Hukum Newton"
+                               required>
+                    </div>
 
-                        <!-- JUDUL BAB -->
-                        <div class="mb-3">
-                            <label for="judul" class="form-label fw-semibold">
-                                Judul Bab
-                            </label>
-                            <input type="text"
-                                   name="judul"
-                                   id="judul"
-                                   class="form-control"
-                                   placeholder="Contoh: Persamaan Linear"
-                                   required>
-                        </div>
+                    <div class="field-group">
+                        <label>📄 Deskripsi <span style="color:var(--text-muted);font-weight:400;">(opsional)</span></label>
+                        <textarea name="deskripsi"
+                                  placeholder="Deskripsi singkat tentang isi bab ini..."></textarea>
+                    </div>
 
-                        <!-- DESKRIPSI -->
-                        <div class="mb-3">
-                            <label for="deskripsi" class="form-label fw-semibold">
-                                Deskripsi
-                            </label>
-                            <textarea name="deskripsi"
-                                      id="deskripsi"
-                                      rows="3"
-                                      class="form-control"
-                                      placeholder="Deskripsi singkat bab (opsional)"></textarea>
-                        </div>
+                    <hr class="divider">
 
-                        <!-- BUTTON -->
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'detail_mapel_guru' mapel.id %}"
-                               class="btn btn-secondary">
-                                ⬅ Kembali
-                            </a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'detail_mapel_guru' mapel.id %}" class="btn-back">← Kembali</a>
+                        <button type="submit" class="btn-save">➕ Tambah Bab</button>
+                    </div>
 
-                            <button type="submit" class="btn btn-success">
-                                ➕ Tambah Bab
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
+                </form>
             </div>
-            <!-- END CARD -->
-
         </div>
     </div>
 </div>
