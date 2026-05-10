@@ -22,8 +22,8 @@ from .models import (
 
 ALLOWED_IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.webp'}
 ALLOWED_TUGAS_EXT = {
-    '.pdf', '.doc', '.docx', '.xls', '.xlsx',
-    '.ppt', '.pptx', '.zip', '.rar',
+    '.pdf', '.doc', '.docx', '.xls', 
+    '.xlsx', '.ppt', '.pptx', '.zip', 
     '.jpg', '.jpeg', '.png', '.txt',
 }
 
