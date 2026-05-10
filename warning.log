@@ -1,1 +1,338 @@
 [2026-05-10 10:43:07,796] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:33:35,492] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:33:43,335] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:33:52,290] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:34:02,894] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:34:16,037] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:34:24,050] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:34:24,051] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:34:35,648] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:34:35,649] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:36:07,813] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:37:25,221] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:38:47,356] WARNING django.request Not Found: /favicon.ico
+[2026-05-10 11:38:47,357] WARNING django.server "GET /favicon.ico HTTP/1.1" 404 9773
+[2026-05-10 11:38:52,781] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:38:58,064] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:39:02,438] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:39:07,288] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:39:12,287] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:39:25,260] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:39:25,261] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:42:37,176] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:42:37,176] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:42:45,580] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:42:45,580] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:42:55,118] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:43:16,618] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:48:55,472] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:49:02,168] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:49:23,583] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:49:37,535] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:49:51,097] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:50:06,269] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 11:50:26,166] WARNING django.request Too Many Requests: /login/
+[2026-05-10 11:50:26,167] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 11:55:25,931] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2057, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1686, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 11:55:25,937] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136215
+[2026-05-10 12:00:35,275] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2057, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1686, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:00:35,282] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136339
+[2026-05-10 12:03:18,710] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2057, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1686, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:03:18,716] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136339
+[2026-05-10 12:04:13,026] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2057, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1686, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:04:13,030] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136339
+[2026-05-10 12:07:21,367] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 718, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 241, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2034, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1666, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:07:21,375] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136397
+[2026-05-10 12:07:45,529] WARNING django.request Not Found: /accounts/login/
+[2026-05-10 12:07:45,529] WARNING django.server "GET /accounts/login/?next=/murid/dashboard/ HTTP/1.1" 404 10186
+[2026-05-10 12:08:14,706] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:08:26,765] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:08:56,859] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:09:07,491] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:09:17,292] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:09:25,679] WARNING django.request Too Many Requests: /login/
+[2026-05-10 12:09:25,679] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 12:09:33,582] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 718, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 241, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2034, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1666, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:09:33,584] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136397
+[2026-05-10 12:14:08,042] WARNING django.request Too Many Requests: /admin/login/
+[2026-05-10 12:14:08,042] WARNING django.server "POST /admin/login/?next=/admin/axes/accessattempt/ HTTP/1.1" 429 71
+[2026-05-10 12:14:33,307] WARNING django.request Too Many Requests: /admin/login/
+[2026-05-10 12:14:33,307] WARNING django.server "POST /admin/login/?next=/admin/ HTTP/1.1" 429 71
+[2026-05-10 12:17:09,987] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:17:27,621] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:17:35,115] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:17:41,083] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:17:48,611] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:17:55,033] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 12:18:02,029] WARNING django.request Too Many Requests: /login/
+[2026-05-10 12:18:02,029] WARNING django.server "POST /login/ HTTP/1.1" 429 71
+[2026-05-10 12:18:16,734] ERROR django.request Internal Server Error: /admin/axes/accessattempt/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 718, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\sites.py", line 241, in inner
+    return view(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\project web\Env\Lib\site-packages\django\utils\decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 2034, in changelist_view
+    response = self.response_action(
+        request, queryset=cl.get_queryset(request)
+    )
+  File "C:\project web\Env\Lib\site-packages\django\contrib\admin\options.py", line 1666, in response_action
+    response = func(self, request, queryset)
+  File "C:\project web\Env\Lib\site-packages\axes\admin.py", line 81, in cleanup_expired_attempts
+    count = self.handler.clean_expired_user_attempts(request=request)
+  File "C:\project web\Env\Lib\site-packages\axes\handlers\database.py", line 421, in clean_expired_user_attempts
+    threshold = get_cool_off_threshold(request)
+  File "C:\project web\Env\Lib\site-packages\axes\attempts.py", line 23, in get_cool_off_threshold
+    attempt_time = request.axes_attempt_time  # type: ignore[union-attr]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'axes_attempt_time'
+[2026-05-10 12:18:16,740] ERROR django.server "POST /admin/axes/accessattempt/ HTTP/1.1" 500 136400
+[2026-05-10 12:20:54,618] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 14:16:00,459] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 14:16:19,394] ERROR django.request Internal Server Error: /login/
+Traceback (most recent call last):
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\project web\Env\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\project web\learning\views.py", line 118, in login_view
+    'username': get_client_username(request, credentials={
+                ^^^^^^^^^^^^^^^^^^^
+NameError: name 'get_client_username' is not defined
+[2026-05-10 14:16:19,399] ERROR django.server "POST /login/ HTTP/1.1" 500 70154
+[2026-05-10 14:17:39,125] WARNING django.security.csrf Forbidden (CSRF token from POST incorrect.): /accounts/logout/
+[2026-05-10 14:17:39,125] WARNING django.server "POST /accounts/logout/ HTTP/1.1" 403 2506
+[2026-05-10 14:17:50,124] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883

@@ -104,20 +104,27 @@ def home(request):
     return render(request, 'learning/home.html')
 
 
+
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
 
         user = authenticate(request, username=username, password=password)
+
         if user:
             login(request, user)
-            return redirect('dashboard_guru' if is_guru(user) else 'dashboard_siswa')
+            messages.success(request, 'Login berhasil.')
+            return redirect(
+                'dashboard_guru'
+                if is_guru(user)
+                else 'dashboard_siswa'
+            )
 
         messages.error(request, 'Username atau password salah.')
 
     return render(request, 'learning/login.html')
-
 
 # =============================================================
 # PROFILE
@@ -343,28 +350,48 @@ def detail_bab_guru(request, bab_id):
 
 @guru_required
 def tambah_tugas(request):
-    guru     = get_object_or_404(GuruProfile, user=request.user)
-    bab_list = Bab.objects.filter(mapel__guru=guru).select_related('mapel')
+    guru = get_object_or_404(GuruProfile, user=request.user)
+
+    bab_list = (
+        Bab.objects
+        .filter(mapel__guru=guru)
+        .select_related('mapel')
+    )
 
     bab_obj = None
     bab_id_param = request.GET.get('bab')
+
     if bab_id_param:
         bab_obj = bab_list.filter(id=bab_id_param).first()
 
     if request.method == 'POST':
         bab_id = request.POST.get('bab')
-        judul  = request.POST.get('judul', '').strip()
+        judul = request.POST.get('judul', '').strip()
 
         if not bab_id or not judul:
             messages.error(request, 'Bab dan judul tugas wajib diisi.')
+
         else:
-            bab        = get_object_or_404(Bab, id=bab_id)
+            # FIX SECURITY:
+            # pastikan bab benar-benar milik guru login
+            bab = get_object_or_404(
+                Bab,
+                id=bab_id,
+                mapel__guru=guru
+            )
+
             file_tugas = request.FILES.get('file_tugas')
 
-            # FIX: validasi file lampiran tugas
-            ok, err = validate_file(file_tugas, ALLOWED_TUGAS_EXT, MAX_TUGAS_SIZE, 'File tugas')
+            ok, err = validate_file(
+                file_tugas,
+                ALLOWED_TUGAS_EXT,
+                MAX_TUGAS_SIZE,
+                'File tugas'
+            )
+
             if not ok:
                 messages.error(request, err)
+
                 return render(request, 'learning/tambah_tugas.html', {
                     'bab_list': bab_list,
                     'bab_obj': bab_obj,
@@ -373,10 +400,11 @@ def tambah_tugas(request):
             Tugas.objects.create(
                 bab=bab,
                 judul=judul,
-                deskripsi=request.POST.get('deskripsi', ''),
+                deskripsi=request.POST.get('deskripsi', '').strip(),
                 file_tugas=file_tugas,
                 deadline=request.POST.get('deadline') or None,
             )
+
             messages.success(request, 'Tugas berhasil ditambahkan!')
             return redirect('detail_bab_guru', bab_id=bab.id)
 
@@ -384,7 +412,6 @@ def tambah_tugas(request):
         'bab_list': bab_list,
         'bab_obj': bab_obj,
     })
-
 
 @guru_required
 def hapus_tugas(request, tugas_id):

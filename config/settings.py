@@ -46,9 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third Party
-    'axes',
-
     # Local Apps
     'learning',
     'accounts',
@@ -68,9 +65,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-
-    # Anti Brute Force
-    'axes.middleware.AxesMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
 
@@ -151,29 +145,6 @@ DATABASES = {
 # ==============================================================
 
 AUTH_USER_MODEL = 'learning.CustomUser'
-
-# ==============================================================
-# AUTHENTICATION BACKENDS
-# ==============================================================
-
-AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesStandaloneBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-# ==============================================================
-# DJANGO-AXES
-# ==============================================================
-
-AXES_FAILURE_LIMIT = 5
-
-AXES_COOLOFF_TIME = timedelta(hours=1)
-
-AXES_RESET_ON_SUCCESS = True
-
-AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
-
-AXES_ENABLE_ADMIN = True
 
 # ==============================================================
 # PASSWORD VALIDATION
