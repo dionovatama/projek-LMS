@@ -28,6 +28,7 @@
    THEME VARIABLES
 ============================================================ */
 :root[data-theme="light"] {
+
     --bg: #f4f6fb;
 
     --navbar-bg: #ffffff;
@@ -51,9 +52,24 @@
     --text-muted: #64748b;
 
     --divider: #e2e8f0;
+
+    /* ========================================================
+       BOOTSTRAP FIX
+    ======================================================== */
+    --bs-body-color: #1e293b;
+    --bs-body-bg: #f4f6fb;
+
+    --bs-secondary-color: #64748b;
+
+    --bs-tertiary-bg: #f8fafc;
+
+    --bs-info-bg-subtle: #dbeafe;
+
+    --bs-light-rgb: 248,249,250;
 }
 
 :root[data-theme="dark"] {
+
     --bg: #0f172a;
 
     --navbar-bg: #1e293b;
@@ -77,6 +93,20 @@
     --text-muted: #94a3b8;
 
     --divider: rgba(255,255,255,0.08);
+
+    /* ========================================================
+       BOOTSTRAP FIX
+    ======================================================== */
+    --bs-body-color: #f1f5f9;
+    --bs-body-bg: #0f172a;
+
+    --bs-secondary-color: #94a3b8;
+
+    --bs-tertiary-bg: #334155;
+
+    --bs-info-bg-subtle: rgba(59,130,246,0.15);
+
+    --bs-light-rgb: 51,65,85;
 }
 
 /* ============================================================
@@ -689,6 +719,152 @@ body {
     .user-name {
         display: none;
     }
+}
+/* ============================================================
+   BOOTSTRAP DARK MODE FIX
+============================================================ */
+
+/* TEXT */
+body,
+p,
+span,
+label,
+small,
+h1,h2,h3,h4,h5,h6 {
+    color: var(--text-primary);
+}
+
+/* CARD */
+.card,
+.modal-content,
+.dropdown-menu,
+.list-group-item,
+.table,
+.form-control,
+.form-select,
+.input-group-text {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* TABLE */
+.table {
+    --bs-table-bg: transparent !important;
+    --bs-table-color: var(--text-primary) !important;
+    --bs-table-border-color: var(--card-border) !important;
+}
+
+.table th,
+.table td {
+    color: var(--text-primary) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* FORM */
+.form-control,
+.form-select {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+
+    border-color: #3b82f6 !important;
+
+    box-shadow:
+        0 0 0 0.2rem rgba(59,130,246,0.25) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* MODAL */
+.modal-header,
+.modal-footer {
+    border-color: var(--card-border) !important;
+}
+
+/* DROPDOWN */
+.dropdown-item {
+    color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover {
+    background: var(--sidebar-hover) !important;
+}
+
+/* LIST GROUP */
+.list-group-item {
+    border-color: var(--card-border) !important;
+}
+
+/* ALERT */
+.alert {
+    border: none !important;
+}
+
+/* BUTTON CLOSE */
+.btn-close {
+    filter: invert(
+        var(--btn-close-invert)
+    );
+}
+
+:root[data-theme="light"] {
+    --btn-close-invert: 0;
+}
+
+:root[data-theme="dark"] {
+    --btn-close-invert: 1;
+}
+
+/* PAGINATION */
+.page-link {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--card-border) !important;
+}
+
+.page-link:hover {
+    background: var(--sidebar-hover) !important;
+}
+
+/* OFFCANVAS */
+.offcanvas {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ACCORDION */
+.accordion-item,
+.accordion-button {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--card-border) !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--sidebar-hover) !important;
+}
+
+/* NAV TABS */
+.nav-tabs {
+    border-color: var(--card-border) !important;
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-muted) !important;
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--card-border) !important;
 }
 </style>
 </head>

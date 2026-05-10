@@ -336,3 +336,6 @@ NameError: name 'get_client_username' is not defined
 [2026-05-10 14:17:39,125] WARNING django.security.csrf Forbidden (CSRF token from POST incorrect.): /accounts/logout/
 [2026-05-10 14:17:39,125] WARNING django.server "POST /accounts/logout/ HTTP/1.1" 403 2506
 [2026-05-10 14:17:50,124] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883
+[2026-05-10 15:25:08,751] WARNING django.request Not Found: /favicon.ico
+[2026-05-10 15:25:08,753] WARNING django.server "GET /favicon.ico HTTP/1.1" 404 9773
+[2026-05-10 15:25:10,366] WARNING django.server "GET /static/image/bg-blur-green.jpg HTTP/1.1" 404 1883

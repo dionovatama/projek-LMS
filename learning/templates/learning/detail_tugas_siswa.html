@@ -8,9 +8,11 @@
          style="background: linear-gradient(135deg, #f6c23e, #e74a3b); border-radius: 18px;">
         <div class="card-body text-white p-4">
             <h4 class="fw-bold mb-1">📘 {{ tugas.judul }}</h4>
-            <p class="mb-0 opacity-75 small">
+
+            <p class="mb-0 small text-white-50">
                 {{ tugas.deskripsi|default:"Tidak ada deskripsi tugas" }}
             </p>
+
             {% if tugas.deadline %}
             <div class="mt-2">
                 <span style="background:rgba(255,255,255,0.2);
@@ -26,12 +28,17 @@
 
     <!-- FILE TUGAS DARI GURU -->
     {% if tugas.file_tugas %}
-    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+    <div class="card shadow-sm border-0 mb-4"
+         style="border-radius: 16px;
+                background-color: var(--bs-body-bg);
+                color: var(--bs-body-color);">
+
         <div class="card-header text-white fw-bold"
              style="background: linear-gradient(135deg, #1e40af, #3b82f6);
                     border-radius: 16px 16px 0 0;">
             📎 File Tugas dari Guru
         </div>
+
         <div class="card-body p-3">
             <a href="{{ tugas.file_tugas.url }}"
                target="_blank"
@@ -43,7 +50,9 @@
                onmouseout="this.style.opacity='1'">
                 ⬇️ Download File Tugas
             </a>
-            <p class="text-muted small mt-2 mb-0">
+
+            <p class="small mt-2 mb-0"
+               style="color: var(--bs-secondary-color);">
                 Klik tombol di atas untuk membuka atau mengunduh file tugas.
             </p>
         </div>
@@ -51,33 +60,50 @@
     {% endif %}
 
     <!-- Status Pengumpulan -->
-    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+    <div class="card shadow-sm border-0 mb-4"
+         style="border-radius: 16px;
+                background-color: var(--bs-body-bg);
+                color: var(--bs-body-color);">
+
         <div class="card-header bg-primary text-white fw-bold"
              style="border-radius: 16px 16px 0 0;">
             📌 Status Pengumpulan
         </div>
 
         <div class="card-body p-4">
+
             {% if pengumpulan %}
-                <span class="badge bg-success mb-3 px-3 py-2" style="font-size:13px;">
+
+                <span class="badge bg-success mb-3 px-3 py-2"
+                      style="font-size:13px;">
                     ✅ Sudah Dikumpulkan
                 </span>
 
                 <p class="mb-2">
                     <strong>Nilai:</strong>
+
                     {% if pengumpulan.nilai %}
-                        <span class="text-success fw-bold fs-5">{{ pengumpulan.nilai }}</span>
+                        <span class="text-success fw-bold fs-5">
+                            {{ pengumpulan.nilai }}
+                        </span>
                     {% else %}
-                        <span class="text-muted">Belum dinilai</span>
+                        <span style="color: var(--bs-secondary-color);">
+                            Belum dinilai
+                        </span>
                     {% endif %}
                 </p>
 
                 {% if pengumpulan.jawaban_teks %}
                 <div class="mb-3">
                     <strong>Jawaban Teks:</strong>
-                    <div class="bg-light rounded p-3 mt-1 small"
-                         style="border-left: 4px solid #3b82f6;">
+
+                    <div class="rounded p-3 mt-2 small
+                                border-start border-4 border-primary"
+                         style="background-color: var(--bs-tertiary-bg);
+                                color: var(--bs-body-color);">
+
                         {{ pengumpulan.jawaban_teks }}
+
                     </div>
                 </div>
                 {% endif %}
@@ -85,6 +111,7 @@
                 {% if pengumpulan.jawaban_file %}
                 <p class="mb-2">
                     <strong>File Jawaban:</strong>
+
                     <a href="{{ pengumpulan.jawaban_file.url }}"
                        class="btn btn-sm btn-outline-primary ms-2">
                         ⬇ Download
@@ -93,54 +120,86 @@
                 {% endif %}
 
                 {% if pengumpulan.komentar_guru %}
-                <div class="alert alert-info mt-3 mb-0" style="border-radius: 12px;">
-                    <strong>💬 Komentar Guru:</strong><br>
+                <div class="mt-3 mb-0 p-3 rounded"
+                     style="border-radius:12px;
+                            background-color: var(--bs-info-bg-subtle);
+                            color: var(--bs-body-color);">
+
+                    <strong>💬 Komentar Guru:</strong>
+                    <br>
+
                     {{ pengumpulan.komentar_guru }}
+
                 </div>
                 {% endif %}
 
             {% else %}
-                <span class="badge bg-danger mb-3 px-3 py-2" style="font-size:13px;">
+
+                <span class="badge bg-danger mb-3 px-3 py-2"
+                      style="font-size:13px;">
                     ❌ Belum Dikumpulkan
                 </span>
+
             {% endif %}
         </div>
     </div>
 
-    <!-- Form Pengumpulan — hanya tampil kalau belum kumpul -->
+    <!-- Form Pengumpulan -->
     {% if not pengumpulan %}
-    <div class="card shadow-sm border-0" style="border-radius: 16px;">
+    <div class="card shadow-sm border-0"
+         style="border-radius: 16px;
+                background-color: var(--bs-body-bg);
+                color: var(--bs-body-color);">
+
         <div class="card-header bg-success text-white fw-bold"
              style="border-radius: 16px 16px 0 0;">
             📝 Kumpulkan Jawaban
         </div>
 
         <div class="card-body p-4">
-            <form method="post" enctype="multipart/form-data"
+
+            <form method="post"
+                  enctype="multipart/form-data"
                   action="{% url 'kirim_tugas' tugas.id %}">
+
                 {% csrf_token %}
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">
-                        📎 Upload File <span class="text-muted fw-normal">(opsional)</span>
+                        📎 Upload File
+                        <span style="color: var(--bs-secondary-color);">
+                            (opsional)
+                        </span>
                     </label>
-                    <input type="file" name="file" class="form-control">
-                    <small class="text-muted">Format: PDF, DOC, DOCX, JPG, PNG, ZIP</small>
+
+                    <input type="file"
+                           name="file"
+                           class="form-control">
                 </div>
 
-                <div class="mb-3">
+                <small style="color: var(--bs-secondary-color);">
+                    Format: PDF, DOC, DOCX, JPG, PNG, ZIP
+                </small>
+
+                <div class="mb-3 mt-3">
                     <label class="form-label fw-semibold">
-                        ✍️ Tulis Jawaban <span class="text-muted fw-normal">(opsional)</span>
+                        ✍️ Tulis Jawaban
+                        <span style="color: var(--bs-secondary-color);">
+                            (opsional)
+                        </span>
                     </label>
+
                     <textarea name="jawaban"
                               class="form-control"
                               rows="4"
                               placeholder="Tulis jawaban kamu di sini..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-success fw-bold px-4">
+                <button type="submit"
+                        class="btn btn-success fw-bold px-4">
                     🚀 Kirim Jawaban
                 </button>
+
             </form>
         </div>
     </div>
@@ -148,7 +207,9 @@
 
     <!-- Tombol Kembali -->
     <div class="mt-4">
-        <a href="javascript:history.back()" class="text-muted text-decoration-none">
+        <a href="javascript:history.back()"
+           class="text-decoration-none"
+           style="color: var(--bs-secondary-color);">
             ← Kembali
         </a>
     </div>
